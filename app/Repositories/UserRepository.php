@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class UserRepository extends BaseRepository
 {
@@ -12,28 +12,47 @@ class UserRepository extends BaseRepository
         parent::__construct($model);
     }
 
-    public function paginate(array $filters = [], int $perPage = 15)
+    public function findByEmail(string $email): ?User
     {
-        return $this->query()
-            ->when($filters['search'] ?? null, function (Builder $query, string $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('first_name', 'like', "%{$search}%")
-                      ->orWhere('last_name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
-                });
-            })
-            ->when($filters['region_code'] ?? null, function (Builder $query, string $region) {
-                $query->where('region_code', $region);
-            })
-            ->when($filters['role'] ?? null, function (Builder $query, string $role) {
-                $query->where('role', $role);
-            })
-            ->when($filters['sort'] ?? null, function (Builder $query, string $sort) {
-                [$column, $direction] = explode(',', $sort);
-                $query->orderBy($column, $direction ?? 'asc');
-            }, function (Builder $query) {
-                $query->latest();
-            })
-            ->paginate($perPage);
+        return $this->model->where('email', $email)->first();
+    }
+
+    public function createWithProfile(array $userData, array $profileData): User
+    {
+        $user = $this->create($userData);
+        $user->profile()->create($profileData);
+        return $user->load('profile');
+    }
+
+    public function updateWithProfile(User $user, array $userData, array $profileData = []): User
+    {
+        $this->update($user, $userData);
+        
+        if ($profileData) {
+            $user->profile()->updateOrCreate(
+                ['user_id' => $user->id],
+                $profileData
+            );
+        }
+
+        return $user->load('profile');
+    }
+
+    public function getFilteredUsers(array $filters = [], int $perPage = 15): LengthAwarePaginator
+    {
+        $query = $this->model->with(['profile']);
+
+        if (isset($filters['search'])) {
+            $query->where(function ($q) use ($filters) {
+                $q->where('name', 'like', "%{$filters['search']}%")
+                  ->orWhere('email', 'like', "%{$filters['search']}%");
+            });
+        }
+
+        if (isset($filters['role'])) {
+            $query->where('role', $filters['role']);
+        }
+
+        return $query->latest()->paginate($perPage);
     }
 } 

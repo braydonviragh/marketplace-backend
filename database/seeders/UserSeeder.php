@@ -3,101 +3,35 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Brand;
+use App\Models\UserProfile;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create super admin user
-        User::create([
-            'first_name' => 'Super',
-            'last_name' => 'Admin',
+        // Create super admin
+        $admin = User::factory()->create([
             'email' => 'admin@example.com',
-            'password' => Hash::make('password'),
-            'phone_number' => '+1234567890',
-            'bio' => 'System Administrator',
-            'role' => 'admin',
-            'account_type' => 'business',
-            'email_verified_at' => now(),
-            'is_active' => true,
-            'timezone' => 'America/Toronto',
-            'locale' => 'en',
-            'country_code' => 'CA',
-            'region_code' => 'ON',
-            'last_login_at' => now(),
+            'username' => 'superadmin',
+            'name' => 'Super Admin',
+            'role' => 'super_admin',
         ]);
 
-        // Create moderator user
-        User::create([
-            'first_name' => 'Content',
-            'last_name' => 'Moderator',
-            'email' => 'moderator@example.com',
-            'password' => Hash::make('password'),
-            'phone_number' => '+1234567891',
-            'bio' => 'Content Moderator',
-            'role' => 'moderator',
-            'account_type' => 'business',
-            'email_verified_at' => now(),
-            'is_active' => true,
-            'timezone' => 'America/Toronto',
-            'locale' => 'en',
-            'country_code' => 'CA',
-            'region_code' => 'ON',
-            'last_login_at' => now(),
+        // Create admin profile
+        UserProfile::factory()->create([
+            'user_id' => $admin->id,
+            'style_preference' => 'unisex',
         ]);
 
-        // Create test business user
-        User::create([
-            'first_name' => 'Business',
-            'last_name' => 'User',
-            'email' => 'business@example.com',
-            'password' => Hash::make('password'),
-            'phone_number' => '+1234567892',
-            'bio' => 'Business Account',
-            'role' => 'user',
-            'account_type' => 'business',
-            'email_verified_at' => now(),
-            'is_active' => true,
-            'timezone' => 'America/Toronto',
-            'locale' => 'en',
-            'country_code' => 'CA',
-            'region_code' => 'ON',
-        ]);
+        // Attach some random brands to admin (using sync instead of attach)
+        $brands = Brand::inRandomOrder()->limit(3)->pluck('id');
+        $admin->brands()->sync($brands);
 
-        // Create test personal user
-        User::create([
-            'first_name' => 'Personal',
-            'last_name' => 'User',
-            'email' => 'user@example.com',
-            'password' => Hash::make('password'),
-            'phone_number' => '+1234567893',
-            'bio' => 'Personal Account',
-            'role' => 'user',
-            'account_type' => 'personal',
-            'email_verified_at' => now(),
-            'is_active' => true,
-            'timezone' => 'America/Toronto',
-            'locale' => 'en',
-            'country_code' => 'CA',
-            'region_code' => 'ON',
-        ]);
-
-        // Create random users with factory
-        User::factory(20)->create();
-
-        // Create some unverified users
-        User::factory(5)
-            ->unverified()
-            ->create();
-
-        // Create some inactive users
-        User::factory(3)
-            ->state([
-                'is_active' => false,
-                'email_verified_at' => null
-            ])
-            ->create();
+        // Create 15 random users with profiles and brand preferences
+        User::factory(15)
+            ->has(UserProfile::factory(), 'profile')
+            ->create(['role' => 'user']);
     }
 } 

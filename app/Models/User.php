@@ -3,140 +3,80 @@
 namespace App\Models;
 
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
-        'first_name',
-        'last_name',
+        'username',
+        'name',
         'email',
+        'phone_number',
         'password',
-        'provider',
-        'provider_id',
-        'provider_token',
-        'timezone',
-        'locale',
-        'country_code',
-        'region_code',
-        'account_type',
+        'role',
+        'terms_accepted',
+        'terms_accepted_at',
+        'is_active',
+        'email_verified_at',
+        'phone_verified_at'
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
-        'provider_token',
-        'two_factor_secret',
-        'two_factor_recovery_codes',
     ];
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'last_login_at' => 'datetime',
-        'locked_until' => 'datetime',
-        'provider_token' => 'encrypted:array',
+        'phone_verified_at' => 'datetime',
+        'terms_accepted_at' => 'datetime',
+        'terms_accepted' => 'boolean',
         'is_active' => 'boolean',
-        'two_factor_enabled' => 'boolean',
     ];
 
-    // Accessors
-    public function getFullNameAttribute(): string
-    {
-        return "{$this->first_name} {$this->last_name}";
-    }
-
-    // Relationships
-    public function profile()
+    public function profile(): HasOne
     {
         return $this->hasOne(UserProfile::class);
     }
 
-    public function listings()
+    public function brands(): BelongsToMany
     {
-        return $this->hasMany(ClothesListing::class);
+        return $this->belongsToMany(Brand::class, 'user_brand_preferences')
+            ->withTimestamps();
     }
 
-    public function rentals()
+    public function sizes(): BelongsToMany
     {
-        return $this->hasMany(Rental::class);
+        return $this->belongsToMany(Size::class, 'user_sizes')
+            ->withTimestamps();
     }
 
-    // Security Methods
-    public function incrementLoginAttempts(): void
+    public function numberSizes(): BelongsToMany
     {
-        $this->increment('login_attempts');
-        
-        if ($this->login_attempts >= 5) {
-            $this->locked_until = now()->addMinutes(30);
-            $this->save();
-        }
+        return $this->belongsToMany(NumberSize::class, 'user_detailed_sizes')
+            ->where('size_type', 'number')
+            ->withTimestamps();
     }
 
-    public function resetLoginAttempts(): void
+    public function waistSizes(): BelongsToMany
     {
-        $this->login_attempts = 0;
-        $this->locked_until = null;
-        $this->save();
+        return $this->belongsToMany(WaistSize::class, 'user_detailed_sizes')
+            ->where('size_type', 'waist')
+            ->withTimestamps();
     }
 
-    public function isLocked(): bool
+    public function shoeSizes(): BelongsToMany
     {
-        return $this->locked_until && $this->locked_until->isFuture();
-    }
-
-    // OAuth Methods
-    public static function findOrCreateFromOAuth($oauthUser, string $provider): self
-    {
-        return self::firstOrCreate(
-            [
-                'email' => $oauthUser->getEmail(),
-                'provider' => $provider,
-            ],
-            [
-                'first_name' => $oauthUser->getName(),
-                'last_name' => $oauthUser->getName(),
-                'provider_id' => $oauthUser->getId(),
-                'email_verified_at' => now(),
-            ]
-        );
-    }
-
-    // Role & Permission Methods
-    public function isAdmin(): bool
-    {
-        return $this->role === 'admin';
-    }
-
-    public function isModerator(): bool
-    {
-        return $this->role === 'moderator';
-    }
-
-    // Region Methods
-    public function updateRegion(string $countryCode, string $regionCode): void
-    {
-        $this->update([
-            'country_code' => strtoupper($countryCode),
-            'region_code' => strtoupper($regionCode),
-        ]);
-    }
-
-    // Scopes
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
-    }
-
-    public function scopeInRegion($query, string $countryCode, string $regionCode)
-    {
-        return $query->where('country_code', strtoupper($countryCode))
-                    ->where('region_code', strtoupper($regionCode));
+        return $this->belongsToMany(ShoeSize::class, 'user_detailed_sizes')
+            ->where('size_type', 'shoe')
+            ->withTimestamps();
     }
 } 

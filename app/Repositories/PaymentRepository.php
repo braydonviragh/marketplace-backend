@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Payment;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class PaymentRepository extends BaseRepository
 {
@@ -12,7 +13,7 @@ class PaymentRepository extends BaseRepository
         parent::__construct($model);
     }
 
-    public function paginate(array $filters = [], int $perPage = 15)
+    public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         return $this->query()
             ->with(['payer', 'payee', 'rental'])

@@ -1,0 +1,361 @@
+{
+    "info": {
+        "name": "Rental Platform API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/api/v1/auth/login",
+                        "body": {
+                            "mode": "raw",
+                            "raw": {
+                                "email": "user@example.com",
+                                "password": "password"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Register",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/api/v1/auth/register",
+                        "body": {
+                            "mode": "raw",
+                            "raw": {
+                                "name": "John Doe",
+                                "email": "john@example.com",
+                                "password": "password",
+                                "password_confirmation": "password"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/api/v1/auth/logout",
+                        "headers": {
+                            "Authorization": "Bearer {{token}}"
+                        }
+                    }
+                },
+                {
+                    "name": "Verify Email",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/api/v1/auth/email/verify/{{id}}/{{hash}}"
+                    }
+                },
+                {
+                    "name": "Resend Verification",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/api/v1/auth/email/resend",
+                        "headers": {
+                            "Authorization": "Bearer {{token}}"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Users",
+            "item": [
+                {
+                    "name": "List Users",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/api/v1/users",
+                        "headers": {
+                            "Authorization": "Bearer {{token}}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get User",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/api/v1/users/{{user_id}}",
+                        "headers": {
+                            "Authorization": "Bearer {{token}}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get User Reviews",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/api/v1/users/{{user_id}}/reviews",
+                        "headers": {
+                            "Authorization": "Bearer {{token}}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get User Rentals",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/api/v1/users/{{user_id}}/rentals",
+                        "headers": {
+                            "Authorization": "Bearer {{token}}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get User Payments",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/api/v1/users/{{user_id}}/payments",
+                        "headers": {
+                            "Authorization": "Bearer {{token}}"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Products",
+            "item": [
+                {
+                    "name": "List Products",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/api/v1/products",
+                        "query": [
+                            {
+                                "key": "category_id",
+                                "value": "1"
+                            },
+                            {
+                                "key": "price_min",
+                                "value": "10"
+                            },
+                            {
+                                "key": "price_max",
+                                "value": "100"
+                            },
+                            {
+                                "key": "size_id",
+                                "value": "1"
+                            },
+                            {
+                                "key": "city",
+                                "value": "Toronto"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Get Product",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/api/v1/products/{{product_id}}"
+                    }
+                },
+                {
+                    "name": "Create Product",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/api/v1/products",
+                        "headers": {
+                            "Authorization": "Bearer {{token}}"
+                        },
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "title",
+                                    "value": "Designer Dress"
+                                },
+                                {
+                                    "key": "description",
+                                    "value": "Beautiful designer dress"
+                                },
+                                {
+                                    "key": "category_id",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "brand",
+                                    "value": "Example Brand"
+                                },
+                                {
+                                    "key": "price",
+                                    "value": "100"
+                                },
+                                {
+                                    "key": "size",
+                                    "value": "M"
+                                },
+                                {
+                                    "key": "size_id",
+                                    "value": "2"
+                                },
+                                {
+                                    "key": "specifications",
+                                    "value": "{\"color\":\"black\",\"material\":\"cotton\",\"style\":\"casual\"}"
+                                },
+                                {
+                                    "key": "city",
+                                    "value": "Toronto"
+                                },
+                                {
+                                    "key": "province",
+                                    "value": "Ontario"
+                                },
+                                {
+                                    "key": "postal_code",
+                                    "value": "M5V 2T6"
+                                },
+                                {
+                                    "key": "images[]",
+                                    "type": "file",
+                                    "src": []
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Product",
+                    "request": {
+                        "method": "PUT",
+                        "url": "{{base_url}}/api/v1/products/{{product_id}}",
+                        "headers": {
+                            "Authorization": "Bearer {{token}}"
+                        },
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "title",
+                                    "value": "Updated Designer Dress"
+                                },
+                                {
+                                    "key": "price",
+                                    "value": "150"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Categories",
+            "item": [
+                {
+                    "name": "List Categories",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/api/v1/categories"
+                    }
+                },
+                {
+                    "name": "Get Category",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/api/v1/categories/{{category_id}}"
+                    }
+                },
+                {
+                    "name": "Create Category",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/api/v1/categories",
+                        "headers": {
+                            "Authorization": "Bearer {{token}}"
+                        }
+                    }
+                },
+                {
+                    "name": "Update Category",
+                    "request": {
+                        "method": "PUT",
+                        "url": "{{base_url}}/api/v1/categories/{{category_id}}",
+                        "headers": {
+                            "Authorization": "Bearer {{token}}"
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Category",
+                    "request": {
+                        "method": "DELETE",
+                        "url": "{{base_url}}/api/v1/categories/{{category_id}}",
+                        "headers": {
+                            "Authorization": "Bearer {{token}}"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Rentals",
+            "item": [
+                {
+                    "name": "List Rentals",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/api/v1/rentals",
+                        "headers": {
+                            "Authorization": "Bearer {{token}}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get Rental",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/api/v1/rentals/{{rental_id}}",
+                        "headers": {
+                            "Authorization": "Bearer {{token}}"
+                        }
+                    }
+                },
+                {
+                    "name": "Create Rental",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/api/v1/rentals",
+                        "headers": {
+                            "Authorization": "Bearer {{token}}"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": {
+                                "product_id": 1,
+                                "rental_from": "2024-04-01",
+                                "rental_to": "2024-04-07"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Update Rental",
+                    "request": {
+                        "method": "PUT",
+                        "url": "{{base_url}}/api/v1/rentals/{{rental_id}}",
+                        "headers": {
+                            "Authorization": "Bearer {{token}}"
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://127.0.0.1/laravel/mp-backend/public"
+        }
+    ]
+} 

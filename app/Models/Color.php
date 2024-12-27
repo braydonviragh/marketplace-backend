@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Category extends Model
+class Color extends Model
 {
-    protected $fillable = ['name', 'slug', 'description', 'icon', 'is_active'];
-
-    protected $casts = [
-        'is_active' => 'boolean'
+    protected $fillable = [
+        'name',
+        'hex_code',
+        'slug'
     ];
 
     public function products(): HasMany

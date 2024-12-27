@@ -2,25 +2,74 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Repositories\UserRepository;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class UserService
 {
-    protected UserRepository $repository;
+    protected UserRepository $userRepository;
 
-    public function __construct(UserRepository $repository)
+    public function __construct(UserRepository $userRepository)
     {
-        $this->repository = $repository;
+        $this->userRepository = $userRepository;
     }
 
     public function getUsers(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return $this->repository->paginate($filters, $perPage);
+        return $this->userRepository->getFilteredUsers($filters, $perPage);
     }
 
-    public function findUser(int $id)
+    public function findUser(int $id): User
     {
-        return $this->repository->find($id);
+        return $this->userRepository->findOrFail($id);
+    }
+
+    public function createUser(array $data): User
+    {
+        $userData = [
+            'email' => $data['email'],
+            'phone_number' => $data['phone_number'],
+            'password' => Hash::make($data['password']),
+            'is_active' => true
+        ];
+
+        $profileData = [
+            'username' => $data['username'] ?? null,
+            'name' => $data['name'] ?? null,
+            'birthday' => $data['birthday'] ?? null,
+            'zip_code' => $data['zip_code'] ?? null,
+            'profile_picture' => $data['profile_picture'] ?? null,
+            'style_preference' => $data['style_preference'] ?? 'both'
+        ];
+
+        return $this->userRepository->createWithProfile($userData, $profileData);
+    }
+
+    public function updateUser(User $user, array $data): User
+    {
+        $userData = array_filter([
+            'email' => $data['email'] ?? null,
+            'phone_number' => $data['phone_number'] ?? null,
+            'password' => isset($data['password']) ? Hash::make($data['password']) : null,
+        ]);
+
+        $profileData = array_filter([
+            'username' => $data['username'] ?? null,
+            'name' => $data['name'] ?? null,
+            'birthday' => $data['birthday'] ?? null,
+            'zip_code' => $data['zip_code'] ?? null,
+            'profile_picture' => $data['profile_picture'] ?? null,
+            'style_preference' => $data['style_preference'] ?? null,
+        ]);
+
+        return $this->userRepository->updateWithProfile($user, $userData, $profileData);
+    }
+
+    public function deleteUser(User $user): bool
+    {
+        return $this->userRepository->delete($user);
     }
 } 

@@ -3,43 +3,35 @@
 namespace App\Repositories;
 
 use App\Models\Rental;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
-class RentalRepository extends BaseRepository
+class RentalRepository
 {
-    public function __construct(Rental $model)
+    public function create(array $data): Rental
     {
-        parent::__construct($model);
+        return Rental::create($data);
     }
 
-    public function paginate(array $filters = [], int $perPage = 15)
+    public function update(Rental $rental, array $data): bool
     {
-        return $this->query()
-            ->with(['renter', 'owner', 'listing'])
-            ->when($filters['status'] ?? null, function (Builder $query, string $status) {
-                $query->where('status', $status);
-            })
-            ->when($filters['date_range'] ?? null, function (Builder $query, array $dateRange) {
-                $query->whereBetween('start_date', $dateRange);
-            })
-            ->when($filters['category_id'] ?? null, function (Builder $query, int $categoryId) {
-                $query->whereHas('listing', function ($q) use ($categoryId) {
-                    $q->where('category_id', $categoryId);
-                });
-            })
-            ->when($filters['min_price'] ?? null, function (Builder $query, float $price) {
-                $query->where('total_price', '>=', $price);
-            })
-            ->when($filters['max_price'] ?? null, function (Builder $query, float $price) {
-                $query->where('total_price', '<=', $price);
-            })
-            ->when($filters['user_id'] ?? null, function (Builder $query, int $userId) {
-                $query->where(function ($q) use ($userId) {
-                    $q->where('renter_id', $userId)
-                      ->orWhere('owner_id', $userId);
-                });
-            })
-            ->latest()
-            ->paginate($perPage);
+        return $rental->update($data);
     }
-} 
+
+    public function getUserRentals(int $userId): Collection
+    {
+        return Rental::where('user_id', $userId)
+            ->with(['product', 'payment'])
+            ->latest()
+            ->get();
+    }
+
+    public function findById(int $id): ?Rental
+    {
+        return Rental::with(['product', 'user', 'payment'])->find($id);
+    }
+
+    public function updateStatus(Rental $rental, string $status): bool
+    {
+        return $rental->update(['status' => $status]);
+    }
+}

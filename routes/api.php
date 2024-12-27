@@ -11,6 +11,10 @@ use App\Http\Controllers\Api\V1\Auth\SocialAuthController;
 use App\Http\Controllers\Api\V1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\Auth\VerificationController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
+use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\ListingController;
+use App\Http\Controllers\Api\V1\ProductController;
+use App\Http\Controllers\Api\V1\OfferController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,31 +55,20 @@ Route::prefix('v1')->group(function () {
     });
 
     // Protected routes with specific middleware
-    Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    // Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    
         // Users
-        Route::prefix('users')->middleware(['throttle:api.users'])->group(function () {
-            Route::get('/', [UserController::class, 'index'])->middleware('permission:view-users');
-            Route::get('/{id}', [UserController::class, 'show'])->middleware('permission:view-users');
+        Route::prefix('users')->group(function () {
+            Route::get('/', [UserController::class, 'index']);
+            Route::get('/{id}', [UserController::class, 'show']);
             Route::get('/{id}/reviews', [ReviewController::class, 'userReviews']);
             Route::get('/{id}/rentals', [RentalController::class, 'userRentals']);
             Route::get('/{id}/payments', [PaymentController::class, 'userPayments'])
                 ->middleware('verify.user.access');
         });
 
-        // Reviews with rate limiting and permissions
-        Route::prefix('reviews')->middleware(['throttle:api.reviews'])->group(function () {
-            Route::get('/', [ReviewController::class, 'index']);
-            Route::get('/{id}', [ReviewController::class, 'show']);
-            Route::post('/', [ReviewController::class, 'store'])
-                ->middleware(['verified', 'complete.rental']);
-            Route::put('/{id}', [ReviewController::class, 'update'])
-                ->middleware('verify.review.owner');
-            Route::delete('/{id}', [ReviewController::class, 'destroy'])
-                ->middleware('permission:delete-reviews');
-        });
-
-        // Rentals with specific middleware
-        Route::prefix('rentals')->middleware(['throttle:api.rentals'])->group(function () {
+        // Rentals
+        Route::prefix('rentals')->group(function () {
             Route::get('/', [RentalController::class, 'index']);
             Route::get('/{id}', [RentalController::class, 'show']);
             Route::post('/', [RentalController::class, 'store'])
@@ -86,11 +79,8 @@ Route::prefix('v1')->group(function () {
                 ->middleware(['verify.rental.participant']);
         });
 
-        // Payments with additional security
-        Route::prefix('payments')->middleware([
-            'throttle:api.payments',
-            'verify.payment.access'
-        ])->group(function () {
+        // Payments
+        Route::prefix('payments')->group(function () {
             Route::get('/', [PaymentController::class, 'index']);
             Route::get('/{id}', [PaymentController::class, 'show']);
             Route::post('/', [PaymentController::class, 'store'])
@@ -99,12 +89,51 @@ Route::prefix('v1')->group(function () {
                 ->middleware('permission:process-refunds');
         });
 
-        // Notifications
-        Route::prefix('notifications')->middleware(['throttle:api.notifications'])->group(function () {
-            Route::get('/', [NotificationController::class, 'index']);
-            Route::patch('/{id}/read', [NotificationController::class, 'markAsRead'])
-                ->middleware('verify.notification.owner');
-            Route::patch('/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+        // Categories
+        Route::prefix('categories')->group(function () {
+            // Public routes
+            Route::get('/', [CategoryController::class, 'index']);
+            Route::get('/{category}', [CategoryController::class, 'show']);
+
+            // Protected routes
+            Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+                Route::post('/', [CategoryController::class, 'store']);
+                Route::put('/{category}', [CategoryController::class, 'update']);
+                Route::delete('/{category}', [CategoryController::class, 'destroy']);
+                Route::patch('/{category}/toggle-status', [CategoryController::class, 'toggleStatus']);
+            });
         });
-    });
+
+        Route::middleware(['auth:sanctum'])->group(function () {
+            Route::prefix('rentals')->group(function () {
+                Route::get('/', [RentalController::class, 'index']);
+                Route::get('/{id}', [RentalController::class, 'show']);
+                Route::post('/', [RentalController::class, 'store']);
+                Route::put('/{rental}', [RentalController::class, 'update']);
+                Route::delete('/{rental}', [RentalController::class, 'destroy']);
+            });
+        });
+        
+        // Products
+        Route::prefix('products')->group(function () {
+            Route::get('/', [ProductController::class, 'index']);
+            Route::get('/{id}', [ProductController::class, 'show']);
+            Route::post('/', [ProductController::class, 'store'])
+                ->middleware(['verified', 'check.user.status']);
+            Route::put('/{product}', [ProductController::class, 'update'])
+                ->middleware('verify.product.owner');
+        });
+
+        // Offers
+        Route::prefix('offers')->group(function () {
+            Route::get('/', [OfferController::class, 'index']);
+            Route::post('/', [OfferController::class, 'store']);
+            Route::put('/{offer}', [OfferController::class, 'update'])
+                ->middleware('verify.offer.owner');
+            Route::post('/{offer}/accept', [OfferController::class, 'accept'])
+                ->middleware('verify.product.owner');
+            Route::post('/{offer}/reject', [OfferController::class, 'reject'])
+                ->middleware('verify.product.owner');
+        });
+    // });
 }); 

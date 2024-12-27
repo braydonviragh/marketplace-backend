@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 abstract class BaseRepository
@@ -15,18 +15,33 @@ abstract class BaseRepository
         $this->model = $model;
     }
 
-    public function query(): Builder
+    public function find(int $id): ?Model
     {
-        return $this->model->newQuery();
+        return $this->model->find($id);
     }
 
-    public function find(int $id)
+    public function findOrFail(int $id): Model
     {
-        return $this->query()->findOrFail($id);
+        return $this->model->findOrFail($id);
     }
 
-    public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
+    public function create(array $data): Model
     {
-        return $this->query()->paginate($perPage);
+        return $this->model->create($data);
+    }
+
+    public function update(Model $model, array $data): bool
+    {
+        return $model->update($data);
+    }
+
+    public function delete(Model $model): bool
+    {
+        return $model->delete();
+    }
+
+    public function paginate(int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->model->paginate($perPage);
     }
 } 

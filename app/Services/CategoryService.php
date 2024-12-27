@@ -11,12 +11,12 @@ class CategoryService
 {
     public function getAllCategories(): Collection
     {
-        return Category::active()->orderBy('name')->get();
+        return Category::active()->orderBy('id', 'asc')->get();
     }
 
     public function getPaginatedCategories(int $perPage = 15): LengthAwarePaginator
     {
-        return Category::orderBy('name')->paginate($perPage);
+        return Category::orderBy('id', 'asc')->paginate($perPage);
     }
 
     public function findCategory(int $id): Category

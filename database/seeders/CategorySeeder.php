@@ -11,47 +11,96 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            // Essential Categories
             [
                 'name' => 'Dresses',
-                'icon' => 'fa-dress',
-                'description' => 'All types of dresses'
+                'description' => 'All types of dresses including casual, formal, and special occasion',
+                'icon' => 'dress'
             ],
             [
                 'name' => 'Tops',
-                'icon' => 'fa-shirt',
-                'description' => 'Shirts, blouses, and tank tops'
+                'description' => 'Shirts, blouses, t-shirts, and all upper body garments',
+                'icon' => 'top'
             ],
             [
-                'name' => 'Skirts',
-                'icon' => 'fa-skirt',
-                'description' => 'Mini to maxi skirts'
-            ],
-            [
-                'name' => 'Pants',
-                'icon' => 'fa-pants',
-                'description' => 'Jeans, trousers, and leggings'
-            ],
-            [
-                'name' => 'Sweaters',
-                'icon' => 'fa-sweater',
-                'description' => 'Sweaters and cardigans'
-            ],
-            [
-                'name' => 'Jackets',
-                'icon' => 'fa-jacket',
-                'description' => 'Jackets, coats, and blazers'
-            ],
-            [
-                'name' => 'Sets',
-                'icon' => 'fa-clothes-hanger',
-                'description' => 'Matching sets and coordinates'
+                'name' => 'Handbags',
+                'description' => 'Purses, totes, clutches, and all types of bags',
+                'icon' => 'handbag'
             ],
             [
                 'name' => 'Accessories',
-                'icon' => 'fa-bag',
-                'description' => 'Bags, jewelry, and other accessories'
-            ]
+                'description' => 'Belts, scarves, hats, and other fashion accessories',
+                'icon' => 'accessories'
+            ],
+            [
+                'name' => 'Activewear',
+                'description' => 'Athletic and workout clothing',
+                'icon' => 'activewear'
+            ],
+            [
+                'name' => 'Blazers',
+                'description' => 'Professional and casual blazers and jackets',
+                'icon' => 'blazer'
+            ],
+            [
+                'name' => 'Bodysuits',
+                'description' => 'Form-fitting one-piece garments',
+                'icon' => 'bodysuit'
+            ],
+            [
+                'name' => 'Jeans',
+                'description' => 'Denim pants in various styles and cuts',
+                'icon' => 'jeans'
+            ],
+            [
+                'name' => 'Jewelry',
+                'description' => 'Necklaces, earrings, bracelets, and other jewelry items',
+                'icon' => 'jewelry'
+            ],
+            [
+                'name' => 'Pants',
+                'description' => 'All types of pants excluding jeans',
+                'icon' => 'pants'
+            ],
+            [
+                'name' => 'Jumpsuits',
+                'description' => 'One-piece outfits and rompers',
+                'icon' => 'jumpsuit'
+            ],
+            [
+                'name' => 'Shoes',
+                'description' => 'All types of footwear',
+                'icon' => 'shoes'
+            ],
+            [
+                'name' => 'Shorts',
+                'description' => 'Casual and formal shorts',
+                'icon' => 'shorts'
+            ],
+            [
+                'name' => 'Skirts',
+                'description' => 'All styles and lengths of skirts',
+                'icon' => 'skirt'
+            ],
+            [
+                'name' => 'Sweats & Hoodies',
+                'description' => 'Comfortable loungewear and casual outerwear',
+                'icon' => 'sweats'
+            ],
+            [
+                'name' => 'Sweaters & Knits',
+                'description' => 'Knitted tops and sweaters',
+                'icon' => 'sweater'
+            ],
+            [
+                'name' => 'Suits',
+                'description' => 'Professional and formal suit sets',
+                'icon' => 'suit'
+            ],
+            [
+                'name' => 'Other',
+                'description' => 'Other clothing items not listed in other categories',
+                'icon' => 'other'
+            ],
         ];
 
         foreach ($categories as $category) {
@@ -64,4 +113,4 @@ class CategorySeeder extends Seeder
             ]);
         }
     }
-} 
+}

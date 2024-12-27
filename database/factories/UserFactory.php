@@ -13,31 +13,19 @@ class UserFactory extends Factory
 
     public function definition(): array
     {
-        $accountType = $this->faker->randomElement(['personal', 'business']);
-        $isPersonal = $accountType === 'personal';
-
         return [
-            'first_name' => $this->faker->firstName(),
-            'last_name' => $this->faker->lastName(),
             'email' => $this->faker->unique()->safeEmail(),
+            'phone_number' => $this->faker->unique()->phoneNumber(),
             'password' => Hash::make('password'),
-            'phone_number' => $this->faker->phoneNumber(),
-            'bio' => $this->faker->text(200),
-            'profile_picture' => $this->faker->imageUrl(200, 200, 'people'),
-            'account_type' => $accountType,
-            'role' => $this->faker->randomElement(['user', 'user', 'user', 'moderator']), // 75% users
-            'email_verified_at' => now(),
+            'username' => $this->faker->unique()->userName(),
+            'name' => $this->faker->name(),
+            'role' => $this->faker->randomElement(['user', 'super_admin']), // 75% users
+            'terms_accepted' => true,
+            'terms_accepted_at' => now(),
             'is_active' => true,
-            'timezone' => $this->faker->randomElement([
-                'America/Toronto', 'America/New_York', 'America/Los_Angeles'
-            ]),
-            'locale' => $this->faker->randomElement(['en', 'fr', 'es']),
-            'country_code' => 'CA',
-            'region_code' => $this->faker->randomElement([
-                'ON', 'BC', 'AB', 'QC', 'NS'
-            ]),
-            'last_login_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
-            'last_login_ip' => $this->faker->ipv4,
+            'email_verified_at' => now(),
+            'phone_verified_at' => now(),
+            'remember_token' => Str::random(10),
         ];
     }
 
@@ -45,6 +33,7 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+            'phone_verified_at' => null,
         ]);
     }
 } 
