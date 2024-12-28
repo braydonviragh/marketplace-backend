@@ -12,7 +12,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->enum('style_preference', ['male', 'female', 'unisex'])->default('unisex');
-            $table->json('notification_settings')->nullable();
             $table->string('language')->default('en');
             $table->timestamps();
 

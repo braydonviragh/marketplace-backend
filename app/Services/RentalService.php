@@ -3,56 +3,31 @@
 namespace App\Services;
 
 use App\Models\Rental;
-use App\Models\Offer;
 use App\Repositories\RentalRepository;
-use App\Services\PaymentService;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
-use App\Events\RentalCreated;
-use App\Events\RentalStatusChanged;
 use App\Exceptions\RentalException;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Carbon\Carbon;
 
 class RentalService
 {
     public function __construct(
-        private RentalRepository $rentalRepository,
-        private PaymentService $paymentService
+        private RentalRepository $rentalRepository
     ) {}
 
-    public function createFromOffer(Offer $offer, array $paymentData): Rental
+    public function getRentals(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return DB::transaction(function () use ($offer, $paymentData) {
-            // Validate offer status
-            if ($offer->status !== 'accepted') {
-                throw new RentalException('Cannot create rental from non-accepted offer');
-            }
+        return $this->rentalRepository->getFilteredRentals($filters, $perPage);
+    }
 
-            // Process payment first
-            $payment = $this->paymentService->processPayment([
-                'amount' => $offer->amount,
-                'payment_data' => $paymentData
-            ]);
-            
-            $rentalData = [
-                'product_id' => $offer->product_id,
-                'user_id' => $offer->user_id,
-                'payment_id' => $payment->id,
-                'rental_from' => Carbon::now(),
-                'rental_to' => Carbon::now()->addDays(7), // Default rental period
-                'status' => 'pending',
-                'offer_id' => $offer->id
-            ];
+    public function getUserRentals(int $userId): Collection
+    {
+        return $this->rentalRepository->getUserRentals($userId);
+    }
 
-            $rental = $this->rentalRepository->create($rentalData);
-            
-            // Update offer status
-            $offer->update(['status' => 'converted']);
-            
-            // Dispatch rental created event
-            event(new RentalCreated($rental));
-            
-            return $rental;
-        });
+    public function createRental(array $data): Rental
+    {
+        return $this->rentalRepository->create($data);
     }
 
     public function activateRental(Rental $rental): bool
@@ -84,22 +59,15 @@ class RentalService
     public function cancelRental(Rental $rental): bool
     {
         if (!in_array($rental->status, ['pending', 'active'])) {
-            throw new RentalException('This rental cannot be cancelled');
+            throw new RentalException('Only pending or active rentals can be cancelled');
         }
 
-        return DB::transaction(function () use ($rental) {
-            // Process refund if needed
-            if ($rental->status === 'active') {
-                $this->paymentService->processRefund($rental->payment);
-            }
-
-            $success = $this->rentalRepository->updateStatus($rental, 'cancelled');
-            
-            if ($success) {
-                event(new RentalStatusChanged($rental, 'cancelled'));
-            }
-            
-            return $success;
-        });
+        $success = $this->rentalRepository->updateStatus($rental, 'cancelled');
+        
+        if ($success) {
+            event(new RentalStatusChanged($rental, 'cancelled'));
+        }
+        
+        return $success;
     }
 } 

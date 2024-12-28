@@ -21,7 +21,6 @@ class CategoryFactory extends Factory
                 'fa-shirt', 'fa-hat', 'fa-dress', 
                 'fa-shoe', 'fa-glasses', 'fa-watch'
             ]),
-            'is_active' => true
         ];
     }
 } 

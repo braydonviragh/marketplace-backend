@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateRentalRequest;
@@ -14,6 +14,14 @@ class RentalController extends Controller
     public function __construct(
         private RentalService $rentalService
     ) {}
+
+    public function index(): JsonResponse
+    {
+        $rentals = $this->rentalService->getRentals();
+        return response()->json([
+            'data' => RentalResource::collection($rentals)
+        ]);
+    }   
 
     public function store(CreateRentalRequest $request): JsonResponse
     {

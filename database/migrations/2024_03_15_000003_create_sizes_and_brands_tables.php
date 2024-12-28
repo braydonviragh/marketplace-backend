@@ -13,7 +13,6 @@ return new class extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->text('description')->nullable();
-            $table->timestamps();
         });
 
         //General colors table 
@@ -22,7 +21,6 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->string('hex_code')->unique();
             $table->string('slug')->unique();
-            $table->timestamps();
         });
 
         // General sizes table (XS, S, M, etc.)
@@ -31,9 +29,6 @@ return new class extends Migration
             $table->string('size_name')->unique();
             $table->string('display_name');
             $table->text('description')->nullable();
-            $table->integer('order');
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
         });
 
         // Number sizes table (00-22)
@@ -42,9 +37,6 @@ return new class extends Migration
             $table->string('name');
             $table->string('display_name');
             $table->text('description')->nullable();
-            $table->integer('order');
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
         });
 
         // Waist sizes table (24-48)
@@ -53,9 +45,6 @@ return new class extends Migration
             $table->integer('size');
             $table->string('display_name');
             $table->text('description')->nullable();
-            $table->integer('order');
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
         });
 
         // Shoe sizes table (5-15 with half sizes)
@@ -64,9 +53,6 @@ return new class extends Migration
             $table->decimal('size', 3, 1);
             $table->string('display_name');
             $table->text('description')->nullable();
-            $table->integer('order');
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
         });
 
         // User-Brand preferences

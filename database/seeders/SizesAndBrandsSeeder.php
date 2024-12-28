@@ -18,37 +18,31 @@ class SizesAndBrandsSeeder extends Seeder
                 'size_name' => 'XS',
                 'display_name' => 'Extra Small',
                 'description' => 'Extra Small size, typically fits US size 0-2',
-                'order' => 1
             ],
             [
                 'size_name' => 'S',
                 'display_name' => 'Small',
                 'description' => 'Small size, typically fits US size 4-6',
-                'order' => 2
             ],
             [
                 'size_name' => 'M',
                 'display_name' => 'Medium',
                 'description' => 'Medium size, typically fits US size 8-10',
-                'order' => 3
             ],
             [
                 'size_name' => 'L',
                 'display_name' => 'Large',
                 'description' => 'Large size, typically fits US size 12-14',
-                'order' => 4
             ],
             [
                 'size_name' => 'XL',
                 'display_name' => 'Extra Large',
                 'description' => 'Extra Large size, typically fits US size 16-18',
-                'order' => 5
             ],
             [
                 'size_name' => 'XXL',
                 'display_name' => 'Double Extra Large',
                 'description' => 'Double Extra Large size, typically fits US size 20-22',
-                'order' => 6
             ],
         ];
 
@@ -57,8 +51,6 @@ class SizesAndBrandsSeeder extends Seeder
                 'size_name' => $size['size_name'],
                 'display_name' => $size['display_name'],
                 'description' => $size['description'],
-                'order' => $size['order'],
-                'is_active' => true
             ]);
         }
 
@@ -69,10 +61,6 @@ class SizesAndBrandsSeeder extends Seeder
                 'name' => $size,
                 'display_name' => "Size {$size}",
                 'description' => "US Women's Size {$size}",
-                'order' => $index + 1,
-                'is_active' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
             ]);
         }
 
@@ -82,10 +70,6 @@ class SizesAndBrandsSeeder extends Seeder
                 'size' => $size,
                 'display_name' => "{$size}\"",
                 'description' => "{$size} inch waist measurement",
-                'order' => ($size - 22) / 2,
-                'is_active' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
             ]);
         }
 
@@ -95,10 +79,6 @@ class SizesAndBrandsSeeder extends Seeder
                 'size' => $size,
                 'display_name' => "US {$size}",
                 'description' => "US Women's Shoe Size {$size}",
-                'order' => ($size - 5) * 2 + 1,
-                'is_active' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
             ]);
         }
 

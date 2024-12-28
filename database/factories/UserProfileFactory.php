@@ -17,16 +17,15 @@ class UserProfileFactory extends Factory
             'birthday' => fake()->dateTimeBetween('-50 years', '-18 years'),
             'zip_code' => fake()->postcode(),
             'style_preference' => fake()->randomElement(['male', 'female', 'unisex']),
-            'notification_settings' => [
-                'rental_updates' => true,
-                'messages' => true,
-                'marketing' => fake()->boolean(30)
-            ],
             'language' => 'en',
             'preferences' => [
                 'favorite_brands' => Brand::inRandomOrder()->limit(rand(2, 4))->pluck('id')->toArray(),
-                'preferred_categories' => fake()->randomElements(['dresses', 'tops', 'pants', 'skirts'], 2),
-                'preferred_styles' => fake()->randomElements(['casual', 'formal', 'bohemian', 'vintage'], 2)
+                'preferred_categories' => fake()->randomElements([
+                    'Dresses', 'Tops', 'Handbags', 'Accessories', 'Activewear',
+                    'Blazers', 'Bodysuits', 'Jeans', 'Jewelry', 'Pants',
+                    'Jumpsuits', 'Shoes', 'Shorts', 'Skirts', 'Sweats & Hoodies',
+                    'Sweaters & Knits', 'Suits'
+                ], rand(3, 5)),
             ]
         ];
     }

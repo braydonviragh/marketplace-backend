@@ -15,6 +15,12 @@ use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\ListingController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\OfferController;
+use App\Http\Controllers\Api\V1\BrandController;
+use App\Http\Controllers\Api\V1\ColorController;
+use App\Http\Controllers\Api\V1\SizeController;
+use App\Http\Controllers\Api\V1\NumberSizeController;
+use App\Http\Controllers\Api\V1\ShoeSizeController;
+use App\Http\Controllers\Api\V1\WaistSizeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,18 +73,6 @@ Route::prefix('v1')->group(function () {
                 ->middleware('verify.user.access');
         });
 
-        // Rentals
-        Route::prefix('rentals')->group(function () {
-            Route::get('/', [RentalController::class, 'index']);
-            Route::get('/{id}', [RentalController::class, 'show']);
-            Route::post('/', [RentalController::class, 'store'])
-                ->middleware(['verified', 'check.user.status']);
-            Route::put('/{id}', [RentalController::class, 'update'])
-                ->middleware('verify.rental.owner');
-            Route::patch('/{id}/status', [RentalController::class, 'updateStatus'])
-                ->middleware(['verify.rental.participant']);
-        });
-
         // Payments
         Route::prefix('payments')->group(function () {
             Route::get('/', [PaymentController::class, 'index']);
@@ -104,14 +98,24 @@ Route::prefix('v1')->group(function () {
             });
         });
 
-        Route::middleware(['auth:sanctum'])->group(function () {
-            Route::prefix('rentals')->group(function () {
-                Route::get('/', [RentalController::class, 'index']);
-                Route::get('/{id}', [RentalController::class, 'show']);
-                Route::post('/', [RentalController::class, 'store']);
-                Route::put('/{rental}', [RentalController::class, 'update']);
-                Route::delete('/{rental}', [RentalController::class, 'destroy']);
-            });
+         // Brands
+        Route::apiResource('brands', BrandController::class);
+            
+        // Colors
+        Route::apiResource('colors', ColorController::class);
+        
+        // Sizes
+        Route::apiResource('sizes', SizeController::class);
+        Route::apiResource('number-sizes', NumberSizeController::class);
+        Route::apiResource('shoe-sizes', ShoeSizeController::class);
+        Route::apiResource('waist-sizes', WaistSizeController::class);
+
+        Route::prefix('rentals')->group(function () {
+            Route::get('/', [RentalController::class, 'index']);
+            Route::get('/{id}', [RentalController::class, 'show']);
+            Route::post('/', [RentalController::class, 'store']);
+            Route::put('/{rental}', [RentalController::class, 'update']);
+            Route::delete('/{rental}', [RentalController::class, 'destroy']);
         });
         
         // Products

@@ -44,10 +44,4 @@ class CategoryService
     {
         return $category->delete();
     }
-
-    public function toggleStatus(Category $category): Category
-    {
-        $category->update(['is_active' => !$category->is_active]);
-        return $category->fresh();
-    }
 } 

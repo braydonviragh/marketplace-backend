@@ -24,8 +24,7 @@ class UserProfileResource extends JsonResource
             'zip_code' => $this->zip_code,
             'profile_picture' => $this->profile_picture,
             'style_preference' => $this->style_preference,
-            'created_at' => $this->created_at->toISOString(),
-            'updated_at' => $this->updated_at->toISOString(),
+            'preferences' => $this->preferences
         ];
     }
 } 

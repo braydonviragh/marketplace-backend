@@ -36,19 +36,9 @@ class ProductResource extends JsonResource
             'province' => $this->province,
             'postal_code' => $this->postal_code,
             
-            // Relationships
-            'user' => new UserResource($this->whenLoaded('user')),
-            'category' => new CategoryResource($this->whenLoaded('category')),
-            // 'images' => ProductImageResource::collection($this->whenLoaded('images')),
-            
-            // Related Counts
-            'offers_count' => $this->whenCounted('offers'),
-
-            
-            // Timestamps
-            'created_at' => $this->created_at->toISOString(),
-            'updated_at' => $this->updated_at->toISOString(),
-            'deleted_at' => $this->deleted_at?->toISOString(),
+            // Simplified Relationships
+            'user' => new SimpleUserResource($this->whenLoaded('user')),
+            'category' => new SimpleCategoryResource($this->whenLoaded('category')),
             
             // Meta
             'can_edit' => $request->user()?->id === $this->user_id,

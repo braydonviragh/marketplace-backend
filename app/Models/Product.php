@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 class Product extends Model
 {
     use SoftDeletes;
+    public $timestamps = false;
 
     protected $fillable = [
         'user_id',

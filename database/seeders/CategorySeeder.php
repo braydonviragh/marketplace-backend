@@ -109,7 +109,6 @@ class CategorySeeder extends Seeder
                 'slug' => Str::slug($category['name']),
                 'description' => $category['description'],
                 'icon' => $category['icon'],
-                'is_active' => true
             ]);
         }
     }

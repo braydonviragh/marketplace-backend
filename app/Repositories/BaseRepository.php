@@ -40,8 +40,13 @@ abstract class BaseRepository
         return $model->delete();
     }
 
-    public function paginate(int $perPage = 15): LengthAwarePaginator
+    public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         return $this->model->paginate($perPage);
+    }
+
+    protected function query()
+    {
+        return $this->model->query();
     }
 } 

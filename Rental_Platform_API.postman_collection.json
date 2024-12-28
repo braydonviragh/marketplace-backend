@@ -350,6 +350,296 @@
                     }
                 }
             ]
+        },
+        {
+            "name": "Product Attributes",
+            "item": [
+                {
+                    "name": "Brands",
+                    "item": [
+                        {
+                            "name": "List Brands",
+                            "request": {
+                                "method": "GET",
+                                "url": "{{base_url}}/api/v1/brands",
+                                "headers": {
+                                    "Authorization": "Bearer {{token}}"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Get Brand",
+                            "request": {
+                                "method": "GET",
+                                "url": "{{base_url}}/api/v1/brands/{{brand_id}}",
+                                "headers": {
+                                    "Authorization": "Bearer {{token}}"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Create Brand",
+                            "request": {
+                                "method": "POST",
+                                "url": "{{base_url}}/api/v1/brands",
+                                "headers": {
+                                    "Authorization": "Bearer {{token}}",
+                                    "Content-Type": "application/json"
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": {
+                                        "name": "Example Brand",
+                                        "description": "Brand description here"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "name": "Update Brand",
+                            "request": {
+                                "method": "PUT",
+                                "url": "{{base_url}}/api/v1/brands/{{brand_id}}",
+                                "headers": {
+                                    "Authorization": "Bearer {{token}}",
+                                    "Content-Type": "application/json"
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": {
+                                        "name": "Updated Brand Name",
+                                        "description": "Updated description"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "name": "Delete Brand",
+                            "request": {
+                                "method": "DELETE",
+                                "url": "{{base_url}}/api/v1/brands/{{brand_id}}",
+                                "headers": {
+                                    "Authorization": "Bearer {{token}}"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Colors",
+                    "item": [
+                        {
+                            "name": "List Colors",
+                            "request": {
+                                "method": "GET",
+                                "url": "{{base_url}}/api/v1/colors",
+                                "headers": {
+                                    "Authorization": "Bearer {{token}}"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Get Color",
+                            "request": {
+                                "method": "GET",
+                                "url": "{{base_url}}/api/v1/colors/{{color_id}}",
+                                "headers": {
+                                    "Authorization": "Bearer {{token}}"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Create Color",
+                            "request": {
+                                "method": "POST",
+                                "url": "{{base_url}}/api/v1/colors",
+                                "headers": {
+                                    "Authorization": "Bearer {{token}}",
+                                    "Content-Type": "application/json"
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": {
+                                        "name": "Navy Blue",
+                                        "hex_code": "000080",
+                                        "slug": "navy-blue"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "name": "Update Color",
+                            "request": {
+                                "method": "PUT",
+                                "url": "{{base_url}}/api/v1/colors/{{color_id}}",
+                                "headers": {
+                                    "Authorization": "Bearer {{token}}",
+                                    "Content-Type": "application/json"
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": {
+                                        "name": "Dark Navy",
+                                        "hex_code": "000050",
+                                        "slug": "dark-navy"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "name": "Delete Color",
+                            "request": {
+                                "method": "DELETE",
+                                "url": "{{base_url}}/api/v1/colors/{{color_id}}",
+                                "headers": {
+                                    "Authorization": "Bearer {{token}}"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Sizes",
+                    "item": [
+                        {
+                            "name": "Standard Sizes",
+                            "item": [
+                                {
+                                    "name": "List Sizes",
+                                    "request": {
+                                        "method": "GET",
+                                        "url": "{{base_url}}/api/v1/sizes",
+                                        "headers": {
+                                            "Authorization": "Bearer {{token}}"
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "Create Size",
+                                    "request": {
+                                        "method": "POST",
+                                        "url": "{{base_url}}/api/v1/sizes",
+                                        "headers": {
+                                            "Authorization": "Bearer {{token}}",
+                                            "Content-Type": "application/json"
+                                        },
+                                        "body": {
+                                            "mode": "raw",
+                                            "raw": {
+                                                "size_name": "XL",
+                                                "description": "Extra Large",
+                                                "category": "tops"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Number Sizes",
+                            "item": [
+                                {
+                                    "name": "List Number Sizes",
+                                    "request": {
+                                        "method": "GET",
+                                        "url": "{{base_url}}/api/v1/number-sizes",
+                                        "headers": {
+                                            "Authorization": "Bearer {{token}}"
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "Create Number Size",
+                                    "request": {
+                                        "method": "POST",
+                                        "url": "{{base_url}}/api/v1/number-sizes",
+                                        "headers": {
+                                            "Authorization": "Bearer {{token}}",
+                                            "Content-Type": "application/json"
+                                        },
+                                        "body": {
+                                            "mode": "raw",
+                                            "raw": {
+                                                "name": "42",
+                                                "display_name": "Size 42",
+                                                "description": "European size 42"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Shoe Sizes",
+                            "item": [
+                                {
+                                    "name": "List Shoe Sizes",
+                                    "request": {
+                                        "method": "GET",
+                                        "url": "{{base_url}}/api/v1/shoe-sizes",
+                                        "headers": {
+                                            "Authorization": "Bearer {{token}}"
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "Create Shoe Size",
+                                    "request": {
+                                        "method": "POST",
+                                        "url": "{{base_url}}/api/v1/shoe-sizes",
+                                        "headers": {
+                                            "Authorization": "Bearer {{token}}",
+                                            "Content-Type": "application/json"
+                                        },
+                                        "body": {
+                                            "mode": "raw",
+                                            "raw": {
+                                                "size": 10.5,
+                                                "display_name": "US 10.5",
+                                                "description": "US Men's size 10.5"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Waist Sizes",
+                            "item": [
+                                {
+                                    "name": "List Waist Sizes",
+                                    "request": {
+                                        "method": "GET",
+                                        "url": "{{base_url}}/api/v1/waist-sizes",
+                                        "headers": {
+                                            "Authorization": "Bearer {{token}}"
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "Create Waist Size",
+                                    "request": {
+                                        "method": "POST",
+                                        "url": "{{base_url}}/api/v1/waist-sizes",
+                                        "headers": {
+                                            "Authorization": "Bearer {{token}}",
+                                            "Content-Type": "application/json"
+                                        },
+                                        "body": {
+                                            "mode": "raw",
+                                            "raw": {
+                                                "size": 32,
+                                                "display_name": "32\"",
+                                                "description": "32 inch waist"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "variable": [
