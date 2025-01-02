@@ -15,16 +15,20 @@ class UserProfile extends Model
         'user_id',
         'profile_picture',
         'birthday',
-        'zip_code',
+        'postal_code',
+        'city',
+        'country',
         'style_preference',
         'language',
         'preferences'
     ];
 
     protected $casts = [
-        'birthday' => 'date',
+        'birthday' => 'string',
         'preferences' => 'array'
     ];
+
+    protected $dates = ['birthday'];
 
     public function user(): BelongsTo
     {

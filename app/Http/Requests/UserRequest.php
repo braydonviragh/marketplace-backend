@@ -22,7 +22,9 @@ class UserRequest extends FormRequest
             'username' => 'sometimes|required|string|max:255|unique:user_profiles,username,' . $this->user?->id . ',user_id',
             'name' => 'sometimes|required|string|max:255',
             'birthday' => 'sometimes|date',
-            'zip_code' => 'sometimes|string|max:10',
+            'postal_code' => 'sometimes|string|max:10',
+            'city' => 'sometimes|string|max:255',
+            'country' => 'sometimes|string|max:255',
             'profile_picture' => 'sometimes|image|max:5120', // 5MB max
             'style_preference' => 'sometimes|in:male,female,both'
         ];

@@ -46,7 +46,7 @@ class ProductController extends Controller
     public function store(ProductRequest $request): JsonResponse
     {
         $product = $this->productService->createProduct(
-            array_merge($request->validated(), ['user_id' => auth()->id()])
+            array_merge($request->validated(), ['user_id' => 2])
         );
 
         return $this->resourceResponse(

@@ -11,7 +11,7 @@ class CategoryService
 {
     public function getAllCategories(): Collection
     {
-        return Category::active()->orderBy('id', 'asc')->get();
+        return Category::orderBy('id', 'asc')->get();
     }
 
     public function getPaginatedCategories(int $perPage = 15): LengthAwarePaginator

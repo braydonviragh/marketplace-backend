@@ -38,10 +38,7 @@ class ProductResource extends JsonResource
             
             // Simplified Relationships
             'user' => new SimpleUserResource($this->whenLoaded('user')),
-            'category' => new SimpleCategoryResource($this->whenLoaded('category')),
-            
-            // Meta
-            'can_edit' => $request->user()?->id === $this->user_id,
+            'category' => new SimpleCategoryResource($this->whenLoaded('category'))
         ];
     }
 } 

@@ -79,4 +79,10 @@ class User extends Authenticatable
             ->where('size_type', 'shoe')
             ->withTimestamps();
     }
+
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'user_category_preferences')
+            ->withTimestamps();
+    }
 } 

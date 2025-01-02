@@ -18,10 +18,10 @@ class UserProfileResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
-            'username' => $this->username,
-            'name' => $this->name,
-            'birthday' => $this->birthday?->toISOString(),
-            'zip_code' => $this->zip_code,
+            'birthday' => $this->birthday,
+            'postal_code' => $this->postal_code,
+            'city' => $this->city,
+            'country' => $this->country,
             'profile_picture' => $this->profile_picture,
             'style_preference' => $this->style_preference,
             'preferences' => $this->preferences

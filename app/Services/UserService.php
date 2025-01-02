@@ -39,8 +39,10 @@ class UserService
         $profileData = [
             'username' => $data['username'] ?? null,
             'name' => $data['name'] ?? null,
-            'birthday' => $data['birthday'] ?? null,
-            'zip_code' => $data['zip_code'] ?? null,
+            'birthday' => isset($data['birthday']) ? date('Y-m-d', strtotime($data['birthday'])) : null,
+            'postal_code' => $data['postal_code'] ?? null,
+            'city' => $data['city'] ?? null,
+            'country' => $data['country'] ?? null,
             'profile_picture' => $data['profile_picture'] ?? null,
             'style_preference' => $data['style_preference'] ?? 'both'
         ];
@@ -59,8 +61,10 @@ class UserService
         $profileData = array_filter([
             'username' => $data['username'] ?? null,
             'name' => $data['name'] ?? null,
-            'birthday' => $data['birthday'] ?? null,
-            'zip_code' => $data['zip_code'] ?? null,
+            'birthday' => isset($data['birthday']) ? date('Y-m-d', strtotime($data['birthday'])) : null,
+            'postal_code' => $data['postal_code'] ?? null,
+            'city' => $data['city'] ?? null,
+            'country' => $data['country'] ?? null,
             'profile_picture' => $data['profile_picture'] ?? null,
             'style_preference' => $data['style_preference'] ?? null,
         ]);

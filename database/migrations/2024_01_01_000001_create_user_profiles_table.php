@@ -13,13 +13,13 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('profile_picture')->nullable();
             $table->date('birthday')->nullable();
-            $table->string('zip_code');
+            $table->string('postal_code')->nullable();
+            $table->string('city')->nullable();
+            $table->string('country')->nullable();
             $table->enum('style_preference', ['male', 'female', 'unisex'])->default('unisex');
             $table->string('language')->default('en');
             $table->json('preferences')->nullable();
             $table->timestamps();
-            
-            $table->index('zip_code');
         });
     }
 
