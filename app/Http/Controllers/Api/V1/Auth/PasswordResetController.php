@@ -3,41 +3,95 @@
 namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Models\User;
+use App\Models\VerificationCode;
+use App\Services\SmsService;
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
-use App\Http\Requests\Auth\ResetPasswordRequest;
-use App\Http\Requests\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Auth\ForgotPasswordInitRequest;
+use App\Http\Requests\Auth\ResetPasswordWithCodeRequest;
+use App\Traits\ApiResponse;
 
 class PasswordResetController extends Controller
 {
-    public function forgotPassword(ForgotPasswordRequest $request)
-    {
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+    use ApiResponse;
 
-        return $status === Password::RESET_LINK_SENT
-            ? $this->successResponse(null, 'Password reset link sent to your email')
-            : $this->errorResponse('Unable to send reset link', 'RESET_LINK_ERROR', 400);
+    protected SmsService $smsService;
+
+    public function __construct(SmsService $smsService)
+    {
+        $this->smsService = $smsService;
     }
 
-    public function reset(ResetPasswordRequest $request)
+    public function initiateReset(ForgotPasswordInitRequest $request)
     {
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function (User $user, string $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password),
-                    'remember_token' => Str::random(60),
-                ])->save();
-            }
-        );
+        $user = User::where('email', $request->identifier)
+            ->orWhere('phone_number', $request->identifier)
+            ->first();
 
-        return $status === Password::PASSWORD_RESET
-            ? $this->successResponse(null, 'Password has been reset successfully')
-            : $this->errorResponse('Unable to reset password', 'RESET_ERROR', 400);
+        if (!$user) {
+            return $this->errorResponse('No user found with this identifier', 404);
+        }
+
+        // Generate 6-digit code
+        $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+        // Store verification code
+        $verificationCode = VerificationCode::create([
+            'email' => $request->method === 'email' ? $user->email : null,
+            'phone_number' => $request->method === 'sms' ? $user->phone_number : null,
+            'code' => $code,
+            'type' => 'password_reset',
+            'expires_at' => now()->addMinutes(10),
+        ]);
+
+        // Send code via chosen method
+        if ($request->method === 'sms') {
+            $this->smsService->sendVerificationCode($user->phone_number, $code);
+            $message = 'Reset code sent to your phone number';
+        } else {
+            // Send email with code
+            // TODO: Implement email sending
+            $message = 'Reset code sent to your email';
+        }
+
+        return $this->successResponse(null, $message);
+    }
+
+    public function resetWithCode(ResetPasswordWithCodeRequest $request)
+    {
+        $user = User::where('email', $request->identifier)
+            ->orWhere('phone_number', $request->identifier)
+            ->first();
+
+        if (!$user) {
+            return $this->errorResponse('No user found with this identifier', 404);
+        }
+
+        $verificationCode = VerificationCode::where(function ($query) use ($request, $user) {
+                $query->where('email', $user->email)
+                    ->orWhere('phone_number', $user->phone_number);
+            })
+            ->where('code', $request->code)
+            ->where('type', 'password_reset')
+            ->where('used', false)
+            ->where('expires_at', '>', now())
+            ->latest()
+            ->first();
+
+        if (!$verificationCode) {
+            return $this->errorResponse('Invalid or expired code', 422);
+        }
+
+        // Mark code as used
+        $verificationCode->update(['used' => true]);
+
+        // Update password
+        $user->update([
+            'password' => Hash::make($request->password),
+            'remember_token' => Str::random(60),
+        ]);
+
+        return $this->successResponse(null, 'Password has been reset successfully');
     }
 } 

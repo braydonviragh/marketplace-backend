@@ -10,8 +10,6 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('username')->unique();
-            $table->string('name');
             $table->enum('role', ['user', 'admin', 'super_admin'])->default('user');
             $table->string('email')->unique();
             $table->string('phone_number')->unique();
@@ -22,6 +20,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('phone_verified_at')->nullable();
             $table->rememberToken();
+            $table->boolean('onboarding_completed')->default(false);
             $table->timestamps();
             $table->softDeletes();
 

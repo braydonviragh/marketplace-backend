@@ -18,6 +18,6 @@ class NumberSize extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_detailed_sizes')
-            ->where('size_type', 'number');
+            ->where('user_number_size_id', $this->id);
     }
 } 

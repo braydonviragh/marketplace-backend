@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Models\User;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +12,8 @@ use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
+    use ApiResponse;
+
     public function login(LoginRequest $request)
     {
         if (!Auth::attempt($request->only('email', 'password'))) {
@@ -49,4 +52,4 @@ class LoginController extends Controller
             'token_type' => 'Bearer',
         ], 'Token successfully refreshed');
     }
-} 
+}

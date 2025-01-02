@@ -5,7 +5,12 @@ namespace Database\Factories;
 use App\Models\User;
 use App\Models\Size;
 use App\Models\Brand;
-use App\Models\Category;
+use App\Models\Style;
+use App\Models\NumberSize;
+use App\Models\WaistSize;
+use App\Models\UserDetailedSize;
+use App\Models\UserBrandPreference;
+
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -13,13 +18,12 @@ class UserProfileFactory extends Factory
 {
     public function definition(): array
     {
-        $preferredBrands = Brand::inRandomOrder()->limit(rand(2, 4))->pluck('id')->toArray();
-        $preferredCategories = Category::inRandomOrder()->limit(rand(3, 5))->pluck('id')->toArray();
-        
         $city = fake()->randomElement(['Toronto', 'Ottawa', 'Mississauga', 'Hamilton']);
         
         return [
             'user_id' => User::factory(),
+            'username' => $this->faker->unique()->userName(),
+            'name' => $this->faker->name(),
             'profile_picture' => 'profiles/default.jpg',
             'birthday' => Carbon::now()->subYears(rand(18, 50))->format('Y-m-d'),
             'city' => $city,
@@ -31,26 +35,32 @@ class UserProfileFactory extends Factory
                 default => throw new \Exception('Invalid city')
             } . ' ' . str_pad(fake()->numberBetween(0, 999), 3, '0', STR_PAD_LEFT),
             'country' => 'Canada',
-            'style_preference' => fake()->randomElement(['male', 'female', 'unisex']),
             'language' => 'en',
-            'preferences' => [
-                'preferred_brands' => $preferredBrands,
-                'preferred_categories' => $preferredCategories,
-            ]
+            'style_id' => function () {
+                return Style::inRandomOrder()->first()->id ?? Style::factory()->create()->id;
+            },
         ];
     }
 
     public function configure()
     {
         return $this->afterCreating(function ($profile) {
-            // Sync preferred brands to the pivot table
-            if (!empty($profile->preferences['preferred_brands'])) {
-                $profile->user->brands()->syncWithoutDetaching($profile->preferences['preferred_brands']);
-            }
+            // Attach random brands (2-4)
+            $brands = Brand::inRandomOrder()->limit(rand(2, 4))->pluck('id');
+            UserBrandPreference::create([
+                'user_id' => $profile->user->id,
+                'brand_id' => $brands->first(),
+            ]);
             
-            // Sync preferred categories to the pivot table
-            if (!empty($profile->preferences['preferred_categories'])) {
-                $profile->user->categories()->syncWithoutDetaching($profile->preferences['preferred_categories']);
+            // Create detailed sizes (1-3 combinations)
+            $sizeCombinations = rand(1, 3);
+            for ($i = 0; $i < $sizeCombinations; $i++) {
+                UserDetailedSize::create([
+                    'user_id' => $profile->user->id,
+                    'size_id' => Size::inRandomOrder()->first()->id,
+                    'waist_size_id' => WaistSize::inRandomOrder()->first()->id,
+                    'number_size_id' => NumberSize::inRandomOrder()->first()->id,
+                ]);
             }
         });
     }

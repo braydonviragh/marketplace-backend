@@ -13,25 +13,52 @@ class UserProfile extends Model
 
     protected $fillable = [
         'user_id',
+        'username',
+        'name',
         'profile_picture',
         'birthday',
         'postal_code',
         'city',
         'country',
-        'style_preference',
+        'style_id',
         'language',
-        'preferences'
     ];
 
     protected $casts = [
-        'birthday' => 'string',
-        'preferences' => 'array'
+        'birthday' => 'date',
     ];
 
-    protected $dates = ['birthday'];
+    // Define which relationships to eager load by default
+    protected $with = ['style', 'user.detailedSizes.letterSize', 'user.detailedSizes.waistSize', 'user.detailedSizes.numberSize', 'user.brands'];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function style(): BelongsTo
+    {
+        return $this->belongsTo(Style::class);
+    }
+
+    public function brands(): BelongsToMany
+    {
+        return $this->belongsToMany(Brand::class);
+    }
+
+    // Helper method to get all preferences in a structured format
+    public function getAllPreferences(): array
+    {
+        return [
+            'style' => $this->style,
+            'sizes' => $this->user->detailedSizes->map(function ($size) {
+                return [
+                    'letter_size' => $size->letterSize,
+                    'waist_size' => $size->waistSize,
+                    'number_size' => $size->numberSize,
+                ];
+            }),
+            'brands' => $this->brands,
+        ];
     }
 } 

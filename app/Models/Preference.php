@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Preference extends Model
 {
     protected $fillable = [
-        'user_id', 'style_preference', 'language'
+        'user_id', 'language'
     ];
 
     public function user(): BelongsTo

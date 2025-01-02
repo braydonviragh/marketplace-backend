@@ -44,7 +44,7 @@ class UserService
             'city' => $data['city'] ?? null,
             'country' => $data['country'] ?? null,
             'profile_picture' => $data['profile_picture'] ?? null,
-            'style_preference' => $data['style_preference'] ?? 'both'
+            'style_id' => $data['style_id'] ?? null
         ];
 
         return $this->userRepository->createWithProfile($userData, $profileData);
@@ -61,12 +61,12 @@ class UserService
         $profileData = array_filter([
             'username' => $data['username'] ?? null,
             'name' => $data['name'] ?? null,
-            'birthday' => isset($data['birthday']) ? date('Y-m-d', strtotime($data['birthday'])) : null,
+            'birthday' => $data['birthday'] ?? null,
             'postal_code' => $data['postal_code'] ?? null,
             'city' => $data['city'] ?? null,
             'country' => $data['country'] ?? null,
             'profile_picture' => $data['profile_picture'] ?? null,
-            'style_preference' => $data['style_preference'] ?? null,
+            'style_id' => $data['style_id'] ?? null,
         ]);
 
         return $this->userRepository->updateWithProfile($user, $userData, $profileData);

@@ -11,15 +11,15 @@ return new class extends Migration
         Schema::create('user_profiles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('username')->unique();
+            $table->string('name');
             $table->string('profile_picture')->nullable();
             $table->date('birthday')->nullable();
             $table->string('postal_code')->nullable();
             $table->string('city')->nullable();
             $table->string('country')->nullable();
-            $table->enum('style_preference', ['male', 'female', 'unisex'])->default('unisex');
+            $table->foreignId('style_id')->constrained()->onDelete('cascade');
             $table->string('language')->default('en');
-            $table->json('preferences')->nullable();
-            $table->timestamps();
         });
     }
 

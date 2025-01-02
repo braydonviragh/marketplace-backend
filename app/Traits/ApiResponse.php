@@ -17,22 +17,21 @@ trait ApiResponse
         ], $code);
     }
 
-    protected function errorResponse(string $message, string $code, int $statusCode): JsonResponse
+    protected function errorResponse(string $message, int $code = 400): JsonResponse
     {
         return response()->json([
             'status' => 'error',
             'message' => $message,
-            'code' => $code
-        ], $statusCode);
+        ], $code);
     }
 
-    protected function resourceResponse(JsonResource $resource, string $message = ''): JsonResponse
+    protected function resourceResponse(JsonResource $resource, string $message = '', int $code = 200): JsonResponse
     {
         return response()->json([
             'status' => 'success',
             'message' => $message,
             'data' => $resource
-        ]);
+        ], $code);
     }
 
     protected function collectionResponse(ResourceCollection $collection, string $message = ''): JsonResponse

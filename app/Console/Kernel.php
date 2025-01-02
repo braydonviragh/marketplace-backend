@@ -15,7 +15,13 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        // Clean up expired verification codes daily at midnight
+        $schedule->command('verification:cleanup')
+            ->daily()
+            ->at('00:00')
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->appendOutputTo(storage_path('logs/verification-cleanup.log'));
     }
 
     /**

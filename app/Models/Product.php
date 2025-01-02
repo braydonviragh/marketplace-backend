@@ -16,6 +16,7 @@ class Product extends Model
     protected $fillable = [
         'user_id',
         'category_id',
+        'style_id',
         'title',
         'description',
         'brand',
@@ -82,6 +83,11 @@ class Product extends Model
             ->where('size_type', 'shoe');
     }
 
+    public function style(): BelongsTo
+    {
+        return $this->belongsTo(Style::class);
+    }
+
     // Scopes
     public function scopeAvailable($query)
     {
@@ -105,6 +111,11 @@ class Product extends Model
             'ST_Distance_Sphere(location, POINT(?, ?)) <= ?',
             [$longitude, $latitude, $radius * 1000]
         );
+    }
+
+    public function scopeByStyle($query, $styleId)
+    {
+        return $query->where('style_id', $styleId);
     }
 
     // Accessors & Mutators

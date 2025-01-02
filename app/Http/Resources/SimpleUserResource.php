@@ -10,9 +10,11 @@ class SimpleUserResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'username' => $this->username,
-            'name' => $this->name,
-            'profile_picture' => $this->profile?->profile_picture,
+            'email' => $this->email,
+            'name' => $this->name ?? '',
+            'username' => $this->username ?? '',
+            'profile_picture' => $this->profile?->profile_picture ?? '',
+            'phone_number' => $this->phone_number ?? '',
         ];
     }
 } 

@@ -20,13 +20,13 @@ class UserRequest extends FormRequest
             
             // Profile data
             'username' => 'sometimes|required|string|max:255|unique:user_profiles,username,' . $this->user?->id . ',user_id',
-            'name' => 'sometimes|required|string|max:255',
+            'name' => 'sometimes|required|string|max:255|unique:user_profiles,name,' . $this->user?->id . ',user_id',
             'birthday' => 'sometimes|date',
             'postal_code' => 'sometimes|string|max:10',
             'city' => 'sometimes|string|max:255',
             'country' => 'sometimes|string|max:255',
             'profile_picture' => 'sometimes|image|max:5120', // 5MB max
-            'style_preference' => 'sometimes|in:male,female,both'
+            'style_id' => 'sometimes|exists:styles,id'
         ];
 
         return $rules;

@@ -8,19 +8,16 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('preferences', function (Blueprint $table) {
+        Schema::create('user_brand_preferences', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->enum('style_preference', ['male', 'female', 'unisex'])->default('unisex');
-            $table->string('language')->default('en');
-            $table->timestamps();
-
-            $table->unique('user_id');
+            $table->foreignId('brand_id')->constrained()->onDelete('cascade');
+            $table->unique(['user_id', 'brand_id']);
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('preferences');
+        Schema::dropIfExists('user_brand_preferences');
     }
 }; 

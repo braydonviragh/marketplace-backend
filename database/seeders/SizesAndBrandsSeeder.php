@@ -15,42 +15,49 @@ class SizesAndBrandsSeeder extends Seeder
         // Seed general sizes (XS-XXL)
         $generalSizes = [
             [
-                'size_name' => 'XS',
+                'name' => 'XS',
                 'display_name' => 'Extra Small',
                 'description' => 'Extra Small size, typically fits US size 0-2',
+                'slug' => 'xs',
             ],
             [
-                'size_name' => 'S',
+                'name' => 'S',
                 'display_name' => 'Small',
                 'description' => 'Small size, typically fits US size 4-6',
+                'slug' => 's',
             ],
             [
-                'size_name' => 'M',
+                'name' => 'M',
                 'display_name' => 'Medium',
                 'description' => 'Medium size, typically fits US size 8-10',
+                'slug' => 'm',
             ],
             [
-                'size_name' => 'L',
+                'name' => 'L',
                 'display_name' => 'Large',
                 'description' => 'Large size, typically fits US size 12-14',
+                'slug' => 'l',
             ],
             [
-                'size_name' => 'XL',
+                'name' => 'XL',
                 'display_name' => 'Extra Large',
                 'description' => 'Extra Large size, typically fits US size 16-18',
+                'slug' => 'xl',
             ],
             [
-                'size_name' => 'XXL',
+                'name' => 'XXL',
                 'display_name' => 'Double Extra Large',
                 'description' => 'Double Extra Large size, typically fits US size 20-22',
+                'slug' => 'xxl',
             ],
         ];
 
         foreach ($generalSizes as $size) {
             Size::create([
-                'size_name' => $size['size_name'],
+                'name' => $size['name'],
                 'display_name' => $size['display_name'],
                 'description' => $size['description'],
+                'slug' => $size['slug'],
             ]);
         }
 
@@ -61,40 +68,33 @@ class SizesAndBrandsSeeder extends Seeder
                 'name' => $size,
                 'display_name' => "Size {$size}",
                 'description' => "US Women's Size {$size}",
+                'slug' => $size,
             ]);
         }
 
         // Seed waist sizes (24-48)
         for ($size = 24; $size <= 48; $size += 2) {
             DB::table('waist_sizes')->insert([
-                'size' => $size,
+                'name' => $size,
                 'display_name' => "{$size}\"",
                 'description' => "{$size} inch waist measurement",
-            ]);
-        }
-
-        // Seed shoe sizes (5-15 with half sizes)
-        for ($size = 5.0; $size <= 15.0; $size += 0.5) {
-            DB::table('shoe_sizes')->insert([
-                'size' => $size,
-                'display_name' => "US {$size}",
-                'description' => "US Women's Shoe Size {$size}",
+                'slug' => $size,
             ]);
         }
 
         // Seed brands
         $brands = [
-            ['name' => 'Nike', 'description' => 'Athletic and casual wear'],
-            ['name' => 'Zara', 'description' => 'Contemporary fashion'],
-            ['name' => 'H&M', 'description' => 'Affordable fashion'],
-            ['name' => 'Gucci', 'description' => 'Luxury fashion house'],
-            ['name' => 'Lululemon', 'description' => 'Athletic and yoga wear'],
-            ['name' => 'Uniqlo', 'description' => 'Basic casual wear'],
-            ['name' => 'The North Face', 'description' => 'Outdoor apparel'],
-            ['name' => 'Aritzia', 'description' => 'Contemporary women\'s fashion'],
-            ['name' => 'Frank And Oak', 'description' => 'Sustainable casual wear'],
-            ['name' => 'Canada Goose', 'description' => 'Premium outerwear'],
-            ['name' => 'Other', 'description' => 'Other brands']
+            ['name' => 'Nike', 'description' => 'Athletic and casual wear', 'slug' => 'nike'],
+            ['name' => 'Zara', 'description' => 'Contemporary fashion', 'slug' => 'zara'],
+            ['name' => 'H&M', 'description' => 'Affordable fashion', 'slug' => 'h&m'],
+            ['name' => 'Gucci', 'description' => 'Luxury fashion house', 'slug' => 'gucci'],
+            ['name' => 'Lululemon', 'description' => 'Athletic and yoga wear', 'slug' => 'lululemon'],
+            ['name' => 'Uniqlo', 'description' => 'Basic casual wear', 'slug' => 'uniqlo'],
+            ['name' => 'The North Face', 'description' => 'Outdoor apparel', 'slug' => 'the-north-face'],
+            ['name' => 'Aritzia', 'description' => 'Contemporary women\'s fashion', 'slug' => 'aritzia'],
+            ['name' => 'Frank And Oak', 'description' => 'Sustainable casual wear', 'slug' => 'frank-and-oak'],
+            ['name' => 'Canada Goose', 'description' => 'Premium outerwear', 'slug' => 'canada-goose'],
+            ['name' => 'Other', 'description' => 'Other brands', 'slug' => 'other']
         ];
 
         foreach ($brands as $brand) {

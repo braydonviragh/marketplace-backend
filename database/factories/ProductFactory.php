@@ -9,6 +9,7 @@ use App\Models\ShoeSize;
 use App\Models\WaistSize;
 use App\Models\Color;
 use App\Models\Brand;
+use App\Models\Style;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -85,10 +86,12 @@ class ProductFactory extends Factory
     {
         $category = Category::inRandomOrder()->first() ?? Category::factory()->create();
         $sizeInfo = $this->getSizeByCategory($category);
+        $style = Style::inRandomOrder()->first();
         
         return [
             'user_id' => User::factory(),
             'category_id' => $category->id,
+            'style_id' => $style->id,
             'title' => fake()->sentence(4),
             'description' => fake()->paragraphs(3, true),
             'brand_id' => Brand::factory(),

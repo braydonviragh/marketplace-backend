@@ -4,20 +4,19 @@ namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RegisterRequest extends FormRequest
+class UpdateSuperAdminRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user() && $this->user()->role === 'super_admin';
     }
 
     public function rules(): array
     {
         return [
-            'phone_number' => ['required', 'string', 'unique:users', 'regex:/^\+1[0-9]{10}$/'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8'],
-            'terms_accepted' => ['required', 'boolean', 'accepted'],
+            'phone_number' => ['sometimes', 'string', 'unique:users,phone_number,' . $this->superAdmin->id, 'regex:/^\+1[0-9]{10}$/'],
+            'email' => ['sometimes', 'string', 'email', 'max:255', 'unique:users,email,' . $this->superAdmin->id],
+            'password' => ['sometimes', 'string', 'min:8'],
         ];
     }
 
@@ -29,7 +28,6 @@ class RegisterRequest extends FormRequest
             'email.unique' => 'Email address already in use',
             'email.regex' => 'Email address must be in format: example@example.com',
             'password.min' => 'Password must be at least 8 characters long',
-            'terms_accepted.accepted' => 'You must accept the terms of service',
         ];
     }
 } 

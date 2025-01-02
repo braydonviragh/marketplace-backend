@@ -23,6 +23,6 @@ class WaistSize extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_detailed_sizes')
-            ->where('size_type', 'waist');
+            ->where('user_waist_size_id', $this->id);
     }
-} 
+}

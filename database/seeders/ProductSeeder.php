@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\Size;
 use App\Models\Color;
+use App\Models\Style;
 use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
@@ -20,6 +21,7 @@ class ProductSeeder extends Seeder
         $categories = Category::all();
         $sizes = Size::all();
         $colors = Color::all();
+        $styles = Style::all();
 
         // Check if we have the necessary data
         if ($users->isEmpty()) {
@@ -41,6 +43,11 @@ class ProductSeeder extends Seeder
             $this->command->error('No sizes found. Please run SizesAndBrandsSeeder first.');
             return;
         }
+
+        if ($styles->isEmpty()) {
+            $this->command->error('No styles found. Please run StyleSeeder first.');
+            return;
+        }
         
         foreach ($users as $user) {
             // Create 2-5 products per user
@@ -52,6 +59,7 @@ class ProductSeeder extends Seeder
                 $product = Product::create([
                     'user_id' => $user->id,
                     'category_id' => $categories->random()->id,
+                    'style_id' => $styles->random()->id,
                     'brand_id' => $brands->random()->id,
                     'title' => fake()->sentence(4),
                     'description' => fake()->paragraphs(3, true),

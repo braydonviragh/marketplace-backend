@@ -18,6 +18,7 @@ class Size extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'user_sizes');
+        return $this->belongsToMany(User::class, 'user_detailed_sizes')
+            ->where('user_size_id', $this->id);
     }
 } 

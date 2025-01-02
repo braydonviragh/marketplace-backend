@@ -16,8 +16,6 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
-        'username',
-        'name',
         'email',
         'phone_number',
         'password',
@@ -26,7 +24,9 @@ class User extends Authenticatable
         'terms_accepted_at',
         'is_active',
         'email_verified_at',
-        'phone_verified_at'
+        'phone_verified_at',
+        'onboarding_completed',
+        'remember_token',
     ];
 
     protected $hidden = [
@@ -40,6 +40,7 @@ class User extends Authenticatable
         'terms_accepted_at' => 'datetime',
         'terms_accepted' => 'boolean',
         'is_active' => 'boolean',
+        'onboarding_completed' => 'boolean',
     ];
 
     public function profile(): HasOne
@@ -47,42 +48,29 @@ class User extends Authenticatable
         return $this->hasOne(UserProfile::class);
     }
 
+    public function detailedSizes(): HasMany
+    {
+        return $this->hasMany(UserDetailedSize::class);
+    }
+
+    // Helper methods to get specific size types
+    public function getLetterSizes()
+    {
+        return $this->detailedSizes()->whereNotNull('size_id')->with('letterSize');
+    }
+
+    public function getWaistSizes()
+    {
+        return $this->detailedSizes()->whereNotNull('waist_size_id')->with('waistSize');
+    }
+
+    public function getNumberSizes()
+    {
+        return $this->detailedSizes()->whereNotNull('number_size_id')->with('numberSize');
+    }
+
     public function brands(): BelongsToMany
     {
-        return $this->belongsToMany(Brand::class, 'user_brand_preferences')
-            ->withTimestamps();
-    }
-
-    public function sizes(): BelongsToMany
-    {
-        return $this->belongsToMany(Size::class, 'user_sizes')
-            ->withTimestamps();
-    }
-
-    public function numberSizes(): BelongsToMany
-    {
-        return $this->belongsToMany(NumberSize::class, 'user_detailed_sizes')
-            ->where('size_type', 'number')
-            ->withTimestamps();
-    }
-
-    public function waistSizes(): BelongsToMany
-    {
-        return $this->belongsToMany(WaistSize::class, 'user_detailed_sizes')
-            ->where('size_type', 'waist')
-            ->withTimestamps();
-    }
-
-    public function shoeSizes(): BelongsToMany
-    {
-        return $this->belongsToMany(ShoeSize::class, 'user_detailed_sizes')
-            ->where('size_type', 'shoe')
-            ->withTimestamps();
-    }
-
-    public function categories(): BelongsToMany
-    {
-        return $this->belongsToMany(Category::class, 'user_category_preferences')
-            ->withTimestamps();
+        return $this->belongsToMany(Brand::class, 'user_brand_preferences');
     }
 } 

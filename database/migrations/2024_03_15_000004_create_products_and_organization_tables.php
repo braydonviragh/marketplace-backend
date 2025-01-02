@@ -20,9 +20,12 @@ return new class extends Migration
             $table->text('description');
             $table->decimal('price', 10, 2);
             
-            // Size Information
+            // Size/Style Information
             $table->foreignId('size_id')->nullable()->constrained()->onDelete('set null');
-            
+            $table->foreignId('waist_size_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('number_size_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('style_id')->constrained()->onDelete('cascade');
+
             // Product Details
             $table->json('specifications')->nullable(); // color, material, style, etc.
             
@@ -45,8 +48,11 @@ return new class extends Migration
             // Indexes
             $table->index('user_id');
             $table->index('category_id');
+            $table->index('style_id');
             $table->index('brand_id');
             $table->index('size_id');
+            $table->index('waist_size_id');
+            $table->index('number_size_id');
             $table->index('is_available');
         });
     }

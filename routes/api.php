@@ -21,6 +21,8 @@ use App\Http\Controllers\Api\V1\SizeController;
 use App\Http\Controllers\Api\V1\NumberSizeController;
 use App\Http\Controllers\Api\V1\ShoeSizeController;
 use App\Http\Controllers\Api\V1\WaistSizeController;
+use App\Http\Controllers\Api\V1\Auth\SuperAdminController;
+use App\Http\Controllers\Api\V1\Auth\OnboardingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,12 +37,6 @@ Route::prefix('v1')->group(function () {
         Route::post('logout', [LoginController::class, 'logout'])->middleware('auth:sanctum');
         Route::post('refresh', [LoginController::class, 'refresh'])->middleware('auth:sanctum');
         
-        // Social Authentication
-        Route::prefix('social')->group(function () {
-            Route::get('{provider}/redirect', [SocialAuthController::class, 'redirect']);
-            Route::get('{provider}/callback', [SocialAuthController::class, 'callback']);
-        });
-
         // Registration
         Route::post('register', [RegisterController::class, 'register']);
         
@@ -52,12 +48,12 @@ Route::prefix('v1')->group(function () {
             ->name('verification.resend');
         
         // Password Reset
-        Route::post('forgot-password', [PasswordResetController::class, 'forgotPassword'])
+        Route::post('forgot-password', [PasswordResetController::class, 'initiateReset'])
             ->middleware('throttle:6,1')
-            ->name('password.email');
-        Route::post('reset-password', [PasswordResetController::class, 'reset'])
+            ->name('password.request');
+        Route::post('reset-password', [PasswordResetController::class, 'resetWithCode'])
             ->middleware('throttle:6,1')
-            ->name('password.reset');
+            ->name('password.update');
     });
 
     // Protected routes with specific middleware
@@ -72,6 +68,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/payments', [PaymentController::class, 'userPayments'])
                 ->middleware('verify.user.access');
         });
+
+        // Onboarding
+        Route::post('onboarding/complete', [OnboardingController::class, 'complete']);
 
         // Payments
         Route::prefix('payments')->group(function () {
@@ -138,6 +137,17 @@ Route::prefix('v1')->group(function () {
                 ->middleware('verify.product.owner');
             Route::post('/{offer}/reject', [OfferController::class, 'reject'])
                 ->middleware('verify.product.owner');
+        });
+
+        // Super Admin Management
+        Route::middleware(['auth:sanctum', 'role:super_admin'])->group(function () {
+            Route::prefix('admin/super-admins')->group(function () {
+                Route::get('/', [SuperAdminController::class, 'index']);
+                Route::post('/', [SuperAdminController::class, 'store']);
+                Route::put('/{superAdmin}', [SuperAdminController::class, 'update']);
+                Route::post('/{superAdmin}/deactivate', [SuperAdminController::class, 'deactivate']);
+                Route::post('/{superAdmin}/reactivate', [SuperAdminController::class, 'reactivate']);
+            });
         });
     // });
 }); 

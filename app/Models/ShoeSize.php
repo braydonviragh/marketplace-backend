@@ -13,7 +13,6 @@ class ShoeSize extends Model
         'size',
         'display_name',
         'description',
-        'order',
     ];
 
     protected $casts = [
@@ -23,6 +22,6 @@ class ShoeSize extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_detailed_sizes')
-            ->where('size_type', 'shoe');
+            ->where('user_shoe_size_id', $this->id);
     }
 } 

@@ -4,11 +4,12 @@ namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RegisterRequest extends FormRequest
+class CreateSuperAdminRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        // Only allow existing super admins to create other super admins
+        return $this->user() && $this->user()->role === 'super_admin';
     }
 
     public function rules(): array
@@ -17,7 +18,6 @@ class RegisterRequest extends FormRequest
             'phone_number' => ['required', 'string', 'unique:users', 'regex:/^\+1[0-9]{10}$/'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
-            'terms_accepted' => ['required', 'boolean', 'accepted'],
         ];
     }
 
@@ -29,7 +29,6 @@ class RegisterRequest extends FormRequest
             'email.unique' => 'Email address already in use',
             'email.regex' => 'Email address must be in format: example@example.com',
             'password.min' => 'Password must be at least 8 characters long',
-            'terms_accepted.accepted' => 'You must accept the terms of service',
         ];
     }
 } 
