@@ -56,4 +56,17 @@ class ProductRepository extends BaseRepository
                     ->latest()
                     ->paginate($perPage);
     }
+
+    public function findProductWithRelations(int $id): Product
+    {
+        return $this->model->with([
+            'user',
+            'category',
+            'images',
+            'color',
+            'letterSize',
+            'waistSize',
+            'numberSize'
+        ])->findOrFail($id);
+    }
 } 

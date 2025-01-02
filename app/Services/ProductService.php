@@ -22,7 +22,7 @@ class ProductService
 
     public function findProduct(int $id): Product
     {
-        return $this->productRepository->findOrFail($id);
+        return $this->productRepository->findProductWithRelations($id);
     }
 
     public function createProduct(array $data): Product
