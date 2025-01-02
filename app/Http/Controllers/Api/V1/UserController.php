@@ -10,10 +10,13 @@ use App\Http\Resources\UserResource;
 use App\Http\Resources\UserCollection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use App\Traits\WithDynamicRelations;
+use App\Http\Resources\SimpleUserResource;
 
 class UserController extends Controller
 {
     protected UserService $userService;
+    use WithDynamicRelations;
 
     public function __construct(UserService $userService)
     {
@@ -33,12 +36,28 @@ class UserController extends Controller
         );
     }
 
+    public function getSimpleProfile(User $user)
+    {
+        return new SimpleUserResource($user);
+    }
+
+
     public function show(int $id): JsonResponse
     {
         $user = $this->userService->findUser($id);
         
+        // Load all relevant relations for a complete user profile
+        $user->load([
+            'profile',
+            'profile.style',
+            'detailedSizes.letterSize',
+            'detailedSizes.waistSize',
+            'detailedSizes.numberSize',
+            'brands'
+        ]);
+        
         return $this->resourceResponse(
-            new UserResource($user->load('profile')),
+            new UserResource($user),
             'User retrieved successfully'
         );
     }

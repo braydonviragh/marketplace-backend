@@ -38,26 +38,22 @@ class OnboardingController extends Controller
             'country' => 'Canada',
             'style_id' => $request->style_id,
             'language' => 'en',
-            'preferences' => [
-                'preferred_brands' => $request->preferred_brands,
-                'sizes' => $request->sizes,
-            ]
         ]);
 
         // Sync brand preferences
-        $user->brands()->sync($request->preferred_brands);
+        $profile->brands()->sync($request->preferred_brands);
 
         // Sync size preferences
-        $user->sizes()->sync($request->sizes['general']);
+        $profile->sizes()->sync($request->sizes['general']);
         if (isset($request->sizes['number'])) {
-            $user->numberSizes()->sync($request->sizes['number']);
+            $profile->numberSizes()->sync($request->sizes['number']);
         }
         if (isset($request->sizes['waist'])) {
-            $user->waistSizes()->sync($request->sizes['waist']);
+            $profile->waistSizes()->sync($request->sizes['waist']);
         }
 
         // Update user status
-        $user->update(['onboarding_completed' => true]);
+        $profile->update(['onboarding_completed' => true]);
 
         return $this->resourceResponse(
             new UserProfileResource($profile->fresh()),

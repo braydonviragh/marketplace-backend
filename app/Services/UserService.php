@@ -39,7 +39,7 @@ class UserService
         $profileData = [
             'username' => $data['username'] ?? null,
             'name' => $data['name'] ?? null,
-            'birthday' => isset($data['birthday']) ? date('Y-m-d', strtotime($data['birthday'])) : null,
+            'birthday' => $data['birthday'] ?? null,
             'postal_code' => $data['postal_code'] ?? null,
             'city' => $data['city'] ?? null,
             'country' => $data['country'] ?? null,

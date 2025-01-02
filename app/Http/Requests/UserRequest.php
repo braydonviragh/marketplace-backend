@@ -21,7 +21,7 @@ class UserRequest extends FormRequest
             // Profile data
             'username' => 'sometimes|required|string|max:255|unique:user_profiles,username,' . $this->user?->id . ',user_id',
             'name' => 'sometimes|required|string|max:255|unique:user_profiles,name,' . $this->user?->id . ',user_id',
-            'birthday' => 'sometimes|date',
+            'birthday' => 'sometimes|string',
             'postal_code' => 'sometimes|string|max:10',
             'city' => 'sometimes|string|max:255',
             'country' => 'sometimes|string|max:255',

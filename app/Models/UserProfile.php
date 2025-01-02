@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class UserProfile extends Model
 {
@@ -25,11 +26,17 @@ class UserProfile extends Model
     ];
 
     protected $casts = [
-        'birthday' => 'date',
+        'birthday' => 'string',
     ];
 
     // Define which relationships to eager load by default
-    protected $with = ['style', 'user.detailedSizes.letterSize', 'user.detailedSizes.waistSize', 'user.detailedSizes.numberSize', 'user.brands'];
+    protected $with = [
+        'style', 
+        'user.detailedSizes.letterSize', 
+        'user.detailedSizes.waistSize', 
+        'user.detailedSizes.numberSize', 
+        'user.brands'
+    ];
 
     public function user(): BelongsTo
     {
@@ -39,11 +46,6 @@ class UserProfile extends Model
     public function style(): BelongsTo
     {
         return $this->belongsTo(Style::class);
-    }
-
-    public function brands(): BelongsToMany
-    {
-        return $this->belongsToMany(Brand::class);
     }
 
     // Helper method to get all preferences in a structured format
@@ -58,7 +60,7 @@ class UserProfile extends Model
                     'number_size' => $size->numberSize,
                 ];
             }),
-            'brands' => $this->brands,
+            'brands' => $this->user->brands,
         ];
     }
 } 

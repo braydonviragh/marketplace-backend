@@ -14,7 +14,7 @@ class SimpleUserResource extends JsonResource
             'name' => $this->name ?? '',
             'username' => $this->username ?? '',
             'profile_picture' => $this->profile?->profile_picture ?? '',
-            'phone_number' => $this->phone_number ?? '',
+            'phone_number' => $this->phone_number,
         ];
     }
 } 
