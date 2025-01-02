@@ -5,20 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Size extends Model
+class LetterSize extends Model
 {
     public $timestamps = false;
     
-    protected $fillable = ['size_name', 'description', 'category'];
+    protected $fillable = ['name', 'slug', 'description'];
 
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'product_sizes');
+        return $this->belongsToMany(Product::class);
     }
 
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_detailed_sizes')
-            ->where('user_size_id', $this->id);
+            ->where('letter_size_id', $this->id);
     }
 } 

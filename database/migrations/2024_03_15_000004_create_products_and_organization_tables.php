@@ -21,7 +21,7 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             
             // Size/Style Information
-            $table->foreignId('size_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('letter_size_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('waist_size_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('number_size_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('style_id')->constrained()->onDelete('cascade');
@@ -50,7 +50,7 @@ return new class extends Migration
             $table->index('category_id');
             $table->index('style_id');
             $table->index('brand_id');
-            $table->index('size_id');
+            $table->index('letter_size_id');
             $table->index('waist_size_id');
             $table->index('number_size_id');
             $table->index('is_available');

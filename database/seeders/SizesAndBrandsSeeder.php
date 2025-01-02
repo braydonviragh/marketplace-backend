@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Size;
+use App\Models\LetterSize;
 use App\Models\Brand;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +13,7 @@ class SizesAndBrandsSeeder extends Seeder
     public function run(): void
     {
         // Seed general sizes (XS-XXL)
-        $generalSizes = [
+        $letterSizes = [
             [
                 'name' => 'XS',
                 'display_name' => 'Extra Small',
@@ -52,8 +52,8 @@ class SizesAndBrandsSeeder extends Seeder
             ],
         ];
 
-        foreach ($generalSizes as $size) {
-            Size::create([
+        foreach ($letterSizes as $size) {
+            LetterSize::create([
                 'name' => $size['name'],
                 'display_name' => $size['display_name'],
                 'description' => $size['description'],

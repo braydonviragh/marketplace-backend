@@ -6,7 +6,9 @@ use App\Models\User;
 use App\Models\Brand;
 use App\Models\Product;
 use App\Models\Category;
-use App\Models\Size;
+use App\Models\LetterSize;
+use App\Models\WaistSize;
+use App\Models\NumberSize;
 use App\Models\Color;
 use App\Models\Style;
 use Illuminate\Database\Seeder;
@@ -19,7 +21,9 @@ class ProductSeeder extends Seeder
         $users = User::where('role', 'user')->get();
         $brands = Brand::all();
         $categories = Category::all();
-        $sizes = Size::all();
+        $letterSizes = LetterSize::all();
+        $waistSizes = WaistSize::all();
+        $numberSizes = NumberSize::all();
         $colors = Color::all();
         $styles = Style::all();
 
@@ -39,8 +43,8 @@ class ProductSeeder extends Seeder
             return;
         }
 
-        if ($sizes->isEmpty()) {
-            $this->command->error('No sizes found. Please run SizesAndBrandsSeeder first.');
+        if ($letterSizes->isEmpty()) {
+            $this->command->error('No letter sizes found. Please run SizesAndBrandsSeeder first.');
             return;
         }
 
@@ -54,16 +58,59 @@ class ProductSeeder extends Seeder
             $productsCount = rand(2, 5);
             
             for ($i = 0; $i < $productsCount; $i++) {
-                $size = $sizes->random();
+                $category = $categories->random();
+                
+                // Initialize all size IDs as null
+                $letterSizeId = null;
+                $waistSizeId = null;
+                $numberSizeId = null;
+
+                // Assign appropriate size based on category type
+                switch ($category->slug) {
+                    // Top wear - Letter sizes
+                    case 'tops':
+                    case 'sweaters-knits':
+                    case 'blazers':
+                    case 'bodysuits':
+                    case 'sweats-hoodies':
+                        $letterSizeId = $letterSizes->random()->id;
+                        break;
+
+                    // Full body/Bottom wear - Number sizes
+                    case 'dresses':
+                    case 'activewear':
+                    case 'skirts':
+                    case 'jumpsuits':
+                    case 'suits':
+                        $numberSizeId = $numberSizes->random()->id;
+                        break;
+
+                    // Waist measured items
+                    case 'jeans':
+                    case 'pants':
+                    case 'shorts':
+                        $waistSizeId = $waistSizes->random()->id;
+                        break;
+
+                    // No size needed for these categories
+                    case 'accessories':
+                    case 'handbags':
+                    case 'jewelry':
+                    case 'shoes':
+                    case 'other':
+                        break;
+                }
                 
                 $product = Product::create([
                     'user_id' => $user->id,
-                    'category_id' => $categories->random()->id,
+                    'category_id' => $category->id,
                     'style_id' => $styles->random()->id,
                     'brand_id' => $brands->random()->id,
                     'title' => fake()->sentence(4),
                     'description' => fake()->paragraphs(3, true),
-                    'size_id' => $size->id,
+                    'letter_size_id' => $letterSizeId,
+                    'waist_size_id' => $waistSizeId,
+                    'number_size_id' => $numberSizeId,
                     'color_id' => $colors->random()->id,
                     'price' => fake()->randomFloat(2, 10, 1000),
                     'city' => fake()->city(),

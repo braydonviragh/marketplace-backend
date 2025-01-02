@@ -104,7 +104,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('colors', ColorController::class);
         
         // Sizes
-        Route::apiResource('sizes', SizeController::class);
+        Route::apiResource('letter-sizes', LetterSizeController::class);
         Route::apiResource('number-sizes', NumberSizeController::class);
         Route::apiResource('shoe-sizes', ShoeSizeController::class);
         Route::apiResource('waist-sizes', WaistSizeController::class);

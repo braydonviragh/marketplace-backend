@@ -25,7 +25,9 @@ class ProductRequest extends FormRequest
             'category_id' => 'required|exists:categories,id',
             
             // Size Information
-            'size_id' => 'nullable|exists:sizes,id',
+            'letter_size_id' => 'nullable|exists:letter_sizes,id',
+            'waist_size_id' => 'nullable|exists:waist_sizes,id',
+            'number_size_id' => 'nullable|exists:number_sizes,id',
             
             // Product Details
             'specifications' => 'nullable|array',

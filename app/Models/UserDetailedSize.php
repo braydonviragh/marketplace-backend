@@ -9,7 +9,7 @@ class UserDetailedSize extends Model
 {
     protected $fillable = [
         'user_id',
-        'size_id',
+        'letter_size_id',
         'waist_size_id',
         'number_size_id',
     ];
@@ -21,7 +21,7 @@ class UserDetailedSize extends Model
 
     public function letterSize(): BelongsTo
     {
-        return $this->belongsTo(Size::class, 'size_id');
+        return $this->belongsTo(LetterSize::class, 'letter_size_id');
     }
 
     public function waistSize(): BelongsTo

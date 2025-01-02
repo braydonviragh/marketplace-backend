@@ -23,7 +23,6 @@ class Product extends Model
         'price',
         'condition',
         'size_id',
-        'specifications',
         'is_available',
         'city',
         'province',
@@ -34,7 +33,6 @@ class Product extends Model
     protected $casts = [
         'price' => 'decimal:2',
         'is_available' => 'boolean',
-        'specifications' => 'array',
         'views_count' => 'integer',
     ];
 
@@ -42,6 +40,10 @@ class Product extends Model
         'is_available' => true,
         'views_count' => 0,
     ];
+
+    protected $with = ['letterSize', 'waistSize', 'numberSize'];
+
+    protected $appends = ['size'];
 
     // Relationships
     public function user(): BelongsTo
@@ -54,6 +56,11 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function brand(): BelongsTo
+    {
+        return $this->belongsTo(Brand::class);
+    }
+
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class)->orderBy('order');
@@ -62,25 +69,22 @@ class Product extends Model
     // Size relationships based on size_type
     public function letterSize(): BelongsTo
     {
-        return $this->belongsTo(Size::class, 'size_id');
+        return $this->belongsTo(LetterSize::class);
     }
 
     public function numberSize(): BelongsTo
     {
-        return $this->belongsTo(NumberSize::class, 'size_id')
-            ->where('size_type', 'number');
+        return $this->belongsTo(NumberSize::class);
     }
 
     public function waistSize(): BelongsTo
     {
-        return $this->belongsTo(WaistSize::class, 'size_id')
-            ->where('size_type', 'waist');
+        return $this->belongsTo(WaistSize::class);
     }
 
     public function shoeSize(): BelongsTo
     {
-        return $this->belongsTo(ShoeSize::class, 'size_id')
-            ->where('size_type', 'shoe');
+        return $this->belongsTo(ShoeSize::class);
     }
 
     public function style(): BelongsTo
@@ -119,12 +123,40 @@ class Product extends Model
     }
 
     // Accessors & Mutators
-    protected function getSizeAttribute($value)
+    protected function getSizeAttribute()
     {
-        if ($this->size_type === 'one_size') {
-            return 'One Size';
+        if ($this->letter_size_id) {
+            return [
+                'id' => $this->letterSize->id,
+                'name' => $this->letterSize->name,
+                'display_name' => $this->letterSize->display_name,
+                'slug' => $this->letterSize->slug,
+                'type' => 'letter'
+            ];
         }
-        return $value;
+        
+        if ($this->number_size_id) {
+            return [
+                'id' => $this->numberSize->id,
+                'name' => $this->numberSize->name,
+                'display_name' => $this->numberSize->display_name,
+                'slug' => $this->numberSize->slug,
+                'type' => 'number'
+            ];
+        }
+        
+        if ($this->waist_size_id) {
+            return [
+                'id' => $this->waistSize->id,
+                'name' => $this->waistSize->name,
+                'display_name' => $this->waistSize->display_name,
+                'slug' => $this->waistSize->slug,
+                'type' => 'waist'
+            ];
+        }
+
+        // For categories that don't need sizes (accessories, jewelry, etc.)
+        return null;
     }
 
     protected function getLocationAttribute($value)

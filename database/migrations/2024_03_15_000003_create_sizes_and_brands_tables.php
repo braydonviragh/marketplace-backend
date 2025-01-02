@@ -25,7 +25,7 @@ return new class extends Migration
         });
 
         // General sizes table (XS, S, M, etc.)
-        Schema::create('sizes', function (Blueprint $table) {
+        Schema::create('letter_sizes', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
             $table->string('display_name');
@@ -56,7 +56,7 @@ return new class extends Migration
     {
         Schema::dropIfExists('waist_sizes');
         Schema::dropIfExists('number_sizes');
-        Schema::dropIfExists('sizes');
+        Schema::dropIfExists('letter_sizes');
         Schema::dropIfExists('brands');
         Schema::dropIfExists('colors');
     }

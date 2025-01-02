@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\User;
-use App\Models\Size;
+use App\Models\LetterSize;
 use App\Models\Brand;
 use App\Models\Style;
 use App\Models\NumberSize;
@@ -57,7 +57,7 @@ class UserProfileFactory extends Factory
             for ($i = 0; $i < $sizeCombinations; $i++) {
                 UserDetailedSize::create([
                     'user_id' => $profile->user->id,
-                    'size_id' => Size::inRandomOrder()->first()->id,
+                    'letter_size_id' => LetterSize::inRandomOrder()->first()->id,
                     'waist_size_id' => WaistSize::inRandomOrder()->first()->id,
                     'number_size_id' => NumberSize::inRandomOrder()->first()->id,
                 ]);

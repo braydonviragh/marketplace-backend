@@ -24,9 +24,6 @@ class ProductResource extends JsonResource
             'price' => $this->price,
             'brand' => $this->brand,
             
-            // Size Information
-            'size_id' => $this->size_id,
-            
             // Product Details
             'specifications' => $this->specifications,
             'is_available' => $this->is_available,
@@ -38,7 +35,8 @@ class ProductResource extends JsonResource
             
             // Simplified Relationships
             'user' => new SimpleUserResource($this->whenLoaded('user')),
-            'category' => new SimpleCategoryResource($this->whenLoaded('category'))
+            'category' => new SimpleCategoryResource($this->whenLoaded('category')),
+            'size' => $this->size,
         ];
     }
 } 
