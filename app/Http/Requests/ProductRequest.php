@@ -21,23 +21,8 @@ class ProductRequest extends FormRequest
             'brand' => 'nullable|string|max:100',
             'price' => 'required|numeric|min:0|max:999999.99',
             
-            // Category
-            'category_id' => 'required|exists:categories,id',
-            
-            // Size Information
-            'letter_size_id' => 'nullable|exists:letter_sizes,id',
-            'waist_size_id' => 'nullable|exists:waist_sizes,id',
-            'number_size_id' => 'nullable|exists:number_sizes,id',
-            
-            // Product Details
-            'specifications' => 'nullable|array',
-            'specifications.color' => 'nullable|string|max:50',
-            'specifications.material' => 'nullable|string|max:50',
-            'specifications.style' => 'nullable|string|max:50',
-            
             // Status and Visibility
             'is_available' => 'boolean',
-
             
             // Location
             'city' => 'required|string|max:100',

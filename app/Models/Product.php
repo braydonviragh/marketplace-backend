@@ -17,6 +17,7 @@ class Product extends Model
         'user_id',
         'category_id',
         'style_id',
+        'color_id',
         'title',
         'description',
         'brand',
@@ -41,7 +42,7 @@ class Product extends Model
         'views_count' => 0,
     ];
 
-    protected $with = ['letterSize', 'waistSize', 'numberSize'];
+    protected $with = ['letterSize', 'waistSize', 'numberSize', 'color'];
 
     protected $appends = ['size'];
 
@@ -64,6 +65,11 @@ class Product extends Model
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class)->orderBy('order');
+    }
+
+    public function color(): BelongsTo
+    {
+        return $this->belongsTo(Color::class);
     }
 
     // Size relationships based on size_type

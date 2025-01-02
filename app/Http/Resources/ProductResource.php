@@ -25,7 +25,6 @@ class ProductResource extends JsonResource
             'brand' => $this->brand,
             
             // Product Details
-            'specifications' => $this->specifications,
             'is_available' => $this->is_available,
             
             // Location
@@ -37,6 +36,7 @@ class ProductResource extends JsonResource
             'user' => new SimpleUserResource($this->whenLoaded('user')),
             'category' => new SimpleCategoryResource($this->whenLoaded('category')),
             'size' => $this->size,
+            'color' => $this->color,
         ];
     }
 } 

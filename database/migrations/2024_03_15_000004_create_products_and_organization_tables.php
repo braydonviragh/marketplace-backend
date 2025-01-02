@@ -25,9 +25,6 @@ return new class extends Migration
             $table->foreignId('waist_size_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('number_size_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('style_id')->constrained()->onDelete('cascade');
-
-            // Product Details
-            $table->json('specifications')->nullable(); // color, material, style, etc.
             
             // Status and Visibility
             $table->boolean('is_available')->default(true);
