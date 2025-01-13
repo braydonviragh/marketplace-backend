@@ -1,6 +1,6 @@
 # Rental Platform API
 
-A Laravel-based API backend for a side project clothing rental marketplace platform. Users can post their clothes for rent and other users can view and rent them.
+A Laravel-based API backend for a side project clothing rental marketplace platform. Users can post their clothes for rent and other users can view and rent them. Please import the JSON postman collection into postman to see Users, products, categories, sizes, rentals, and more. Especially note the detailed relationships that users and products have with categories, sizes, and rentals.
 
 ## Prerequisites
 
@@ -118,19 +118,27 @@ Adjust based on your MAMP/XAMPP setup local server path
 
 ### 7. Testing the API
 
-1. Test Product Endpoints:
-   - List all products
-   - Create new products with different size types based on category
-   - Filter products by:
-     - Category
-     - Size type (letter, number, waist)
-     - Price range
-     - Location
+Test User Endpoints:
+1. Register a new user
+2. View list of users
+3. View a specific user's profile
+4. Update the user's profile
+5. Delete the user
 
-2. Test Rental Endpoints:
-   - Create rental requests
-   - Update rental status
-   - View rental history
+Test Category Endpoints:
+1. List all categories
+2. View a specific category's details
+
+Test Size Endpoints:
+1. List all sizes (letter, number, waist)
+2. View a specific size's details
+
+Test Product Endpoints:
+1. List all products
+2. Create new products with different size types based on category
+ - GET filters in progress (to filter by category, size, price, location)
+
+Some API's will return error as they are in progress 
 
 ### Common Issues & Troubleshooting
 
@@ -143,6 +151,7 @@ php artisan db:show
 # Clear cache if needed
 php artisan config:clear
 php artisan cache:clear
+composer dump-autoload
 ```
 
 2. Seeding Issues:
@@ -155,13 +164,6 @@ composer dump-autoload
 php artisan db:seed
 ```
 
-3. Permission Issues:
-
-```bash
-# Set proper permissions
-chmod -R 777 storage bootstrap/cache
-```
-
 ### Development Notes
 
 - Products have different size types based on category:
@@ -172,7 +174,6 @@ chmod -R 777 storage bootstrap/cache
 
 - Categories are pre-seeded with common clothing types
 - Each product must belong to a category and have appropriate size type
-- Images can be uploaded for products (stored in storage/app/public)
 
 ### Next Steps
 
