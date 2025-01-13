@@ -1,66 +1,188 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Rental Platform API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel-based API backend for a side project clothing rental marketplace platform. Users can post their clothes for rent and other users can view and rent them.
 
-## About Laravel
+## Prerequisites
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP >= 8.1
+- Composer
+- MySQL/MariaDB
+- XAMPP/MAMP for local development
+- Postman for API testing
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Installation Steps
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. Environment Setup
 
-## Learning Laravel
+Ensure you have PHP and Composer installed:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```bash
+php -v
+composer -v
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 2. Clone the Repository
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+git clone https://github.com/your-username/rental-platform-api.git
+cd rental-platform-api
 
-## Laravel Sponsors
+composer install    
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+```
 
-### Premium Partners
+### 3. Database Setup
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+1. Start XAMPP/MAMP and ensure MySQL service is running
+2. Create a new database named `rental_platform`
+3. Copy `.env.example` to `.env`:
 
-## Contributing
+```bash
+cp .env.example .env
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=rental_platform
+DB_USERNAME=root
+DB_PASSWORD=
 
-## Code of Conduct
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 4. Application Setup
 
-## Security Vulnerabilities
+1. Generate application key:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+php artisan key:generate
+```
 
-## License
+2. Run database migrations and seeders:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan migrate:fresh --seed
+```
+
+This will create and populate:
+- Categories (Dresses, Tops, Handbags, etc.)
+- Sizes (Letter: XS-XXL, Number: 00-22, Waist: 24"-48")
+- Brands (Nike, Zara, H&M, etc.)
+- Colors
+- Sample Users (including admin user)
+- Sample Products
+
+
+### 5. API Testing Setup
+
+1. Import the Postman collection:
+   - Open Postman
+   - Import `Rental_Platform_API.postman_collection.json`
+   - Create a new environment and set:
+     ```
+     base_url: http://127.0.0.1/laravel/mp-backend/public
+     ```
+Adjust based on your MAMP/XAMPP setup local server path
+ Authorization has been commented out for now 
+
+### 6. Available API Endpoints
+
+#### Users
+- GET /api/v1/users
+- GET /api/v1/users/{id}
+- POST /api/v1/users
+- PUT /api/v1/users/{id}
+- DELETE /api/v1/users/{id}
+
+#### Super Admins
+
+#### Products
+- GET /api/v1/products
+- GET /api/v1/products/{id}
+- POST /api/v1/products
+- PUT /api/v1/products/{id}
+- DELETE /api/v1/products/{id}
+
+#### Categories
+- GET /api/v1/categories
+- GET /api/v1/categories/{id}
+
+#### Sizes
+- GET /api/v1/letter-sizes
+- GET /api/v1/number-sizes
+- GET /api/v1/waist-sizes
+
+#### Rentals
+- GET /api/v1/rentals
+- POST /api/v1/rentals
+- PUT /api/v1/rentals/{id}
+
+### 7. Testing the API
+
+1. Test Product Endpoints:
+   - List all products
+   - Create new products with different size types based on category
+   - Filter products by:
+     - Category
+     - Size type (letter, number, waist)
+     - Price range
+     - Location
+
+2. Test Rental Endpoints:
+   - Create rental requests
+   - Update rental status
+   - View rental history
+
+### Common Issues & Troubleshooting
+
+1. Database Connection Issues:
+
+```bash
+# Verify database connection
+php artisan db:show
+
+# Clear cache if needed
+php artisan config:clear
+php artisan cache:clear
+```
+
+2. Seeding Issues:
+
+```bash
+# Refresh autoloader
+composer dump-autoload
+
+# Retry seeding
+php artisan db:seed
+```
+
+3. Permission Issues:
+
+```bash
+# Set proper permissions
+chmod -R 777 storage bootstrap/cache
+```
+
+### Development Notes
+
+- Products have different size types based on category:
+  - Letter sizes (XS-XXL): Tops, Sweaters, Blazers
+  - Number sizes (00-22): Dresses, Skirts, Suits
+  - Waist sizes (24"-48"): Jeans, Pants, Shorts
+  - No size: Accessories, Jewelry, Handbags
+
+- Categories are pre-seeded with common clothing types
+- Each product must belong to a category and have appropriate size type
+- Images can be uploaded for products (stored in storage/app/public)
+
+### Next Steps
+
+1. Implement authentication and authorization for 2FA Texting Authentication
+2. Implement payment gateway for rental transactions
+3. Implement notifications for rental requests and updates
+4. Implement user reviews and ratings
+5. Implement search and filtering options
+6. Implement user dashboard for managing rentals and products
+7. Implement admin dashboard for managing users, products, and rentals
+8. Implement API documentation and testing
+9. Implement error handling and logging
+10. Implement API rate limiting and security best practices
