@@ -15,11 +15,8 @@ class CreateRentalRequest extends FormRequest
     {
         return [
             'product_id' => 'required|exists:products,id',
-            'rental_from' => 'required|date|after:now',
-            'rental_to' => 'required|date|after:rental_from',
-            'payment_data' => 'required|array',
-            'payment_data.method' => 'required|string|in:credit_card,apple_pay,paypal',
-            'payment_data.token' => 'required|string'
+            'start_date' => 'required|date|after:now',
+            'end_date' => 'required|date|after:start_date',
         ];
     }
 } 

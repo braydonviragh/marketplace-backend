@@ -23,14 +23,37 @@ class ProductController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $products = $this->productService->getProducts(
-            perPage: $request->per_page ?? 15
-        );
+        $filters = $request->validate([
+            'user_id' => 'sometimes|exists:users,id',
+            'category_id' => 'sometimes|exists:categories,id',
+            'brand_id' => 'sometimes|exists:brands,id',
+            'color_id' => 'sometimes|exists:colors,id',
+            'letter_size_id' => 'sometimes|exists:letter_sizes,id',
+            'number_size_id' => 'sometimes|exists:number_sizes,id',
+            'waist_size_id' => 'sometimes|exists:waist_sizes,id',
+            'price_min' => 'sometimes|numeric|min:0',
+            'price_max' => 'sometimes|numeric|gt:price_min',
+            'city' => 'sometimes|string|max:100',
+            'province' => 'sometimes|string|max:100',
+            'is_available' => 'sometimes|boolean',
+            'search' => 'sometimes|string|max:255',
+            'created_from' => 'sometimes|date_format:Y-m-d H:i:s',
+            'created_to' => 'sometimes|date_format:Y-m-d H:i:s|after:created_from',
+            'sort_by' => 'sometimes|in:price_asc,price_desc,date_asc,date_desc,title_asc,title_desc',
+            'per_page' => 'sometimes|integer|min:1|max:100',
+        ]);
 
-        return $this->collectionResponse(
-            new ProductCollection($products),
-            'Products retrieved successfully'
-        );
+        $products = $this->productService->getProducts($filters);
+        
+        return response()->json([
+            'data' => ProductResource::collection($products),
+            'meta' => [
+                'total' => $products->total(),
+                'per_page' => $products->perPage(),
+                'current_page' => $products->currentPage(),
+                'last_page' => $products->lastPage(),
+            ]
+        ]);
     }
 
     public function show(int $id): JsonResponse

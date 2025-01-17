@@ -48,6 +48,18 @@ class User extends Authenticatable
         return $this->hasOne(UserProfile::class);
     }
 
+    public function rentals(): HasMany
+    {
+        return $this->hasMany(Rental::class);
+    }
+
+    public function activeRentals(): HasMany
+    {
+        return $this->rentals()->whereHas('rentalStatus', function($q) {
+            $q->where('slug', 'active');
+        });
+    }
+
     public function detailedSizes(): HasMany
     {
         return $this->hasMany(UserDetailedSize::class);

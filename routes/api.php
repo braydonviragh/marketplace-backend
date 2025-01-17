@@ -115,6 +115,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/', [RentalController::class, 'store']);
             Route::put('/{rental}', [RentalController::class, 'update']);
             Route::delete('/{rental}', [RentalController::class, 'destroy']);
+            Route::post('/{rental}/confirm', [RentalController::class, 'confirm']);
         });
         
         // Products
@@ -127,17 +128,6 @@ Route::prefix('v1')->group(function () {
                 ->middleware('verify.product.owner');
         });
 
-        // Offers
-        Route::prefix('offers')->group(function () {
-            Route::get('/', [OfferController::class, 'index']);
-            Route::post('/', [OfferController::class, 'store']);
-            Route::put('/{offer}', [OfferController::class, 'update'])
-                ->middleware('verify.offer.owner');
-            Route::post('/{offer}/accept', [OfferController::class, 'accept'])
-                ->middleware('verify.product.owner');
-            Route::post('/{offer}/reject', [OfferController::class, 'reject'])
-                ->middleware('verify.product.owner');
-        });
 
         // Super Admin Management
         Route::middleware(['auth:sanctum', 'role:super_admin'])->group(function () {

@@ -12,15 +12,15 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained()->onDelete('restrict');
             $table->foreignId('user_id')->constrained()->onDelete('restrict');
-            $table->foreignId('offer_id')->nullable()->constrained('offers')->onDelete('set null');
-            $table->dateTime('rental_from');
-            $table->dateTime('rental_to');
+            $table->dateTime('start_date');
+            $table->dateTime('end_date');
+            $table->foreignId('rental_status_id')->constrained('rental_status');
             $table->timestamps();
             $table->softDeletes();
 
             $table->index(['user_id']);
             $table->index(['product_id']);
-            $table->index('offer_id');
+            $table->index('rental_status_id');
         });
     }
 

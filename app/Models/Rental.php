@@ -13,16 +13,14 @@ class Rental extends Model
     protected $fillable = [
         'product_id',
         'user_id',
-        'payment_id',
-        'offer_id',
-        'rental_from',
-        'rental_to',
-        'status'
+        'rental_status_id',
+        'start_date',
+        'end_date',
     ];
 
     protected $casts = [
-        'rental_from' => 'datetime',
-        'rental_to' => 'datetime'
+        'start_date' => 'datetime',
+        'end_date' => 'datetime'
     ];
 
     // Relationships
@@ -41,19 +39,23 @@ class Rental extends Model
         return $this->belongsTo(Payment::class);
     }
 
-    public function offer()
+    public function rentalStatus()
     {
-        return $this->belongsTo(Offer::class);
+        return $this->belongsTo(RentalStatus::class, 'rental_status_id');
     }
 
     // Scopes
     public function scopeActive($query)
     {
-        return $query->where('status', 'active');
+        return $query->whereHas('rentalStatus', function($q) {
+            $q->where('slug', 'active');
+        });
     }
 
     public function scopePending($query)
     {
-        return $query->where('status', 'pending');
+        return $query->whereHas('rentalStatus', function($q) {
+            $q->where('slug', 'pending'); 
+        });
     }
 }

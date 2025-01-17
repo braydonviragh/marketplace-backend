@@ -428,6 +428,92 @@
                             "Authorization": "Bearer {{token}}"
                         }
                     }
+                },
+                {
+                    "name": "Confirm Rental",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/api/v1/rentals/{{rental_id}}/confirm",
+                        "headers": {
+                            "Authorization": "Bearer {{token}}",
+                            "Content-Type": "application/json"
+                        },
+                        "description": "Confirms a rental. Both renter and owner must confirm before the rental becomes active."
+                    },
+                    "response": [
+                        {
+                            "name": "Success Response",
+                            "originalRequest": {
+                                "method": "POST",
+                                "url": "{{base_url}}/api/v1/rentals/{{rental_id}}/confirm"
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": {
+                                "message": "Rental confirmation recorded successfully",
+                                "data": {
+                                    "id": 1,
+                                    "product": {
+                                        "id": 1,
+                                        "title": "Designer Dress",
+                                        "description": "Beautiful designer dress"
+                                    },
+                                    "user": {
+                                        "id": 1,
+                                        "name": "John Doe"
+                                    },
+                                    "status_id": 1,
+                                    "status": "pending",
+                                    "start_date": "2024-04-01 00:00:00",
+                                    "end_date": "2024-04-07 00:00:00",
+                                    "created_at": "2024-03-21 12:00:00",
+                                    "updated_at": "2024-03-21 12:00:00"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Error - Already Confirmed",
+                            "originalRequest": {
+                                "method": "POST",
+                                "url": "{{base_url}}/api/v1/rentals/{{rental_id}}/confirm"
+                            },
+                            "status": "Bad Request",
+                            "code": 400,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": {
+                                "message": "You have already confirmed this rental."
+                            }
+                        },
+                        {
+                            "name": "Error - Unauthorized",
+                            "originalRequest": {
+                                "method": "POST",
+                                "url": "{{base_url}}/api/v1/rentals/{{rental_id}}/confirm"
+                            },
+                            "status": "Unauthorized",
+                            "code": 401,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": {
+                                "message": "You are not authorized to confirm this rental."
+                            }
+                        }
+                    ]
                 }
             ]
         },
