@@ -12,8 +12,9 @@ class RentalResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'product' => new ProductResource($this->whenLoaded('product')),
-            'user' => new UserResource($this->whenLoaded('user')),
+            'product' => $this->product,
+            'product_user_id' => $this->product->user_id,
+            'renter_id' => $this->user_id,
             'status_id' => $this->rental_status_id,
             'status' => $this->rentalStatus->slug,
             'start_date' => $this->start_date->toDateTimeString(),

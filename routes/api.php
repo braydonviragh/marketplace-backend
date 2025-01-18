@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\V1\ShoeSizeController;
 use App\Http\Controllers\Api\V1\WaistSizeController;
 use App\Http\Controllers\Api\V1\Auth\SuperAdminController;
 use App\Http\Controllers\Api\V1\Auth\OnboardingController;
+use App\Http\Controllers\Api\V1\BalanceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -139,5 +140,9 @@ Route::prefix('v1')->group(function () {
                 Route::post('/{superAdmin}/reactivate', [SuperAdminController::class, 'reactivate']);
             });
         });
+
+        Route::get('/balance', [BalanceController::class, 'getBalance']);
+        Route::post('/balance/withdraw', [BalanceController::class, 'withdraw']);
+        Route::get('/transactions', [BalanceController::class, 'getTransactions']);
     // });
 }); 

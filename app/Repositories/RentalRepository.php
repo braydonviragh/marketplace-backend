@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Rental;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\RentalStatus;
 
 class RentalRepository extends BaseRepository
 {
@@ -136,6 +137,12 @@ class RentalRepository extends BaseRepository
 
     public function updateStatus(Rental $rental, string $status): bool
     {
-        return $rental->update(['status' => $status]);
+        $rentalStatus = RentalStatus::where('slug', $status)->first();
+        
+        if (!$rentalStatus) {
+            throw new \Exception('Invalid status');
+        }
+
+        return $rental->update(['rental_status_id' => $rentalStatus->id]);
     }
 }

@@ -85,4 +85,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Brand::class, 'user_brand_preferences');
     }
+
+    public function balance(): HasOne
+    {
+        return $this->hasOne(UserBalance::class);
+    }
 } 

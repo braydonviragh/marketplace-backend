@@ -4,13 +4,17 @@ namespace App\Services;
 
 use App\Models\Rental;
 use App\Repositories\RentalRepository;
-use App\Exceptions\RentalException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Events\RentalCreated;
 use App\Events\RentalStatusChanged;
 use Carbon\Carbon;
 use App\Models\RentalConfirmation;
+use App\Models\UserTransaction;
+use App\Models\AppTransaction;
+use App\Models\AppBalance;
+use App\Models\RentalStatus;
+use Illuminate\Support\Facades\DB;
 
 class RentalService
 {
@@ -45,19 +49,49 @@ class RentalService
 
     public function activateRental(Rental $rental): bool
     {
-        $success = $this->rentalRepository->updateStatus($rental, 'active');
+        DB::transaction(function () use ($rental) {
+            // Calculate owner amount (90%)
+            // Calculate total rental price
+            $totalPrice = $rental->product->price;
+            
+            // Calculate owner's share (90%)
+            $amount = $totalPrice * 0.90;
+            
+            // Calculate app fee (10%) 
+            $appFee = $totalPrice * 0.10;
+            // Create owner transaction
+            UserTransaction::create([
+                'user_id' => $rental->product->user_id,
+                'rental_id' => $rental->id,
+                'amount' => $amount,
+                'type' => 'add'
+            ]);
+            
+            // Create app transaction
+            AppTransaction::create([
+                'rental_id' => $rental->id,
+                'amount' => $appFee,
+            ]);
+
+            // Get current balance
+            $currentBalance = AppBalance::getCurrentBalance();
+
+            // Add fee to balance
+            AppBalance::addToBalance($appFee);
+
+            // Update rental status
+            $rental->update(['rental_status_id' => RentalStatus::where('slug', 'active')->first()->id]);
+        });
+
+        event(new RentalStatusChanged($rental, 'active'));
         
-        if ($success) {
-            event(new RentalStatusChanged($rental, 'active'));
-        }
-        
-        return $success;
+        return true;
     }
 
     public function completeRental(Rental $rental): bool
     {
         if ($rental->status !== 'active') {
-            throw new RentalException('Only active rentals can be completed');
+            throw new \Exception('Only active rentals can be completed');
         }
 
         $success = $this->rentalRepository->updateStatus($rental, 'completed');
@@ -72,7 +106,7 @@ class RentalService
     public function cancelRental(Rental $rental): bool
     {
         if (!in_array($rental->status, ['pending', 'active'])) {
-            throw new RentalException('Only pending or active rentals can be cancelled');
+            throw new \Exception('Only pending or active rentals can be cancelled');
         }
 
         $success = $this->rentalRepository->updateStatus($rental, 'cancelled');
@@ -86,8 +120,7 @@ class RentalService
 
     public function confirmRental(Rental $rental): void
     {
-        $userId = auth()->id();
-        
+        $userId = 2; //auth()->id();
         // Determine if user is renter or owner
         if ($rental->user_id === $userId) {
             $userType = 'renter';
@@ -99,7 +132,7 @@ class RentalService
 
         // Check if rental is in pending status
         if ($rental->rentalStatus->slug !== 'pending') {
-            throw new RentalException('Only pending rentals can be confirmed.');
+            throw new \Exception('Only pending rentals can be confirmed.');
         }
 
         // Check if user hasn't already confirmed
@@ -109,7 +142,7 @@ class RentalService
         ])->exists();
 
         if ($existingConfirmation) {
-            throw new RentalException('You have already confirmed this rental.');
+            throw new \Exception('You have already confirmed this rental.');
         }
 
         // Record the confirmation
@@ -125,9 +158,6 @@ class RentalService
         if ($confirmations === 2) {
             // Activate the rental
             $this->activateRental($rental);
-            if ($this->activateRental($rental)) {
-                // event(new PaymentProcessed($rental));
-            }
         }
     }
 } 

@@ -72,16 +72,6 @@ class RentalController extends Controller
         ]);
     }
 
-    public function activate(Rental $rental): JsonResponse
-    {
-        $this->rentalService->activateRental($rental);
-        
-        return response()->json([
-            'message' => 'Rental activated successfully',
-            'data' => new RentalResource($rental)
-        ]);
-    }
-
     public function complete(Rental $rental): JsonResponse
     {
         $this->rentalService->completeRental($rental);

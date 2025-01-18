@@ -8,6 +8,8 @@ class RentalConfirmation extends Model
 {
     protected $fillable = ['rental_id', 'user_id', 'type'];
 
+    protected $table = 'rental_confirmation';
+
     public function rental()
     {
         return $this->belongsTo(Rental::class);

@@ -7,6 +7,7 @@ use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\UserBalance;
 
 class UserService
 {
@@ -47,7 +48,15 @@ class UserService
             'style_id' => $data['style_id'] ?? null
         ];
 
-        return $this->userRepository->createWithProfile($userData, $profileData);
+        $user = $this->userRepository->createWithProfile($userData, $profileData);
+
+        // Initialize user balance
+        UserBalance::create([
+            'user_id' => $user->id,
+            'balance' => 0
+        ]);
+
+        return $user;
     }
 
     public function updateUser(User $user, array $data): User
