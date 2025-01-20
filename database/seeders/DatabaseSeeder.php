@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             RentalStatusSeeder::class,  
             UserSeeder::class,
             ProductSeeder::class,
+            OfferStatusSeeder::class,
         ]);
     }
 } 

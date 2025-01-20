@@ -208,29 +208,104 @@
                     "name": "List Products",
                     "request": {
                         "method": "GET",
-                        "url": "{{base_url}}/api/v1/products",
-                        "query": [
-                            {
-                                "key": "category_id",
-                                "value": "1"
-                            },
-                            {
-                                "key": "price_min",
-                                "value": "10"
-                            },
-                            {
-                                "key": "price_max",
-                                "value": "100"
-                            },
-                            {
-                                "key": "size_id",
-                                "value": "1"
-                            },
-                            {
-                                "key": "city",
-                                "value": "Toronto"
-                            }
-                        ]
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/products?category_id=1&brand_id=1&color_id=1&letter_size_id=1&number_size_id=1&waist_size_id=1&price_min=10&price_max=100&size_type=letter&size_id=1&city=Toronto&province=Ontario&is_available=true&search=dress&created_from=2024-03-01 00:00:00&created_to=2024-03-21 00:00:00&sort_by=price_asc&per_page=15",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "products"],
+                            "query": [
+                                {
+                                    "key": "category_id",
+                                    "value": "1",
+                                    "description": "Filter by category"
+                                },
+                                {
+                                    "key": "brand_id",
+                                    "value": "1",
+                                    "description": "Filter by brand"
+                                },
+                                {
+                                    "key": "color_id",
+                                    "value": "1",
+                                    "description": "Filter by color"
+                                },
+                                {
+                                    "key": "letter_size_id",
+                                    "value": "1",
+                                    "description": "Filter by letter size (S,M,L)"
+                                },
+                                {
+                                    "key": "number_size_id",
+                                    "value": "1",
+                                    "description": "Filter by number size"
+                                },
+                                {
+                                    "key": "waist_size_id",
+                                    "value": "1",
+                                    "description": "Filter by waist size"
+                                },
+                                {
+                                    "key": "price_min",
+                                    "value": "10",
+                                    "description": "Minimum price"
+                                },
+                                {
+                                    "key": "price_max",
+                                    "value": "100",
+                                    "description": "Maximum price"
+                                },
+                                {
+                                    "key": "size_type",
+                                    "value": "letter",
+                                    "description": "Type of size (letter, number, waist)"
+                                },
+                                {
+                                    "key": "size_id",
+                                    "value": "1",
+                                    "description": "ID of the size within the size_type"
+                                },
+                                {
+                                    "key": "city",
+                                    "value": "Toronto",
+                                    "description": "Filter by city"
+                                },
+                                {
+                                    "key": "province",
+                                    "value": "Ontario",
+                                    "description": "Filter by province"
+                                },
+                                {
+                                    "key": "is_available",
+                                    "value": "true",
+                                    "description": "Filter by availability"
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "dress",
+                                    "description": "Search in title, description, brand name, and category name"
+                                },
+                                {
+                                    "key": "created_from",
+                                    "value": "2024-03-01 00:00:00",
+                                    "description": "Filter by creation date (from)"
+                                },
+                                {
+                                    "key": "created_to",
+                                    "value": "2024-03-21 00:00:00",
+                                    "description": "Filter by creation date (to)"
+                                },
+                                {
+                                    "key": "sort_by",
+                                    "value": "price_asc",
+                                    "description": "Sort options: price_asc, price_desc, date_asc, date_desc, title_asc, title_desc"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "Number of items per page"
+                                }
+                            ]
+                        },
+                        "description": "Get a paginated list of products with comprehensive filtering options"
                     }
                 },
                 {
@@ -377,6 +452,163 @@
                     }
                 }
             ]
+        },
+        {
+            "name": "Offers",
+            "item": [
+                {
+                    "name": "List Offers",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/offers?status_id=1&product_id=1&user_id=1&owner_id=2&date_from=2024-03-01 00:00:00&date_to=2024-04-01 00:00:00&per_page=15",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "offers"],
+                            "query": [
+                                {
+                                    "key": "status_id",
+                                    "value": "1",
+                                    "description": "Filter by offer status ID"
+                                },
+                                {
+                                    "key": "product_id",
+                                    "value": "1",
+                                    "description": "Filter by product ID"
+                                },
+                                {
+                                    "key": "user_id",
+                                    "value": "1",
+                                    "description": "Filter by renter (user) ID"
+                                },
+                                {
+                                    "key": "owner_id",
+                                    "value": "2",
+                                    "description": "Filter by product owner ID"
+                                },
+                                {
+                                    "key": "date_from",
+                                    "value": "2024-03-01 00:00:00",
+                                    "description": "Filter by start date (Y-m-d H:i:s)"
+                                },
+                                {
+                                    "key": "date_to",
+                                    "value": "2024-04-01 00:00:00",
+                                    "description": "Filter by end date (Y-m-d H:i:s)"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "Number of items per page (default: 15)"
+                                }
+                            ]
+                        },
+                        "description": "Get a paginated list of offers with filters. Note: user_id and owner_id are automatically set based on authenticated user's role unless they are a super admin."
+                    }
+                },
+                {
+                    "name": "Get Offer",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/offers/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "offers", "1"]
+                        },
+                        "description": "Get a specific offer by ID"
+                    }
+                },
+                {
+                    "name": "Create Offer",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"product_id\": 1,\n    \"start_date\": \"2024-04-01 10:00:00\",\n    \"end_date\": \"2024-04-03 10:00:00\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/offers",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "offers"]
+                        },
+                        "description": "Create a new offer for a product"
+                    }
+                },
+                {
+                    "name": "Update Offer Status",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"status\": \"accepted\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/offers/1/status",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "offers", "1", "status"]
+                        },
+                        "description": "Update an offer's status (pending, accepted, rejected, cancelled, expired, withdrawn)"
+                    }
+                }
+            ],
+            "description": "Endpoints for managing rental offers"
         },
         {
             "name": "Rentals",

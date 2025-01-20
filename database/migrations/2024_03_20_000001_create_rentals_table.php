@@ -10,16 +10,12 @@ return new class extends Migration
     {
         Schema::create('rentals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained()->onDelete('restrict');
-            $table->foreignId('user_id')->constrained()->onDelete('restrict');
-            $table->dateTime('start_date');
-            $table->dateTime('end_date');
+            $table->foreignId('offer_id')->constrained()->onDelete('restrict');
             $table->foreignId('rental_status_id')->constrained('rental_status');
             $table->timestamps();
             $table->softDeletes();
 
-            $table->index(['user_id']);
-            $table->index(['product_id']);
+            $table->index('offer_id');
             $table->index('rental_status_id');
         });
     }

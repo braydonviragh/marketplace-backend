@@ -118,6 +118,16 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{rental}', [RentalController::class, 'destroy']);
             Route::post('/{rental}/confirm', [RentalController::class, 'confirm']);
         });
+
+        // Offers
+        Route::prefix('offers')->group(function () {
+            Route::get('/', [OfferController::class, 'index']);
+            Route::get('/{offer}', [OfferController::class, 'show']);
+            Route::post('/', [OfferController::class, 'store']);
+            Route::put('/{offer}', [OfferController::class, 'update']);
+            Route::delete('/{offer}', [OfferController::class, 'destroy']);
+            Route::post('/{offer}/status', [OfferController::class, 'updateStatus']);
+        });
         
         // Products
         Route::prefix('products')->group(function () {

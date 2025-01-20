@@ -11,27 +11,19 @@ class Rental extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'product_id',
-        'user_id',
-        'rental_status_id',
-        'start_date',
-        'end_date',
-    ];
-
-    protected $casts = [
-        'start_date' => 'datetime',
-        'end_date' => 'datetime'
+        'offer_id',
+        'rental_status_id'
     ];
 
     // Relationships
-    public function product()
+    public function offer()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Offer::class);
     }
 
-    public function user()
+    public function rentalStatus()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(RentalStatus::class, 'rental_status_id');
     }
 
     public function payment()
@@ -39,9 +31,15 @@ class Rental extends Model
         return $this->belongsTo(Payment::class);
     }
 
-    public function rentalStatus()
+    // Delegate relationships through offer
+    public function product()
     {
-        return $this->belongsTo(RentalStatus::class, 'rental_status_id');
+        return $this->offer->product();
+    }
+
+    public function user()
+    {
+        return $this->offer->user();
     }
 
     // Scopes
