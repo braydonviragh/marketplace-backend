@@ -10,12 +10,17 @@ use App\Models\NumberSize;
 use App\Models\WaistSize;
 use App\Models\UserDetailedSize;
 use App\Models\UserBrandPreference;
+use App\Models\UserProfile;
+use App\Services\MediaService;
+use App\Services\PicsumService;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class UserProfileFactory extends Factory
 {
+    protected $model = UserProfile::class;
+
     public function definition(): array
     {
         $city = fake()->randomElement(['Toronto', 'Ottawa', 'Mississauga', 'Hamilton']);
@@ -24,7 +29,6 @@ class UserProfileFactory extends Factory
             'user_id' => User::factory(),
             'username' => $this->faker->unique()->userName(),
             'name' => $this->faker->name(),
-            'profile_picture' => 'profiles/default.jpg',
             'birthday' => Carbon::now()->subYears(rand(18, 50))->format('Y-m-d'),
             'city' => $city,
             'postal_code' => match($city) {
@@ -44,7 +48,29 @@ class UserProfileFactory extends Factory
 
     public function configure()
     {
-        return $this->afterCreating(function ($profile) {
+        return $this->afterCreating(function (UserProfile $profile) {
+            // Add single profile picture
+            $picsumService = app(PicsumService::class);
+            $mediaService = app(MediaService::class);
+            
+            if ($image = $picsumService->getRandomImage(400, 400)) {
+                // Upload as profile picture
+                $mediaService->uploadMedia($profile, $image, [
+                    'is_primary' => true,
+                    'order' => 0,
+                    'metadata' => [
+                        'width' => 400,
+                        'height' => 400,
+                        'source' => 'picsum',
+                        'picsum_id' => rand(1, 1000),
+                        'type' => 'profile_picture'  // Add this to identify it as profile picture
+                    ],
+                ]);
+                
+                // Clean up temp file
+                unlink($image->getPathname());
+            }
+
             // Attach random brands (2-4)
             $brands = Brand::inRandomOrder()->limit(rand(2, 4))->pluck('id');
             UserBrandPreference::create([

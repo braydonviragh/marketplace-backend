@@ -11,10 +11,21 @@ use App\Models\WaistSize;
 use App\Models\NumberSize;
 use App\Models\Color;
 use App\Models\Style;
+use App\Services\MediaService;
+use App\Services\PicsumService;
 use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
 {
+    protected MediaService $mediaService;
+    protected PicsumService $picsumService;
+
+    public function __construct(MediaService $mediaService, PicsumService $picsumService)
+    {
+        $this->mediaService = $mediaService;
+        $this->picsumService = $picsumService;
+    }
+
     public function run(): void
     {
         // Get all regular users (excluding super_admin)
@@ -101,23 +112,77 @@ class ProductSeeder extends Seeder
                         break;
                 }
                 
+                // Generate a price that's a multiple of 25 with .00 cents
+                $price = ceil(fake()->numberBetween(10, 1000) / 25) * 25;
+
+                // Generate realistic clothing titles
+                $adjectives = ['Vintage', 'Designer', 'Classic', 'Luxury', 'Premium', 'Elegant', 'Casual', 'Modern', 'Trendy', 'Chic'];
+                $conditions = ['Like New', 'Gently Used', 'Excellent Condition', 'New with Tags'];
+                
+                // Category-specific item names
+                $itemNames = [
+                    'tops' => ['Blouse', 'T-Shirt', 'Tank Top', 'Crop Top', 'Button-Down Shirt'],
+                    'sweaters-knits' => ['Cardigan', 'Pullover', 'Turtleneck', 'Cashmere Sweater', 'Knit Top'],
+                    'blazers' => ['Blazer', 'Suit Jacket', 'Sport Coat', 'Tailored Jacket'],
+                    'dresses' => ['Maxi Dress', 'Cocktail Dress', 'Summer Dress', 'Evening Gown', 'Wrap Dress'],
+                    'jeans' => ['Skinny Jeans', 'Mom Jeans', 'Boyfriend Jeans', 'Straight Leg Jeans', 'Bootcut Jeans'],
+                    'pants' => ['Trousers', 'Slacks', 'Palazzo Pants', 'Dress Pants', 'Chinos'],
+                    // Add more categories as needed
+                ];
+
+                $itemName = isset($itemNames[$category->slug]) 
+                    ? fake()->randomElement($itemNames[$category->slug])
+                    : $category->name;
+
+                // Get a random brand once for this product
+                $brand = $brands->random();
+                
+                $title = fake()->randomElement($adjectives) . ' ' . 
+                         $brand->name . ' ' .
+                         $itemName . ' - ' .
+                         fake()->randomElement($conditions);
+
                 $product = Product::create([
                     'user_id' => $user->id,
                     'category_id' => $category->id,
                     'style_id' => $styles->random()->id,
-                    'brand_id' => $brands->random()->id,
-                    'title' => fake()->sentence(4),
+                    'brand_id' => $brand->id,
+                    'title' => $title,
                     'description' => fake()->paragraphs(3, true),
                     'letter_size_id' => $letterSizeId,
                     'waist_size_id' => $waistSizeId,
                     'number_size_id' => $numberSizeId,
                     'color_id' => $colors->random()->id,
-                    'price' => fake()->randomFloat(2, 10, 1000),
+                    'price' => $price,
                     'city' => fake()->city(),
                     'province' => 'Ontario',
                     'postal_code' => fake()->postcode(),
                     'is_available' => true,
                 ]);
+            }
+        }
+
+        // Add sample images for each product
+        foreach (Product::all() as $product) {
+            // Add 1-5 images for each product
+            $imageCount = rand(1, 5);
+            
+            for ($i = 0; $i < $imageCount; $i++) {
+                if ($image = $this->picsumService->getRandomImage()) {
+                    $this->mediaService->uploadMedia($product, $image, [
+                        'is_primary' => $i === 0,
+                        'order' => $i,
+                        'metadata' => [
+                            'width' => 600,
+                            'height' => 800,
+                            'source' => 'picsum',
+                            'picsum_id' => rand(1, 1000),
+                        ],
+                    ]);
+                    
+                    // Clean up temp file
+                    unlink($image->getPathname());
+                }
             }
         }
     }

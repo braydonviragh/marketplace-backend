@@ -21,6 +21,7 @@ class UserResource extends JsonResource
             // Basic Info
             'name' => $this->profile?->name,
             'username' => $this->profile?->username,
+            'profile_picture' => $this->profile?->profile_picture_url,
             'email' => $this->email,
             'phone_number' => $this->phone_number,
             'created_at' => $this->created_at,
@@ -34,7 +35,6 @@ class UserResource extends JsonResource
                 'postal_code' => $this->profile?->postal_code,
                 'city' => $this->profile?->city,
                 'country' => $this->profile?->country,
-                'profile_picture' => $this->profile?->profile_picture,
                 'style' => $this->when($this->profile?->style, [
                     'id' => $this->profile?->style?->id,
                     'name' => $this->profile?->style?->name,

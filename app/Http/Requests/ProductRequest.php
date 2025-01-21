@@ -30,8 +30,8 @@ class ProductRequest extends FormRequest
             'postal_code' => 'required|string|max:10',
 
             // Images
-            'images' => 'sometimes|array|max:10',
-            'images.*' => 'image|max:5120', // 5MB max per image
+            'media' => 'sometimes|array|max:10',
+            'media.*' => 'image|max:5120', // 5MB max per image
         ];
     }
 
@@ -39,8 +39,8 @@ class ProductRequest extends FormRequest
     {
         return [
             'size_id.required_unless' => 'A specific size must be selected unless the item is one-size-fits-all.',
-            'images.*.max' => 'Each image must not exceed 5MB in size.',
-            'images.max' => 'You may not upload more than 10 images per product.',
+            'media.*.max' => 'Each image must not exceed 5MB in size.',
+            'media.max' => 'You may not upload more than 10 images per product.',
         ];
     }
 } 

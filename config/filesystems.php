@@ -39,7 +39,8 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            /*TODO: Change this to the correct URL AFTER TESTING*/
+            'url' => env('APP_URL').'/laravel/mp-backend/public/storage',
             'visibility' => 'public',
             'throw' => false,
         ],

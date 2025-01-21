@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Product extends Model
 {
@@ -16,6 +18,7 @@ class Product extends Model
     protected $fillable = [
         'user_id',
         'category_id',
+        'brand_id',
         'style_id',
         'color_id',
         'title',
@@ -23,6 +26,7 @@ class Product extends Model
         'brand',
         'price',
         'condition',
+        'size_type',
         'size_id',
         'is_available',
         'city',
@@ -62,9 +66,10 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
-    public function images(): HasMany
+    public function media(): MorphMany
     {
-        return $this->hasMany(ProductImage::class)->orderBy('order');
+        return $this->morphMany(Media::class, 'mediable')
+            ->orderBy('order');
     }
 
     public function color(): BelongsTo
@@ -183,5 +188,47 @@ class Product extends Model
         if (is_array($value) && isset($value['latitude']) && isset($value['longitude'])) {
             $this->attributes['location'] = DB::raw("ST_GeomFromText('POINT({$value['longitude']} {$value['latitude']})')");
         }
+    }
+
+    public function getPrimaryImageUrlAttribute(): ?string
+    {
+        return $this->primaryImage?->url;
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($product) {
+            // Clear other size fields based on size_type
+            switch ($product->size_type) {
+                case 'letter':
+                    $product->number_size_id = null;
+                    $product->waist_size_id = null;
+                    $product->shoe_size_id = null;
+                    break;
+                case 'number':
+                    $product->letter_size_id = null;
+                    $product->waist_size_id = null;
+                    $product->shoe_size_id = null;
+                    break;
+                case 'waist':
+                    $product->letter_size_id = null;
+                    $product->number_size_id = null;
+                    $product->shoe_size_id = null;
+                    break;
+                case 'shoe':
+                    $product->letter_size_id = null;
+                    $product->number_size_id = null;
+                    $product->waist_size_id = null;
+                    break;
+                case 'none':
+                    $product->letter_size_id = null;
+                    $product->number_size_id = null;
+                    $product->waist_size_id = null;
+                    $product->shoe_size_id = null;
+                    break;
+            }
+        });
     }
 } 

@@ -13,7 +13,7 @@ class SimpleUserResource extends JsonResource
             'email' => $this->email,
             'name' => $this->profile?->name ?? '',
             'username' => $this->profile?->username ?? '',
-            'profile_picture' => $this->profile?->profile_picture ?? '',
+            'profile_picture' => $this->profile?->profile_picture_url ?? '',
             'phone_number' => $this->phone_number,
         ];
     }

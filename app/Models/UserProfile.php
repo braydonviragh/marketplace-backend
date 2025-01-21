@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class UserProfile extends Model
 {
@@ -38,6 +40,8 @@ class UserProfile extends Model
         'user.brands'
     ];
 
+    protected $appends = ['profile_picture_url'];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -62,5 +66,30 @@ class UserProfile extends Model
             }),
             'brands' => $this->user->brands,
         ];
+    }
+
+    /**
+     * Get all media for the profile
+     */
+    public function media(): MorphMany
+    {
+        return $this->morphMany(Media::class, 'mediable');
+    }
+
+    /**
+     * Get the profile picture
+     */
+    public function profilePicture(): MorphOne
+    {
+        return $this->morphOne(Media::class, 'mediable')
+            ->where('is_primary', true);
+    }
+
+    /**
+     * Get the profile picture URL
+     */
+    public function getProfilePictureUrlAttribute(): ?string
+    {
+        return $this->profilePicture?->url;
     }
 } 

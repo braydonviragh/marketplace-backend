@@ -18,6 +18,7 @@ class Style extends Model
     protected $fillable = [
         'name',
         'slug',
+        'description'
     ];
 
     /**

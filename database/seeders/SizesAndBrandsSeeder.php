@@ -82,6 +82,17 @@ class SizesAndBrandsSeeder extends Seeder
             ]);
         }
 
+        // Shoe Sizes (5-15, including half sizes)
+        $shoeSizes = [];
+        for ($size = 5; $size <= 15; $size += 0.5) {
+            DB::table('shoe_sizes')->insert([
+                'size' => $size,
+                'display_name' => number_format($size, 1),
+                'description' => "US Size {$size}",
+                'order' => ($size - 5) * 2 + 1
+            ]);
+        }
+
         // Seed brands
         $brands = [
             ['name' => 'Nike', 'description' => 'Athletic and casual wear', 'slug' => 'nike'],

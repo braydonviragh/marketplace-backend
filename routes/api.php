@@ -17,13 +17,14 @@ use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\OfferController;
 use App\Http\Controllers\Api\V1\BrandController;
 use App\Http\Controllers\Api\V1\ColorController;
-use App\Http\Controllers\Api\V1\SizeController;
+use App\Http\Controllers\Api\V1\LetterSizeController;
 use App\Http\Controllers\Api\V1\NumberSizeController;
 use App\Http\Controllers\Api\V1\ShoeSizeController;
 use App\Http\Controllers\Api\V1\WaistSizeController;
 use App\Http\Controllers\Api\V1\Auth\SuperAdminController;
 use App\Http\Controllers\Api\V1\Auth\OnboardingController;
 use App\Http\Controllers\Api\V1\BalanceController;
+use App\Http\Controllers\Api\StyleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -105,10 +106,23 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('colors', ColorController::class);
         
         // Sizes
-        Route::apiResource('letter-sizes', LetterSizeController::class);
-        Route::apiResource('number-sizes', NumberSizeController::class);
-        Route::apiResource('shoe-sizes', ShoeSizeController::class);
-        Route::apiResource('waist-sizes', WaistSizeController::class);
+        Route::prefix('sizes')->group(function () {
+            // Letter sizes (XS-XXL)
+            Route::get('/letter', [LetterSizeController::class, 'index']);
+            Route::post('/letter', [LetterSizeController::class, 'store'])->middleware('role:admin');
+            
+            // Number sizes (00-22)
+            Route::get('/number', [NumberSizeController::class, 'index']);
+            Route::post('/number', [NumberSizeController::class, 'store'])->middleware('role:admin');
+            
+            // Waist sizes (24"-48")
+            Route::get('/waist', [WaistSizeController::class, 'index']);
+            Route::post('/waist', [WaistSizeController::class, 'store'])->middleware('role:admin');
+            
+            // Shoe sizes (5-15)
+            Route::get('/shoe', [ShoeSizeController::class, 'index']);
+            Route::post('/shoe', [ShoeSizeController::class, 'store'])->middleware('role:admin');
+        });
 
         Route::prefix('rentals')->group(function () {
             Route::get('/', [RentalController::class, 'index']);
@@ -154,5 +168,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/balance', [BalanceController::class, 'getBalance']);
         Route::post('/balance/withdraw', [BalanceController::class, 'withdraw']);
         Route::get('/transactions', [BalanceController::class, 'getTransactions']);
+
+        Route::get('/styles', [StyleController::class, 'index']);
     // });
 }); 

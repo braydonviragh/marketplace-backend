@@ -319,64 +319,125 @@
                     "name": "Create Product",
                     "request": {
                         "method": "POST",
-                        "url": "{{base_url}}/api/v1/products",
-                        "headers": {
-                            "Authorization": "Bearer {{token}}"
-                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
                         "body": {
                             "mode": "formdata",
                             "formdata": [
                                 {
                                     "key": "title",
-                                    "value": "Designer Dress"
+                                    "value": "Blue Levi's Denim Jacket",
+                                    "type": "text",
+                                    "description": "Product title"
                                 },
                                 {
                                     "key": "description",
-                                    "value": "Beautiful designer dress"
+                                    "value": "Vintage style denim jacket, perfect condition",
+                                    "type": "text",
+                                    "description": "Product description"
                                 },
                                 {
                                     "key": "category_id",
-                                    "value": "1"
+                                    "value": "1",
+                                    "type": "text",
+                                    "description": "Category ID (e.g., 1 for Jackets)"
                                 },
                                 {
-                                    "key": "brand",
-                                    "value": "Example Brand"
+                                    "key": "brand_id",
+                                    "value": "1",
+                                    "type": "text",
+                                    "description": "Brand ID (e.g., 1 for Levi's)"
+                                },
+                                {
+                                    "key": "style_id",
+                                    "value": "1",
+                                    "type": "text",
+                                    "description": "Style ID (e.g., 1 for Casual)"
+                                },
+                                {
+                                    "key": "color_id",
+                                    "value": "1",
+                                    "type": "text",
+                                    "description": "Color ID (e.g., 1 for Blue)"
                                 },
                                 {
                                     "key": "price",
-                                    "value": "100"
+                                    "value": "25.00",
+                                    "type": "text",
+                                    "description": "Rental price"
                                 },
                                 {
-                                    "key": "size",
-                                    "value": "M"
+                                    "key": "size_type",
+                                    "value": "letter",
+                                    "type": "text",
+                                    "description": "Size type (letter, number, waist, none)"
                                 },
                                 {
                                     "key": "size_id",
-                                    "value": "2"
-                                },
-                                {
-                                    "key": "specifications",
-                                    "value": "{\"color\":\"black\",\"material\":\"cotton\",\"style\":\"casual\"}"
+                                    "value": "3",
+                                    "type": "text",
+                                    "description": "Size ID (depends on size_type)"
                                 },
                                 {
                                     "key": "city",
-                                    "value": "Toronto"
+                                    "value": "Toronto",
+                                    "type": "text",
+                                    "description": "City"
                                 },
                                 {
                                     "key": "province",
-                                    "value": "Ontario"
+                                    "value": "Ontario",
+                                    "type": "text",
+                                    "description": "Province"
                                 },
                                 {
                                     "key": "postal_code",
-                                    "value": "M5V 2T6"
+                                    "value": "M5V 2T6",
+                                    "type": "text",
+                                    "description": "Postal code"
                                 },
                                 {
-                                    "key": "images[]",
+                                    "key": "images[0][image]",
                                     "type": "file",
-                                    "src": []
+                                    "src": "/path/to/image1.jpg",
+                                    "description": "First product image"
+                                },
+                                {
+                                    "key": "images[0][order]",
+                                    "value": "1",
+                                    "type": "text",
+                                    "description": "Order of first image"
+                                },
+                                {
+                                    "key": "images[1][image]",
+                                    "type": "file",
+                                    "src": "/path/to/image2.jpg",
+                                    "description": "Second product image"
+                                },
+                                {
+                                    "key": "images[1][order]",
+                                    "value": "2",
+                                    "type": "text",
+                                    "description": "Order of second image"
                                 }
                             ]
-                        }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/products",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "products"]
+                        },
+                        "description": "Create a new product with images using form-data"
                     }
                 },
                 {
@@ -900,35 +961,25 @@
                     "name": "Sizes",
                     "item": [
                         {
-                            "name": "Standard Sizes",
+                            "name": "Letter Sizes",
                             "item": [
                                 {
-                                    "name": "List Sizes",
+                                    "name": "List Letter Sizes",
                                     "request": {
                                         "method": "GET",
-                                        "url": "{{base_url}}/api/v1/sizes",
-                                        "headers": {
-                                            "Authorization": "Bearer {{token}}"
-                                        }
-                                    }
-                                },
-                                {
-                                    "name": "Create Size",
-                                    "request": {
-                                        "method": "POST",
-                                        "url": "{{base_url}}/api/v1/sizes",
-                                        "headers": {
-                                            "Authorization": "Bearer {{token}}",
-                                            "Content-Type": "application/json"
-                                        },
-                                        "body": {
-                                            "mode": "raw",
-                                            "raw": {
-                                                "size_name": "XL",
-                                                "description": "Extra Large",
-                                                "category": "tops"
+                                        "header": [
+                                            {
+                                                "key": "Authorization",
+                                                "value": "Bearer {{token}}",
+                                                "type": "text"
                                             }
-                                        }
+                                        ],
+                                        "url": {
+                                            "raw": "{{base_url}}/api/v1/sizes/letter",
+                                            "host": ["{{base_url}}"],
+                                            "path": ["api", "v1", "sizes", "letter"]
+                                        },
+                                        "description": "Get list of letter sizes (XS-XXL)"
                                     }
                                 }
                             ]
@@ -940,63 +991,19 @@
                                     "name": "List Number Sizes",
                                     "request": {
                                         "method": "GET",
-                                        "url": "{{base_url}}/api/v1/number-sizes",
-                                        "headers": {
-                                            "Authorization": "Bearer {{token}}"
-                                        }
-                                    }
-                                },
-                                {
-                                    "name": "Create Number Size",
-                                    "request": {
-                                        "method": "POST",
-                                        "url": "{{base_url}}/api/v1/number-sizes",
-                                        "headers": {
-                                            "Authorization": "Bearer {{token}}",
-                                            "Content-Type": "application/json"
-                                        },
-                                        "body": {
-                                            "mode": "raw",
-                                            "raw": {
-                                                "name": "42",
-                                                "display_name": "Size 42",
-                                                "description": "European size 42"
+                                        "header": [
+                                            {
+                                                "key": "Authorization",
+                                                "value": "Bearer {{token}}",
+                                                "type": "text"
                                             }
-                                        }
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            "name": "Shoe Sizes",
-                            "item": [
-                                {
-                                    "name": "List Shoe Sizes",
-                                    "request": {
-                                        "method": "GET",
-                                        "url": "{{base_url}}/api/v1/shoe-sizes",
-                                        "headers": {
-                                            "Authorization": "Bearer {{token}}"
-                                        }
-                                    }
-                                },
-                                {
-                                    "name": "Create Shoe Size",
-                                    "request": {
-                                        "method": "POST",
-                                        "url": "{{base_url}}/api/v1/shoe-sizes",
-                                        "headers": {
-                                            "Authorization": "Bearer {{token}}",
-                                            "Content-Type": "application/json"
+                                        ],
+                                        "url": {
+                                            "raw": "{{base_url}}/api/v1/sizes/number",
+                                            "host": ["{{base_url}}"],
+                                            "path": ["api", "v1", "sizes", "number"]
                                         },
-                                        "body": {
-                                            "mode": "raw",
-                                            "raw": {
-                                                "size": 10.5,
-                                                "display_name": "US 10.5",
-                                                "description": "US Men's size 10.5"
-                                            }
-                                        }
+                                        "description": "Get list of number sizes (00-22)"
                                     }
                                 }
                             ]
@@ -1008,29 +1015,43 @@
                                     "name": "List Waist Sizes",
                                     "request": {
                                         "method": "GET",
-                                        "url": "{{base_url}}/api/v1/waist-sizes",
-                                        "headers": {
-                                            "Authorization": "Bearer {{token}}"
-                                        }
-                                    }
-                                },
-                                {
-                                    "name": "Create Waist Size",
-                                    "request": {
-                                        "method": "POST",
-                                        "url": "{{base_url}}/api/v1/waist-sizes",
-                                        "headers": {
-                                            "Authorization": "Bearer {{token}}",
-                                            "Content-Type": "application/json"
-                                        },
-                                        "body": {
-                                            "mode": "raw",
-                                            "raw": {
-                                                "size": 32,
-                                                "display_name": "32\"",
-                                                "description": "32 inch waist"
+                                        "header": [
+                                            {
+                                                "key": "Authorization",
+                                                "value": "Bearer {{token}}",
+                                                "type": "text"
                                             }
-                                        }
+                                        ],
+                                        "url": {
+                                            "raw": "{{base_url}}/api/v1/sizes/waist",
+                                            "host": ["{{base_url}}"],
+                                            "path": ["api", "v1", "sizes", "waist"]
+                                        },
+                                        "description": "Get list of waist sizes (24\"-48\")"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Shoe Sizes",
+                            "item": [
+                                {
+                                    "name": "List Shoe Sizes",
+                                    "request": {
+                                        "method": "GET",
+                                        "header": [
+                                            {
+                                                "key": "Authorization",
+                                                "value": "Bearer {{token}}",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "url": {
+                                            "raw": "{{base_url}}/api/v1/sizes/shoe",
+                                            "host": ["{{base_url}}"],
+                                            "path": ["api", "v1", "sizes", "shoe"]
+                                        },
+                                        "description": "Get list of shoe sizes (5-15)"
                                     }
                                 }
                             ]
@@ -1103,6 +1124,30 @@
                                 "value": "Bearer {{token}}"
                             }
                         ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Styles",
+            "item": [
+                {
+                    "name": "List Styles",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/styles",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "styles"]
+                        },
+                        "description": "Get list of available styles (Male, Female, Unisex)"
                     }
                 }
             ]

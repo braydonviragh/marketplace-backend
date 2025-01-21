@@ -14,7 +14,7 @@ class ProductRepository extends BaseRepository
 
     public function getFilteredProducts(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $query = $this->model->with(['user', 'category', 'images', 'brand', 'color']);
+        $query = $this->model->with(['user', 'category', 'media', 'brand', 'color']);
 
         // Basic filters
         if (isset($filters['user_id'])) {
@@ -133,11 +133,16 @@ class ProductRepository extends BaseRepository
         return $this->model->with([
             'user',
             'category',
-            'images',
+            'media',
             'color',
             'letterSize',
             'waistSize',
             'numberSize'
         ])->findOrFail($id);
+    }
+
+    public function createProduct(array $data): Product
+    {
+        return $this->model->create($data);
     }
 } 
