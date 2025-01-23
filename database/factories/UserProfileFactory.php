@@ -13,6 +13,8 @@ use App\Models\UserBrandPreference;
 use App\Models\UserProfile;
 use App\Services\MediaService;
 use App\Services\PicsumService;
+use App\Models\Country;
+use App\Models\Province;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -24,6 +26,23 @@ class UserProfileFactory extends Factory
     public function definition(): array
     {
         $city = fake()->randomElement(['Toronto', 'Ottawa', 'Mississauga', 'Hamilton']);
+        
+        // Define city coordinates
+        $coordinates = match($city) {
+            'Toronto' => ['latitude' => 43.6532, 'longitude' => -79.3832],
+            'Ottawa' => ['latitude' => 45.4215, 'longitude' => -75.6972],
+            'Mississauga' => ['latitude' => 43.5890, 'longitude' => -79.6441],
+            'Hamilton' => ['latitude' => 43.2557, 'longitude' => -79.8711],
+            default => throw new \Exception('Invalid city')
+        };
+
+        // Add small random offset to coordinates (within ~5km)
+        $coordinates['latitude'] += fake()->randomFloat(6, -0.05, 0.05);
+        $coordinates['longitude'] += fake()->randomFloat(6, -0.05, 0.05);
+        
+        // Get Canada and Ontario IDs
+        $canada = Country::where('abbreviation', 'CA')->first();
+        $ontario = Province::where('abbreviation', 'ON')->first();
         
         return [
             'user_id' => User::factory(),
@@ -38,11 +57,12 @@ class UserProfileFactory extends Factory
                 'Hamilton' => fake()->randomElement(['L8E', 'L8G', 'L8H', 'L8J', 'L8K', 'L8L', 'L8M', 'L8N', 'L8P', 'L8R', 'L8S', 'L8T', 'L8V', 'L8W']),
                 default => throw new \Exception('Invalid city')
             } . ' ' . str_pad(fake()->numberBetween(0, 999), 3, '0', STR_PAD_LEFT),
-            'country' => 'Canada',
+            'country_id' => $canada->id,
+            'province_id' => $ontario->id,
             'language' => 'en',
-            'style_id' => function () {
-                return Style::inRandomOrder()->first()->id ?? Style::factory()->create()->id;
-            },
+            'latitude' => $coordinates['latitude'],
+            'longitude' => $coordinates['longitude'],
+            'style_id' => fn() => Style::inRandomOrder()->first()->id ?? Style::factory()->create()->id,
         ];
     }
 

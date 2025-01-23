@@ -168,7 +168,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/balance', [BalanceController::class, 'getBalance']);
         Route::post('/balance/withdraw', [BalanceController::class, 'withdraw']);
         Route::get('/transactions', [BalanceController::class, 'getTransactions']);
-
+        Route::get('/offer-statuses', [OfferStatusController::class, 'index']);
         Route::get('/styles', [StyleController::class, 'index']);
     // });
 }); 

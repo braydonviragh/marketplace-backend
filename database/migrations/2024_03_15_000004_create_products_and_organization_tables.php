@@ -34,11 +34,6 @@ return new class extends Migration
             //Color 
             $table->foreignId('color_id')->nullable()->constrained()->onDelete('set null');
             
-            // Location
-            $table->string('city');
-            $table->string('province');
-            $table->string('postal_code');
-            
             // Metadata
             $table->unsignedInteger('views_count')->default(0);
             $table->timestamps();

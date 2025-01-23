@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Product;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Query\Expression;
 
 class ProductRepository extends BaseRepository
 {
@@ -14,7 +15,13 @@ class ProductRepository extends BaseRepository
 
     public function getFilteredProducts(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $query = $this->model->with(['user', 'category', 'media', 'brand', 'color']);
+        $query = $this->model->with([
+            'user.profile',
+            'category',
+            'media',
+            'brand',
+            'color'
+        ]);
 
         // Basic filters
         if (isset($filters['user_id'])) {
@@ -96,7 +103,48 @@ class ProductRepository extends BaseRepository
             $query->where('created_at', '<=', $filters['created_to']);
         }
 
-        // Sorting
+        // Location-based filtering
+        if (isset($filters['postal_code']) || (isset($filters['latitude']) && isset($filters['longitude']))) {
+            $distance = $filters['distance'] ?? 50; // Default to 50km if not specified
+            
+            if (isset($filters['postal_code'])) {
+                // Convert postal code to coordinates using geocoding service
+                $geocodingService = app(GeocodingService::class);
+                $coordinates = $geocodingService->getCoordinatesFromPostalCode($filters['postal_code']);
+                
+                if ($coordinates) {
+                    $latitude = $coordinates['latitude'];
+                    $longitude = $coordinates['longitude'];
+                }
+            } else {
+                $latitude = $filters['latitude'];
+                $longitude = $filters['longitude'];
+            }
+
+            if (isset($latitude) && isset($longitude)) {
+                // Join with user_profiles to get seller's location
+                $query->join('users', 'products.user_id', '=', 'users.id')
+                    ->join('user_profiles', 'users.id', '=', 'user_profiles.user_id')
+                    ->select('products.*')
+                    ->selectRaw("
+                        ST_Distance_Sphere(
+                            point(user_profiles.longitude, user_profiles.latitude),
+                            point(?, ?)
+                        ) * 0.001 as distance_in_km",
+                        [$longitude, $latitude]
+                    )
+                    ->whereNotNull('user_profiles.latitude')
+                    ->whereNotNull('user_profiles.longitude')
+                    ->having('distance_in_km', '<=', $distance);
+
+                // Apply distance-based sorting if requested
+                if (isset($filters['sort_by']) && $filters['sort_by'] === 'distance') {
+                    $query->orderBy('distance_in_km', 'asc');
+                }
+            }
+        }
+
+        // Apply other sorting options
         if (isset($filters['sort_by'])) {
             switch ($filters['sort_by']) {
                 case 'price_asc':
@@ -117,15 +165,61 @@ class ProductRepository extends BaseRepository
                 case 'title_desc':
                     $query->orderBy('title', 'desc');
                     break;
+                // Distance sorting is handled in the location filtering section
             }
         } else {
             $query->latest();
         }
 
-        // Availability check
+        // Ensure we're only getting available products
         $query->where('is_available', true);
 
         return $query->paginate($perPage);
+    }
+
+    /**
+     * Get nearby products based on coordinates
+     */
+    public function getNearbyProducts(float $latitude, float $longitude, float $distance = 50, int $limit = 10): array
+    {
+        return $this->model
+            ->join('users', 'products.user_id', '=', 'users.id')
+            ->join('user_profiles', 'users.id', '=', 'user_profiles.user_id')
+            ->select('products.*')
+            ->selectRaw("
+                ST_Distance_Sphere(
+                    point(user_profiles.longitude, user_profiles.latitude),
+                    point(?, ?)
+                ) * 0.001 as distance_in_km",
+                [$longitude, $latitude]
+            )
+            ->whereNotNull('user_profiles.latitude')
+            ->whereNotNull('user_profiles.longitude')
+            ->where('products.is_available', true)
+            ->having('distance_in_km', '<=', $distance)
+            ->orderBy('distance_in_km', 'asc')
+            ->limit($limit)
+            ->get()
+            ->toArray();
+    }
+
+    /**
+     * Get products grouped by city
+     */
+    public function getProductsByCity(int $limit = 10): array
+    {
+        return $this->model
+            ->join('users', 'products.user_id', '=', 'users.id')
+            ->join('user_profiles', 'users.id', '=', 'user_profiles.user_id')
+            ->select('user_profiles.city')
+            ->selectRaw('COUNT(*) as product_count')
+            ->where('products.is_available', true)
+            ->whereNotNull('user_profiles.city')
+            ->groupBy('user_profiles.city')
+            ->orderBy('product_count', 'desc')
+            ->limit($limit)
+            ->get()
+            ->toArray();
     }
 
     public function findProductWithRelations(int $id): Product

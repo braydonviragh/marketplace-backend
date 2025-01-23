@@ -11,7 +11,7 @@ class OfferResource extends JsonResource
         return [
             'id' => $this->id,
             'product' => new ProductResource($this->whenLoaded('product')),
-            'user' => new UserResource($this->whenLoaded('user')),
+            'user' => new SimpleUserResource($this->whenLoaded('user')),
             'status_id' => $this->offer_status_id,
             'status' => $this->offerStatus->slug,
             'start_date' => $this->start_date->toDateTimeString(),

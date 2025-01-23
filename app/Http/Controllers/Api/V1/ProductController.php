@@ -41,6 +41,10 @@ class ProductController extends Controller
             'created_to' => 'sometimes|date_format:Y-m-d H:i:s|after:created_from',
             'sort_by' => 'sometimes|in:price_asc,price_desc,date_asc,date_desc,title_asc,title_desc',
             'per_page' => 'sometimes|integer|min:1|max:100',
+            'postal_code' => 'sometimes|string|max:7',
+            'latitude' => 'sometimes|numeric|between:-90,90',
+            'longitude' => 'sometimes|numeric|between:-180,180',
+            'distance' => 'sometimes|numeric|min:1|max:500',
         ]);
 
         $products = $this->productService->getProducts($filters);

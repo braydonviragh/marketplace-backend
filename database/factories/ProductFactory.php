@@ -99,9 +99,6 @@ class ProductFactory extends Factory
             'size_id' => $sizeInfo['size_id'],
             'color_id' => Color::factory(),
             'is_available' => true,
-            'city' => fake()->city(),
-            'province' => 'Ontario',
-            'postal_code' => fake()->postcode(),
         ];
     }
 } 

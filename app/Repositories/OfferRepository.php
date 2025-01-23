@@ -17,7 +17,13 @@ class OfferRepository
 
     public function getFilteredOffers(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $query = $this->model->with(['user', 'product', 'offerStatus']);
+        $query = $this->model->with([
+            'user', 
+            'product' => function($query) {
+                $query->with(['user', 'media']);
+            }, 
+            'offerStatus'
+        ]);
 
         // Filter by user
         if (isset($filters['user_id'])) {

@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Services\GeocodingService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Facades\DB;
 
 class UserProfile extends Model
 {
@@ -22,9 +24,12 @@ class UserProfile extends Model
         'birthday',
         'postal_code',
         'city',
-        'country',
+        'country_id',
+        'province_id',
         'style_id',
         'language',
+        'latitude',
+        'longitude',
     ];
 
     protected $casts = [
@@ -37,10 +42,42 @@ class UserProfile extends Model
         'user.detailedSizes.letterSize', 
         'user.detailedSizes.waistSize', 
         'user.detailedSizes.numberSize', 
-        'user.brands'
+        'user.brands',
+        'country',
+        'province'
     ];
 
     protected $appends = ['profile_picture_url'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($profile) {
+            // If coordinates are being updated, update the spatial point
+            if ($profile->isDirty(['latitude', 'longitude']) && 
+                $profile->latitude && 
+                $profile->longitude) {
+                $profile->location = DB::raw("ST_GeomFromText('POINT({$profile->longitude} {$profile->latitude})')");
+            }
+            
+            // If postal_code is being updated, update coordinates
+            if ($profile->isDirty('postal_code') && $profile->postal_code) {
+                $geocodingService = app(GeocodingService::class);
+                $coordinates = $geocodingService->getCoordinatesFromPostalCode($profile->postal_code);
+                
+                if ($coordinates) {
+                    $profile->latitude = $coordinates['latitude'];
+                    $profile->longitude = $coordinates['longitude'];
+                    $profile->location = DB::raw("ST_GeomFromText('POINT({$coordinates['longitude']} {$coordinates['latitude']})')");
+                    
+                    if (!$profile->city || $profile->isDirty('postal_code')) {
+                        $profile->city = $coordinates['city'] ?? $profile->city;
+                    }
+                }
+            }
+        });
+    }
 
     public function user(): BelongsTo
     {
@@ -50,6 +87,16 @@ class UserProfile extends Model
     public function style(): BelongsTo
     {
         return $this->belongsTo(Style::class);
+    }
+
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    public function province(): BelongsTo
+    {
+        return $this->belongsTo(Province::class);
     }
 
     // Helper method to get all preferences in a structured format
@@ -91,5 +138,22 @@ class UserProfile extends Model
     public function getProfilePictureUrlAttribute(): ?string
     {
         return $this->profilePicture?->url;
+    }
+
+    // Add a method to calculate distance to another profile or coordinates
+    public function distanceTo($lat, $lng): ?float
+    {
+        if (!$this->latitude || !$this->longitude) {
+            return null;
+        }
+
+        // Calculate distance using MySQL's ST_Distance_Sphere
+        return DB::select("
+            SELECT ST_Distance_Sphere(
+                point(?, ?),
+                point(?, ?)
+            ) * 0.001 as distance_km",
+            [$this->longitude, $this->latitude, $lng, $lat]
+        )[0]->distance_km;
     }
 } 

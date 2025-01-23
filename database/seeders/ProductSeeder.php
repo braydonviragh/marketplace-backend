@@ -154,9 +154,6 @@ class ProductSeeder extends Seeder
                     'number_size_id' => $numberSizeId,
                     'color_id' => $colors->random()->id,
                     'price' => $price,
-                    'city' => fake()->city(),
-                    'province' => 'Ontario',
-                    'postal_code' => fake()->postcode(),
                     'is_available' => true,
                 ]);
             }

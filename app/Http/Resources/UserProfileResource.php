@@ -45,7 +45,7 @@ class UserProfileResource extends JsonResource
             }
         }
 
-        return [
+        $array = [
             'id' => $this->id,
             'user_id' => $this->user_id,
             'city' => $this->city,
@@ -69,6 +69,37 @@ class UserProfileResource extends JsonResource
                     'slug' => $brand->slug,
                 ];
             }),
+            'location' => [
+                'city' => $this->city,
+                'postal_code' => $this->postal_code,
+                'country' => $this->country,
+                'coordinates' => $this->when($this->latitude && $this->longitude, [
+                    'latitude' => (float) $this->latitude,
+                    'longitude' => (float) $this->longitude,
+                ]),
+            ],
         ];
+
+        // Add distance if it was calculated in the query
+        if (isset($this->distance_in_km)) {
+            $array['location']['distance'] = [
+                'value' => round($this->distance_in_km, 1),
+                'unit' => 'km',
+                'formatted' => $this->formatDistance($this->distance_in_km)
+            ];
+        }
+
+        return $array;
+    }
+
+    private function formatDistance(float $distance): string
+    {
+        if ($distance < 1) {
+            return 'Less than 1 km away';
+        }
+        if ($distance < 10) {
+            return round($distance, 1) . ' km away';
+        }
+        return round($distance) . ' km away';
     }
 } 

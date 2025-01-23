@@ -25,14 +25,15 @@ class OfferController extends Controller
             'date_to' => 'sometimes|date_format:Y-m-d H:i:s|after:date_from',
         ]);
 
-        // Add user context to filters
-        if (!auth()->user()->hasRole('super_admin')) {
-            if (auth()->user()->hasRole('owner')) {
-                $filters['owner_id'] = auth()->id();
-            } else {
-                $filters['user_id'] = auth()->id();
-            }
-        }
+        // // Add user context to filters
+        // if (!auth()->user()->hasRole('super_admin')) {
+        //     if (auth()->user()->hasRole('owner')) {
+        //         $filters['owner_id'] = auth()->id();
+        //     } else {
+        //         $filters['user_id'] = auth()->id();
+        //     }
+        // }
+        $filters['user_id'] = 1; //auth()->id();
 
         $offers = $this->offerService->getOffers($filters);
         

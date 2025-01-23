@@ -16,7 +16,7 @@ class ProductResource extends JsonResource
      */
     public function toArray($request): array
     {
-        return [
+        $array = [
             'id' => $this->id,
             
             // Basic Information
@@ -28,10 +28,22 @@ class ProductResource extends JsonResource
             // Product Details
             'is_available' => $this->is_available,
             
-            // Location
-            'city' => $this->city,
-            'province' => $this->province,
-            'postal_code' => $this->postal_code,
+            // Get location from user's profile
+            'location' => [
+                'city' => $this->user->profile->city,
+                'province' => [
+                    'name' => $this->user->profile->province->name,
+                    'abbreviation' => $this->user->profile->province->abbreviation,
+                ],
+                'postal_code' => $this->user->profile->postal_code,
+                'coordinates' => $this->when(
+                    $this->user->profile->latitude && $this->user->profile->longitude,
+                    [
+                        'latitude' => (float) $this->user->profile->latitude,
+                        'longitude' => (float) $this->user->profile->longitude,
+                    ]
+                ),
+            ],
             
             // Simplified Relationships
             'user' => new SimpleUserResource($this->whenLoaded('user')),
@@ -41,5 +53,18 @@ class ProductResource extends JsonResource
             
             'media' => MediaResource::collection($this->whenLoaded('media')),
         ];
+
+        return $array;
+    }
+
+    private function formatDistance(float $distance): string
+    {
+        if ($distance < 1) {
+            return 'Less than 1 km away';
+        }
+        if ($distance < 10) {
+            return round($distance, 1) . ' km away';
+        }
+        return round($distance) . ' km away';
     }
 } 
