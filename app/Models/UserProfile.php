@@ -156,4 +156,33 @@ class UserProfile extends Model
             [$this->longitude, $this->latitude, $lng, $lat]
         )[0]->distance_km;
     }
+
+    public function getQueryablePreferences(): array
+    {
+        $preferences = [];
+        
+        // Add size preferences
+        foreach ($this->user->detailedSizes as $size) {
+            if ($size->letter_size_id) {
+                $preferences['letter_size_ids'][] = $size->letter_size_id;
+            }
+            if ($size->waist_size_id) {
+                $preferences['waist_size_ids'][] = $size->waist_size_id;
+            }
+            if ($size->number_size_id) {
+                $preferences['number_size_ids'][] = $size->number_size_id;
+            }
+        }
+        
+        // Add brand preferences
+        $preferences['brand_ids'] = $this->user->brands->pluck('id')->toArray();
+        
+        // Add location preference
+        $preferences['city'] = $this->city;
+        
+        // Add style preference
+        $preferences['style_id'] = $this->style_id;
+        
+        return $preferences;
+    }
 } 

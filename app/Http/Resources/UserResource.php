@@ -45,7 +45,7 @@ class UserResource extends JsonResource
 
         if ($this->relationLoaded('detailedSizes')) {
             $data['sizes'] = [
-                'letter_sizes' => $this->detailedSizes->where('size_id', '!=', null)
+                'letter_sizes' => $this->detailedSizes->where('letter_size_id', '!=', null)
                     ->map(fn($size) => [
                         'id' => $size->letterSize->id,
                         'name' => $size->letterSize->name,

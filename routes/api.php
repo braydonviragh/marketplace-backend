@@ -65,6 +65,9 @@ Route::prefix('v1')->group(function () {
         Route::prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index']);
             Route::get('/{id}', [UserController::class, 'show']);
+            Route::get('/{id}/products', [ProductController::class, 'userProducts']);
+            Route::post('/{id}', [UserController::class, 'update']);
+            Route::delete('/{id}', [UserController::class, 'destroy']);
             Route::get('/{id}/reviews', [ReviewController::class, 'userReviews']);
             Route::get('/{id}/rentals', [RentalController::class, 'userRentals']);
             Route::get('/{id}/payments', [PaymentController::class, 'userPayments'])

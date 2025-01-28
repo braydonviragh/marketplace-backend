@@ -23,6 +23,46 @@ class ProductRepository extends BaseRepository
             'color'
         ]);
 
+        // If tailored filter is present, apply user preferences
+        if (isset($filters['filter']) && $filters['filter'] === 'tailored') {
+            
+            //$user = auth()->user();
+
+            //TODO remove this after testing
+            $user = \App\Models\User::find(1);
+
+            if ($user && $user->profile) {
+                $preferences = $user->profile->getQueryablePreferences();
+                
+                // First apply mandatory city filter if it exists
+                //TODO determine if tailored product should be filtered by city
+                // if (!empty($preferences['city'])) {
+                //     $query->whereHas('user.profile', function($subQ) use ($preferences) {
+                //         $subQ->where('city', $preferences['city']);
+                //     });
+                // }
+                
+                // Then apply flexible size preferences
+                $query->where(function($q) use ($preferences) {
+                    // Match any size preference
+                    if (!empty($preferences['letter_size_ids'])) {
+                        $q->orWhereIn('letter_size_id', $preferences['letter_size_ids']);
+                    }
+                    if (!empty($preferences['waist_size_ids'])) {
+                        $q->orWhereIn('waist_size_id', $preferences['waist_size_ids']);
+                    }
+                    if (!empty($preferences['number_size_ids'])) {
+                        $q->orWhereIn('number_size_id', $preferences['number_size_ids']);
+                    }
+                    
+                    // Match style
+                    if (!empty($preferences['style_id'])) {
+                        $q->where('style_id', $preferences['style_id']);
+                    }
+                });
+            }
+        }
+
         // Basic filters
         if (isset($filters['user_id'])) {
             $query->where('user_id', $filters['user_id']);
@@ -173,7 +213,6 @@ class ProductRepository extends BaseRepository
 
         // Ensure we're only getting available products
         $query->where('is_available', true);
-
         return $query->paginate($perPage);
     }
 
