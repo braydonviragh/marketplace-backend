@@ -35,18 +35,17 @@ class ProductController extends Controller
             'price_max' => 'sometimes|numeric|gt:price_min',
             'city' => 'sometimes|string|max:100',
             'province' => 'sometimes|string|max:100',
-            'is_available' => 'sometimes|boolean',
             'search' => 'sometimes|string|max:255',
             'created_from' => 'sometimes|date_format:Y-m-d H:i:s',
             'created_to' => 'sometimes|date_format:Y-m-d H:i:s|after:created_from',
             'sort_by' => 'sometimes|in:price_asc,price_desc,date_asc,date_desc,title_asc,title_desc',
-            'per_page' => 'sometimes|integer|min:1|max:100',
+            'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
             'postal_code' => 'sometimes|string|max:7',
             'latitude' => 'sometimes|numeric|between:-90,90',
             'longitude' => 'sometimes|numeric|between:-180,180',
             'distance' => 'sometimes|numeric|min:1|max:500',
-            'filter' => 'sometimes|string|in:tailored,trending,favorite',
-            'page' => 'sometimes|integer|min:1',
+            'filter' => ['sometimes', 'string', 'in:tailored,trending,favorite'],
+            'page' => ['sometimes', 'integer', 'min:1'],
         ]);
 
         $products = $this->productService->getProducts($filters);

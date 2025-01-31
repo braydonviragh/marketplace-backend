@@ -38,8 +38,8 @@ class OfferRepository
         }
 
         // Filter by status
-        if (isset($filters['status_id'])) {
-            $query->where('offer_status_id', $filters['status_id']);
+        if (isset($filters['offer_status_id'])) {
+            $query->where('offer_status_id', $filters['offer_status_id']);
         }
 
         // Filter by product

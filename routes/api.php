@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\ListingController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\OfferController;
+use App\Http\Controllers\Api\V1\OfferStatusController;
 use App\Http\Controllers\Api\V1\BrandController;
 use App\Http\Controllers\Api\V1\ColorController;
 use App\Http\Controllers\Api\V1\LetterSizeController;
@@ -139,6 +140,8 @@ Route::prefix('v1')->group(function () {
         // Offers
         Route::prefix('offers')->group(function () {
             Route::get('/', [OfferController::class, 'index']);
+            Route::get('/sent', [OfferController::class, 'sentOffers']);
+            Route::get('/received', [OfferController::class, 'receivedOffers']);
             Route::get('/{offer}', [OfferController::class, 'show']);
             Route::post('/', [OfferController::class, 'store']);
             Route::put('/{offer}', [OfferController::class, 'update']);

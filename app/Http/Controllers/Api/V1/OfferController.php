@@ -19,7 +19,7 @@ class OfferController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = $request->validate([
-            'status_id' => 'sometimes|exists:offer_status,id',
+            'offer_status_id' => 'sometimes|exists:offer_status,id',
             'product_id' => 'sometimes|exists:products,id',
             'date_from' => 'sometimes|date_format:Y-m-d H:i:s',
             'date_to' => 'sometimes|date_format:Y-m-d H:i:s|after:date_from',
@@ -58,7 +58,7 @@ class OfferController extends Controller
     public function show(Offer $offer): JsonResponse
     {
         return response()->json([
-            'data' => new OfferResource($offer->load(['product', 'user', 'offerStatus']))
+            'data' => new OfferResource($offer->load(['product.media', 'user', 'offerStatus']))
         ]);
     }
 
@@ -73,6 +73,62 @@ class OfferController extends Controller
         return response()->json([
             'message' => 'Offer status updated successfully',
             'data' => new OfferResource($offer->fresh(['product', 'user', 'offerStatus']))
+        ]);
+    }
+
+    /**
+     * Get offers sent by the authenticated user
+     */
+    public function sentOffers(Request $request): JsonResponse
+    {
+        $filters = $request->validate([
+            'offer_status_id' => 'sometimes|exists:offer_status,id',
+            'date_from' => 'sometimes|date_format:Y-m-d H:i:s',
+            'date_to' => 'sometimes|date_format:Y-m-d H:i:s|after:date_from',
+            'per_page' => 'sometimes|integer|min:1|max:100'
+        ]);
+
+        $filters['user_id'] = auth()->id() ?? 1; // Using 1 for testing, remove in production
+        $perPage = $filters['per_page'] ?? 20;
+        
+        $offers = $this->offerService->getOffers($filters, $perPage);
+        
+        return response()->json([
+            'data' => OfferResource::collection($offers),
+            'meta' => [
+                'current_page' => $offers->currentPage(),
+                'last_page' => $offers->lastPage(),
+                'per_page' => $offers->perPage(),
+                'total' => $offers->total()
+            ]
+        ]);
+    }
+
+    /**
+     * Get offers received for the authenticated user's products
+     */
+    public function receivedOffers(Request $request): JsonResponse
+    {
+        $filters = $request->validate([
+            'offer_status_id' => 'sometimes|exists:offer_status,id',
+            'date_from' => 'sometimes|date_format:Y-m-d H:i:s',
+            'date_to' => 'sometimes|date_format:Y-m-d H:i:s|after:date_from',
+            'per_page' => 'sometimes|integer|min:1|max:100'
+        ]);
+
+        $filters['owner_id'] = auth()->id() ?? 1; // Using 1 for testing, remove in production
+        $perPage = $filters['per_page'] ?? 20;
+        
+        $offers = $this->offerService->getOffers($filters, $perPage);
+        
+        return response()->json([
+            'data' => OfferResource::collection($offers),
+            'meta' => [
+                'current_page' => $offers->currentPage(),
+                'last_page' => $offers->lastPage(),
+                'per_page' => $offers->perPage(),
+                'total' => $offers->total()
+            ]
         ]);
     }
 } 

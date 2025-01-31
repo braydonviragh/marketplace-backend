@@ -518,6 +518,30 @@
             "name": "Offers",
             "item": [
                 {
+                    "name": "List Offer Statuses",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/offer-statuses",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "offer-statuses"]
+                        },
+                        "description": "Get a list of all possible offer statuses (pending, accepted, rejected, cancelled, expired, withdrawn)"
+                    }
+                },
+                {
                     "name": "List Offers",
                     "request": {
                         "method": "GET",
@@ -666,6 +690,98 @@
                             "path": ["api", "v1", "offers", "1", "status"]
                         },
                         "description": "Update an offer's status (pending, accepted, rejected, cancelled, expired, withdrawn)"
+                    }
+                },
+                {
+                    "name": "List Sent Offers",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/offers/sent?offer_status_id=1&date_from=2024-03-01 00:00:00&date_to=2024-04-01 00:00:00&per_page=20",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "offers", "sent"],
+                            "query": [
+                                {
+                                    "key": "offer_status_id",
+                                    "value": "1",
+                                    "description": "Filter by offer status ID"
+                                },
+                                {
+                                    "key": "date_from",
+                                    "value": "2024-03-01 00:00:00",
+                                    "description": "Filter by start date (Y-m-d H:i:s)"
+                                },
+                                {
+                                    "key": "date_to",
+                                    "value": "2024-04-01 00:00:00",
+                                    "description": "Filter by end date (Y-m-d H:i:s)"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "20",
+                                    "description": "Number of items per page (default: 20, max: 100)"
+                                }
+                            ]
+                        },
+                        "description": "Get a paginated list of offers sent by the authenticated user"
+                    }
+                },
+                {
+                    "name": "List Received Offers",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/offers/received?offer_status_id=1&date_from=2024-03-01 00:00:00&date_to=2024-04-01 00:00:00&per_page=20",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "offers", "received"],
+                            "query": [
+                                {
+                                    "key": "offer_status_id",
+                                    "value": "1",
+                                    "description": "Filter by offer status ID"
+                                },
+                                {
+                                    "key": "date_from",
+                                    "value": "2024-03-01 00:00:00",
+                                    "description": "Filter by start date (Y-m-d H:i:s)"
+                                },
+                                {
+                                    "key": "date_to",
+                                    "value": "2024-04-01 00:00:00",
+                                    "description": "Filter by end date (Y-m-d H:i:s)"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "20",
+                                    "description": "Number of items per page (default: 20, max: 100)"
+                                }
+                            ]
+                        },
+                        "description": "Get a paginated list of offers received for the authenticated user's products"
                     }
                 }
             ],
