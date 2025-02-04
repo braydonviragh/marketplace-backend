@@ -50,16 +50,17 @@ class RentalService
     public function activateRental(Rental $rental): bool
     {
         DB::transaction(function () use ($rental) {
-            // Calculate owner amount (90%)
+            // Calculate owner amount (80%)
             // Calculate total rental price
             $totalPrice = $rental->product->price;
             
-            // Calculate owner's share (90%)
-            $amount = $totalPrice * 0.90;
+            // Calculate owner's share (80%)
+            $amount = $totalPrice * 0.80;
             
-            // Calculate app fee (10%) 
-            $appFee = $totalPrice * 0.10;
+            // Calculate app fee (20%) 
+            $appFee = $totalPrice * 0.20;
             // Create owner transaction
+
             UserTransaction::create([
                 'user_id' => $rental->product->user_id,
                 'rental_id' => $rental->id,

@@ -45,8 +45,8 @@ class OfferController extends Controller
     public function store(CreateOfferRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $data['user_id'] = auth()->id();
-
+        //TODO: Remove this after testing
+        $data['user_id'] = 1; //auth()->id();
         $offer = $this->offerService->createOffer($data);
         
         return response()->json([
