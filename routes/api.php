@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\UserController;
-use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\RentalController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\NotificationController;
@@ -69,7 +68,6 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/products', [ProductController::class, 'userProducts']);
             Route::post('/{id}', [UserController::class, 'update']);
             Route::delete('/{id}', [UserController::class, 'destroy']);
-            Route::get('/{id}/reviews', [ReviewController::class, 'userReviews']);
             Route::get('/{id}/rentals', [RentalController::class, 'userRentals']);
             Route::get('/{id}/payments', [PaymentController::class, 'userPayments'])
                 ->middleware('verify.user.access');
@@ -153,10 +151,15 @@ Route::prefix('v1')->group(function () {
         Route::prefix('products')->group(function () {
             Route::get('/', [ProductController::class, 'index']);
             Route::get('/{id}', [ProductController::class, 'show']);
-            Route::post('/', [ProductController::class, 'store'])
-                ->middleware(['verified', 'check.user.status']);
-            Route::put('/{product}', [ProductController::class, 'update'])
-                ->middleware('verify.product.owner');
+            
+            //TODO remove comment when ready
+            // Route::middleware(['auth:sanctum'])->group(function () {
+                Route::post('/', [ProductController::class, 'store']);
+                Route::put('/{product}', [ProductController::class, 'update']);
+                    // ->middleware('verify.product.owner');
+                Route::delete('/{product}', [ProductController::class, 'destroy']);
+                    // ->middleware('verify.product.owner');
+            // });
         });
 
 

@@ -71,10 +71,9 @@ class ProductSeeder extends Seeder
             for ($i = 0; $i < $productsCount; $i++) {
                 $category = $categories->random();
                 
-                // Initialize all size IDs as null
-                $letterSizeId = null;
-                $waistSizeId = null;
-                $numberSizeId = null;
+                // Initialize sizeable fields as null
+                $sizeableType = null;
+                $sizeableId = null;
 
                 // Assign appropriate size based on category type
                 switch ($category->slug) {
@@ -84,7 +83,9 @@ class ProductSeeder extends Seeder
                     case 'blazers':
                     case 'bodysuits':
                     case 'sweats-hoodies':
-                        $letterSizeId = $letterSizes->random()->id;
+                        $size = $letterSizes->random();
+                        $sizeableType = LetterSize::class;
+                        $sizeableId = $size->id;
                         break;
 
                     // Full body/Bottom wear - Number sizes
@@ -93,14 +94,18 @@ class ProductSeeder extends Seeder
                     case 'skirts':
                     case 'jumpsuits':
                     case 'suits':
-                        $numberSizeId = $numberSizes->random()->id;
+                        $size = $numberSizes->random();
+                        $sizeableType = NumberSize::class;
+                        $sizeableId = $size->id;
                         break;
 
                     // Waist measured items
                     case 'jeans':
                     case 'pants':
                     case 'shorts':
-                        $waistSizeId = $waistSizes->random()->id;
+                        $size = $waistSizes->random();
+                        $sizeableType = WaistSize::class;
+                        $sizeableId = $size->id;
                         break;
 
                     // No size needed for these categories
@@ -149,9 +154,8 @@ class ProductSeeder extends Seeder
                     'brand_id' => $brand->id,
                     'title' => $title,
                     'description' => fake()->paragraphs(3, true),
-                    'letter_size_id' => $letterSizeId,
-                    'waist_size_id' => $waistSizeId,
-                    'number_size_id' => $numberSizeId,
+                    'sizeable_type' => $sizeableType,
+                    'sizeable_id' => $sizeableId,
                     'color_id' => $colors->random()->id,
                     'price' => $price,
                     'is_available' => true,

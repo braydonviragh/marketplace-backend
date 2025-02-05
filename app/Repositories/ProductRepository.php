@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Product;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Eloquent\Model;
 
 class ProductRepository extends BaseRepository
 {
@@ -20,7 +21,8 @@ class ProductRepository extends BaseRepository
             'category',
             'media',
             'brand',
-            'color'
+            'color',
+            'sizeable'
         ]);
 
         // If tailored filter is present, apply user preferences
@@ -44,15 +46,24 @@ class ProductRepository extends BaseRepository
                 
                 // Then apply flexible size preferences
                 $query->where(function($q) use ($preferences) {
-                    // Match any size preference
+                    // Match any size preference using polymorphic relationship
                     if (!empty($preferences['letter_size_ids'])) {
-                        $q->orWhereIn('letter_size_id', $preferences['letter_size_ids']);
+                        $q->orWhere(function($subQ) use ($preferences) {
+                            $subQ->where('sizeable_type', \App\Models\LetterSize::class)
+                                 ->whereIn('sizeable_id', $preferences['letter_size_ids']);
+                        });
                     }
                     if (!empty($preferences['waist_size_ids'])) {
-                        $q->orWhereIn('waist_size_id', $preferences['waist_size_ids']);
+                        $q->orWhere(function($subQ) use ($preferences) {
+                            $subQ->where('sizeable_type', \App\Models\WaistSize::class)
+                                 ->whereIn('sizeable_id', $preferences['waist_size_ids']);
+                        });
                     }
                     if (!empty($preferences['number_size_ids'])) {
-                        $q->orWhereIn('number_size_id', $preferences['number_size_ids']);
+                        $q->orWhere(function($subQ) use ($preferences) {
+                            $subQ->where('sizeable_type', \App\Models\NumberSize::class)
+                                 ->whereIn('sizeable_id', $preferences['number_size_ids']);
+                        });
                     }
                     
                     // Match style
@@ -80,17 +91,20 @@ class ProductRepository extends BaseRepository
             $query->where('color_id', $filters['color_id']);
         }
 
-        // Size filters
+        // Update size filters to use polymorphic relationship
         if (isset($filters['letter_size_id'])) {
-            $query->where('letter_size_id', $filters['letter_size_id']);
+            $query->where('sizeable_type', \App\Models\LetterSize::class)
+                  ->where('sizeable_id', $filters['letter_size_id']);
         }
 
         if (isset($filters['number_size_id'])) {
-            $query->where('number_size_id', $filters['number_size_id']);
+            $query->where('sizeable_type', \App\Models\NumberSize::class)
+                  ->where('sizeable_id', $filters['number_size_id']);
         }
 
         if (isset($filters['waist_size_id'])) {
-            $query->where('waist_size_id', $filters['waist_size_id']);
+            $query->where('sizeable_type', \App\Models\WaistSize::class)
+                  ->where('sizeable_id', $filters['waist_size_id']);
         }
 
         // Price range
@@ -208,7 +222,8 @@ class ProductRepository extends BaseRepository
                 // Distance sorting is handled in the location filtering section
             }
         } else {
-            $query->latest();
+            // Default ordering by ID in descending order
+            $query->orderBy('products.id', 'desc');
         }
 
         // Ensure we're only getting available products
@@ -264,18 +279,23 @@ class ProductRepository extends BaseRepository
     public function findProductWithRelations(int $id): Product
     {
         return $this->model->with([
-            'user',
+            'user.profile',
             'category',
             'media',
             'color',
-            'letterSize',
-            'waistSize',
-            'numberSize'
+            'brand',
+            'style',
+            'sizeable'
         ])->findOrFail($id);
     }
 
     public function createProduct(array $data): Product
     {
         return $this->model->create($data);
+    }
+
+    public function update(Model $model, array $data): bool
+    {
+        return $model->update($data);
     }
 } 

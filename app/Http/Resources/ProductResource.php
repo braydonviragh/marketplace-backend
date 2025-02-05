@@ -50,6 +50,7 @@ class ProductResource extends JsonResource
             'category' => new SimpleCategoryResource($this->whenLoaded('category')),
             'size' => $this->size,
             'color' => $this->color,
+            'style' => $this->style,
             
             'media' => MediaResource::collection($this->whenLoaded('media')),
         ];

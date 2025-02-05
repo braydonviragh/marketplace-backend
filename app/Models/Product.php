@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Product extends Model
 {
@@ -26,8 +27,8 @@ class Product extends Model
         'brand',
         'price',
         'condition',
-        'size_type',
-        'size_id',
+        'sizeable_type',
+        'sizeable_id',
         'is_available',
         'city',
         'province',
@@ -46,7 +47,7 @@ class Product extends Model
         'views_count' => 0,
     ];
 
-    protected $with = ['letterSize', 'waistSize', 'numberSize', 'color'];
+    protected $with = ['sizeable', 'color'];
 
     protected $appends = ['size'];
 
@@ -77,25 +78,9 @@ class Product extends Model
         return $this->belongsTo(Color::class);
     }
 
-    // Size relationships based on size_type
-    public function letterSize(): BelongsTo
+    public function sizeable(): MorphTo
     {
-        return $this->belongsTo(LetterSize::class);
-    }
-
-    public function numberSize(): BelongsTo
-    {
-        return $this->belongsTo(NumberSize::class);
-    }
-
-    public function waistSize(): BelongsTo
-    {
-        return $this->belongsTo(WaistSize::class);
-    }
-
-    public function shoeSize(): BelongsTo
-    {
-        return $this->belongsTo(ShoeSize::class);
+        return $this->morphTo();
     }
 
     public function style(): BelongsTo
@@ -114,10 +99,10 @@ class Product extends Model
         return $query->where('category_id', $categoryId);
     }
 
-    public function scopeBySize($query, $sizeType, $sizeId)
+    public function scopeBySize($query, $sizeableType, $sizeableId)
     {
-        return $query->where('size_type', $sizeType)
-                    ->where('size_id', $sizeId);
+        return $query->where('sizeable_type', $sizeableType)
+                    ->where('sizeable_id', $sizeableId);
     }
 
     public function scopeByLocation($query, $latitude, $longitude, $radius = 50)
@@ -136,38 +121,28 @@ class Product extends Model
     // Accessors & Mutators
     protected function getSizeAttribute()
     {
-        if ($this->letter_size_id) {
-            return [
-                'id' => $this->letterSize->id,
-                'name' => $this->letterSize->name,
-                'display_name' => $this->letterSize->display_name,
-                'slug' => $this->letterSize->slug,
-                'type' => 'letter'
-            ];
-        }
-        
-        if ($this->number_size_id) {
-            return [
-                'id' => $this->numberSize->id,
-                'name' => $this->numberSize->name,
-                'display_name' => $this->numberSize->display_name,
-                'slug' => $this->numberSize->slug,
-                'type' => 'number'
-            ];
-        }
-        
-        if ($this->waist_size_id) {
-            return [
-                'id' => $this->waistSize->id,
-                'name' => $this->waistSize->name,
-                'display_name' => $this->waistSize->display_name,
-                'slug' => $this->waistSize->slug,
-                'type' => 'waist'
-            ];
+        if (!$this->sizeable_type || !$this->sizeable) {
+            return null;
         }
 
-        // For categories that don't need sizes (accessories, jewelry, etc.)
-        return null;
+        return [
+            'id' => $this->sizeable->id,
+            'name' => $this->sizeable->name,
+            'display_name' => $this->sizeable->display_name,
+            'slug' => $this->sizeable->slug,
+            'type' => $this->getSizeTypeFromClass()
+        ];
+    }
+
+    private function getSizeTypeFromClass()
+    {
+        return match ($this->sizeable_type) {
+            LetterSize::class => 'letter',
+            NumberSize::class => 'number',
+            WaistSize::class => 'waist',
+            ShoeSize::class => 'shoe',
+            default => null
+        };
     }
 
     protected function getLocationAttribute($value)
@@ -193,42 +168,5 @@ class Product extends Model
     public function getPrimaryImageUrlAttribute(): ?string
     {
         return $this->primaryImage?->url;
-    }
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::saving(function ($product) {
-            // Clear other size fields based on size_type
-            switch ($product->size_type) {
-                case 'letter':
-                    $product->number_size_id = null;
-                    $product->waist_size_id = null;
-                    $product->shoe_size_id = null;
-                    break;
-                case 'number':
-                    $product->letter_size_id = null;
-                    $product->waist_size_id = null;
-                    $product->shoe_size_id = null;
-                    break;
-                case 'waist':
-                    $product->letter_size_id = null;
-                    $product->number_size_id = null;
-                    $product->shoe_size_id = null;
-                    break;
-                case 'shoe':
-                    $product->letter_size_id = null;
-                    $product->number_size_id = null;
-                    $product->waist_size_id = null;
-                    break;
-                case 'none':
-                    $product->letter_size_id = null;
-                    $product->number_size_id = null;
-                    $product->waist_size_id = null;
-                    $product->shoe_size_id = null;
-                    break;
-            }
-        });
     }
 } 

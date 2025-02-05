@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Models\Product;
 use App\Services\ProductService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CreateProductRequest;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductCollection;
@@ -71,10 +72,10 @@ class ProductController extends Controller
         );
     }
 
-    public function store(ProductRequest $request): JsonResponse
+    public function store(CreateProductRequest $request): JsonResponse
     {
         $product = $this->productService->createProduct(
-            array_merge($request->validated(), ['user_id' => 2])
+            array_merge($request->validated(), ['user_id' => 1])
         );
 
         return $this->resourceResponse(
@@ -84,16 +85,22 @@ class ProductController extends Controller
         );
     }
 
-    public function update(ProductRequest $request, Product $product): JsonResponse
+    public function update(CreateProductRequest $request, Product $product): JsonResponse
     {
-        $product = $this->productService->updateProduct(
-            product: $product,
-            data: $request->validated()
-        );
+        $product = $this->productService->updateProduct($product, array_merge($request->validated(), ['user_id' => 1]));
 
         return $this->resourceResponse(
             new ProductResource($product),
             'Product updated successfully'
         );
+    }
+
+    public function destroy(Product $product): JsonResponse
+    {
+        $this->productService->deleteProduct($product);
+        
+        return response()->json([
+            'message' => 'Product deleted successfully'
+        ], Response::HTTP_OK);
     }
 } 

@@ -21,12 +21,9 @@ return new class extends Migration
             $table->text('description');
             $table->decimal('price', 10, 2);
             
-            // Size Information
-            $table->enum('size_type', ['letter', 'number', 'waist', 'shoe', 'none'])->default('none');
-            $table->foreignId('letter_size_id')->nullable()->constrained('letter_sizes')->onDelete('set null');
-            $table->foreignId('number_size_id')->nullable()->constrained('number_sizes')->onDelete('set null');
-            $table->foreignId('waist_size_id')->nullable()->constrained('waist_sizes')->onDelete('set null');
-            $table->foreignId('shoe_size_id')->nullable()->constrained('shoe_sizes')->onDelete('set null');
+            // Size Information (Polymorphic)
+            $table->string('sizeable_type')->nullable();
+            $table->unsignedBigInteger('sizeable_id')->nullable();
             
             // Status and Visibility
             $table->boolean('is_available')->default(true);
@@ -44,11 +41,7 @@ return new class extends Migration
             $table->index('category_id');
             $table->index('style_id');
             $table->index('brand_id');
-            $table->index('size_type');
-            $table->index('letter_size_id');
-            $table->index('number_size_id');
-            $table->index('waist_size_id');
-            $table->index('shoe_size_id');
+            $table->index(['sizeable_type', 'sizeable_id']);
             $table->index('is_available');
         });
     }

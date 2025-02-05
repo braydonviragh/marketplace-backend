@@ -40,8 +40,14 @@ return [
             'driver' => 'local',
             'root' => storage_path('app/public'),
             /*TODO: Change this to the correct URL AFTER TESTING*/
-            'url' => env('APP_URL').'/laravel/mp-backend/public/storage',
+            'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
+            'throw' => false,
+        ],
+
+        'temp' => [
+            'driver' => 'local',
+            'root' => storage_path('app/temp'),
             'throw' => false,
         ],
 
