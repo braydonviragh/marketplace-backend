@@ -25,6 +25,11 @@ class ProductRepository extends BaseRepository
             'sizeable'
         ]);
 
+        // If userProducts filter is present, get only authenticated user's products
+        if (isset($filters['userProducts']) && $filters['userProducts']) {
+            $query->where('user_id', auth()->id());
+        }
+
         // If tailored filter is present, apply user preferences
         if (isset($filters['filter']) && $filters['filter'] === 'tailored') {
             
