@@ -13,6 +13,7 @@ use App\Http\Resources\SimpleUserResource;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\VerifyPhoneRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
 {
@@ -108,10 +109,24 @@ class RegisterController extends Controller
 
     public function checkAvailability(Request $request)
     {
-        $request->validate([
+
+        // Define the validation rules
+        $rules = [
             'email' => 'sometimes|required|email',
             'phone_number' => 'sometimes|required|string|regex:/^\+1[0-9]{10}$/',
-        ]);
+        ];
+
+        // Create a validator instance
+        $validator = Validator::make($request->all(), $rules);
+
+        // Check if validation fails
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
         $errors = [];
         
@@ -131,10 +146,23 @@ class RegisterController extends Controller
             }
         }
         
+        // Return error response if there are any validation errors
         if (!empty($errors)) {
-            return $this->errorResponse('Validation failed', 422, $errors);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $errors
+            ], 422);
         }
         
-        return $this->successResponse(null, 'Available for registration');
+        // If we get here, both email and phone are available
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Email and phone number are available',
+            'data' => [
+                'email_available' => $request->has('email'),
+                'phone_available' => $request->has('phone_number')
+            ]
+        ]);
     }
 } 
