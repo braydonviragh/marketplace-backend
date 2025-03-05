@@ -113,7 +113,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/', [ProductController::class, 'index']);
         Route::get('/{id}', [ProductController::class, 'show']);
     });
-
+    // User Profile Route
+    Route::post('/user/profile', [UserProfileController::class, 'store']);
     // Protected routes that require authentication
     Route::middleware(['auth:sanctum'])->group(function () {
         // Users
@@ -121,6 +122,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [UserController::class, 'index']);
             Route::get('/current-user', [UserController::class, 'currentUser']);
             Route::get('/{id}', [UserController::class, 'show']);
+            Route::post('/', [UserController::class, 'store']);
             Route::get('/{id}/products', [ProductController::class, 'userProducts']);
             Route::post('/{id}', [UserController::class, 'update']);
             Route::delete('/{id}', [UserController::class, 'destroy']);
@@ -240,6 +242,4 @@ Route::prefix('v1')->group(function () {
 
     // });
 
-    // User Profile Route
-    Route::post('/user/profile', [UserProfileController::class, 'store'])->middleware('auth:sanctum');
 }); 

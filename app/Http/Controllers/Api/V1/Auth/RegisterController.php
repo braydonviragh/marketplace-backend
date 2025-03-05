@@ -48,7 +48,7 @@ class RegisterController extends Controller
         //     'message' => 'Verification code sent to your phone'
         // ], 'Please verify your phone number', 200);
 
-        // TEMPORARY: Create user directly without verification
+        // Create user with basic information
         $user = User::create([
             'email' => $request->email,
             'phone_number' => $request->phone_number,
@@ -58,6 +58,28 @@ class RegisterController extends Controller
             'phone_verified_at' => now(), // Auto-verify for testing
             'remember_token' => Str::random(10),
         ]);
+        
+        // Create user profile if profile data is provided
+        if ($request->has('username')) {
+            // Create profile
+            $user->profile()->create([
+                'username' => $request->username,
+                'name' => $request->name,
+                'city' => $request->city,
+                'postal_code' => $request->postal_code,
+                'province_id' => $request->province_id,
+                'country_id' => $request->country_id,
+            ]);
+            
+            // Handle profile picture if provided
+            if ($request->hasFile('profile_picture')) {
+                $profilePicturePath = $request->file('profile_picture')->store('profiles', 'public');
+                $user->profile()->update(['profile_picture' => $profilePicturePath]);
+            }
+            
+            // Load the profile relationship
+            $user->load('profile');
+        }
 
         // Create a long-lived token for iOS app usage (60 days)
         // Token will be used for authenticating all requests
