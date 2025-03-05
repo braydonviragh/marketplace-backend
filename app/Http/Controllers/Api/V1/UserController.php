@@ -28,7 +28,7 @@ class UserController extends Controller
      */
     public function currentUser(): JsonResponse
     {
-        $userId = 1; //auth()->id();
+        $userId = auth()->id();
 
         $user = $this->userService->findUser($userId);
         

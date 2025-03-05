@@ -121,7 +121,7 @@ class RentalService
 
     public function confirmRental(Rental $rental): void
     {
-        $userId = 1; //auth()->id();
+        $userId = auth()->id();
         
         // Load the offer relationship if not already loaded
         if (!$rental->relationLoaded('offer')) {

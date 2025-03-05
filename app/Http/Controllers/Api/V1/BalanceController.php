@@ -24,7 +24,7 @@ class BalanceController extends Controller
      */
     public function getBalance(): JsonResponse
     {
-        $userId = 16; //auth()->id();
+        $userId = auth()->id();
 
         $balance = UserBalance::where('user_id', $userId)
             ->firstOrCreate(
@@ -64,7 +64,7 @@ class BalanceController extends Controller
     public function withdraw(): JsonResponse
     {
         return DB::transaction(function () {
-            $userId = 16; // TODO: Replace with auth()->id() in production
+            $userId = auth()->id();
             $user = User::findOrFail($userId);
             
             $userBalance = UserBalance::where('user_id', $userId)
@@ -118,7 +118,7 @@ class BalanceController extends Controller
      */
     public function getTransactions(Request $request): JsonResponse
     {
-        $userId = 16; //auth()->id();
+        $userId = auth()->id();
         $transactions = UserTransaction::where('user_id', $userId)
             ->with([
                 'rental.offer',

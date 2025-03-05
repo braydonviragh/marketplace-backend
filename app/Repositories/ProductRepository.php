@@ -26,17 +26,24 @@ class ProductRepository extends BaseRepository
         ]);
 
         // If userProducts filter is present, get only authenticated user's products
-        if (isset($filters['userProducts']) && $filters['userProducts']) {
+        if (isset($filters['filter']) && $filters['filter'] === 'userProducts') {
             $query->where('user_id', auth()->id());
+        }
+
+        // If favorite filter is present, get user's favorite products
+        if (isset($filters['filter']) && $filters['filter'] === 'favorite') {
+            $userId = auth()->id();
+            if ($userId) {
+                $query->whereHas('favorites', function($q) use ($userId) {
+                    $q->where('user_id', $userId);
+                });
+            }
         }
 
         // If tailored filter is present, apply user preferences
         if (isset($filters['filter']) && $filters['filter'] === 'tailored') {
             
-            //$user = auth()->user();
-
-            //TODO remove this after testing
-            $user = \App\Models\User::find(1);
+            $user = auth()->user();
 
             if ($user && $user->profile) {
                 $preferences = $user->profile->getQueryablePreferences();

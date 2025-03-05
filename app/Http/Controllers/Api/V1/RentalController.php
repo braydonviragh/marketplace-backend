@@ -37,9 +37,9 @@ class RentalController extends Controller
         ]);
 
         // Add authenticated user's ID to filters unless they're a super admin
-        // if (!auth()->user()->hasRole('super_admin')) {
-        //     $filters['user_id'] = auth()->id();
-        // }
+        if (!auth()->user()->hasRole('super_admin')) {
+            $filters['user_id'] = auth()->id();
+        }
 
         $rentals = $this->rentalService->getRentals($filters);
         
@@ -51,10 +51,8 @@ class RentalController extends Controller
     public function store(CreateRentalRequest $request): JsonResponse
     {
         $data = $request->validated();
-        // $data['user_id'] = auth()->id();
+        $data['user_id'] = auth()->id();
 
-        //TODO: Remove this after testing
-        $data['user_id'] = 1;
         $data['rental_status_id'] = RentalStatus::where('slug', 'pending')->first()->id;
 
         $rental = $this->rentalService->createRental($data);

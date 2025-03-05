@@ -36,7 +36,7 @@ class OfferController extends Controller
         //         $filters['user_id'] = auth()->id();
         //     }
         // }
-        $filters['user_id'] = 1; //auth()->id();
+        $filters['user_id'] = auth()->id();
 
         $offers = $this->offerService->getOffers($filters);
         
@@ -47,7 +47,7 @@ class OfferController extends Controller
     {
         $data = $request->validated();
         //TODO: Remove this after testing
-        $data['user_id'] = 1; //auth()->id();
+        $data['user_id'] = auth()->id();
         $offer = $this->offerService->createOffer($data);
         
         return $this->resourceResponse(
@@ -90,7 +90,7 @@ class OfferController extends Controller
             'per_page' => 'sometimes|integer|min:1|max:100'
         ]);
 
-        $filters['user_id'] = auth()->id() ?? 1; // Using 1 for testing, remove in production
+        $filters['user_id'] = auth()->id();
         $perPage = $filters['per_page'] ?? 20;
         
         $offers = $this->offerService->getOffers($filters, $perPage);
@@ -110,7 +110,7 @@ class OfferController extends Controller
             'per_page' => 'sometimes|integer|min:1|max:100'
         ]);
 
-        $filters['owner_id'] = auth()->id() ?? 16; // Using 1 for testing, remove in production
+        $filters['owner_id'] = auth()->id();
         $perPage = $filters['per_page'] ?? 20;
         
         $offers = $this->offerService->getOffers($filters, $perPage);
