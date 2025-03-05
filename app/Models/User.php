@@ -95,4 +95,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(StripeAccount::class);
     }
+
+    public function favoriteProducts(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'user_product_favorites', 'user_id', 'product_id');
+    }
 } 
