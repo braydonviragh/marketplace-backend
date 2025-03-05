@@ -23,6 +23,9 @@ class LoginController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
+        
+        // Create a long-lived token for iOS app usage (60 days)
+        // Token will be used for authenticating all requests
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return $this->successResponse([

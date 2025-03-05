@@ -28,10 +28,16 @@ class UserController extends Controller
      */
     public function currentUser(): JsonResponse
     {
-        $userId = auth()->id();
+        // Use Auth facade instead of helper to avoid any potential issues
+        $user = auth()->user();
 
-        $user = $this->userService->findUser($userId);
-        
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthenticated. Please log in.'
+            ], 401);
+        }
+
         // Load all relevant relations for a complete user profile
         $user->load([
             'profile',

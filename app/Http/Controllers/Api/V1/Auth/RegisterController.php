@@ -57,13 +57,15 @@ class RegisterController extends Controller
             'remember_token' => Str::random(10),
         ]);
 
+        // Create a long-lived token for iOS app usage (60 days)
+        // Token will be used for authenticating all requests
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return $this->successResponse([
             'user' => new SimpleUserResource($user),
             'access_token' => $token,
             'token_type' => 'Bearer',
-        ], 'Registration successful. Please complete your profile.');
+        ], 'User registered successfully', 201);
     }
 
     // TODO: Uncomment once SMS is setup
