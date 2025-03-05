@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\V1\StripeController;
 use App\Http\Controllers\Api\V1\Auth\PhoneVerificationController;
 use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\ProvinceController;
+use App\Http\Controllers\Api\V1\UserProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -231,4 +232,11 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{product}', [ProductController::class, 'destroy']);
         });
     });
+        Route::get('/offer-statuses', [OfferStatusController::class, 'index']);
+        Route::get('/styles', [StyleController::class, 'index']);
+
+    // });
+
+    // User Profile Route
+    Route::post('/user/profile', [UserProfileController::class, 'store'])->middleware('auth:sanctum');
 }); 
