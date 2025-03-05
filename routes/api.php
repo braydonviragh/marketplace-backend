@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\V1\Auth\OnboardingController;
 use App\Http\Controllers\Api\V1\BalanceController;
 use App\Http\Controllers\Api\StyleController;
 use App\Http\Controllers\Api\V1\StripeController;
+use App\Http\Controllers\Api\V1\Auth\PhoneVerificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,6 +43,11 @@ Route::prefix('v1')->group(function () {
         
         // Registration
         Route::post('register', [RegisterController::class, 'register']);
+        
+        // Phone Verification
+        Route::post('phone/send', [PhoneVerificationController::class, 'sendCode']);
+        Route::post('phone/verify', [PhoneVerificationController::class, 'verifyCode']);
+        Route::post('phone/resend', [PhoneVerificationController::class, 'resendCode']);
         
         // Email Verification
         Route::get('email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
@@ -197,5 +203,6 @@ Route::prefix('v1')->group(function () {
 
         Route::get('/offer-statuses', [OfferStatusController::class, 'index']);
         Route::get('/styles', [StyleController::class, 'index']);
+
     // });
 }); 

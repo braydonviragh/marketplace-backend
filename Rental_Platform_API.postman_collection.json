@@ -143,6 +143,303 @@
                             "Authorization": "Bearer {{token}}"
                         }
                     }
+                },
+                {
+                    "name": "Send Phone Verification Code",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"phone_number\": \"+14155552671\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/phone/send",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "auth", "phone", "send"]
+                        },
+                        "description": "Sends a verification code to the provided phone number. In test mode, use +14155552671 as the test number."
+                    },
+                    "response": [
+                        {
+                            "name": "Success Response",
+                            "originalRequest": {
+                                "method": "POST",
+                                "url": "{{base_url}}/api/v1/auth/phone/send",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"phone_number\": \"+14155552671\"\n}"
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": {
+                                "status": "success",
+                                "message": "Verification code sent successfully",
+                                "data": {
+                                    "phone_number": "+14155552671"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Validation Error Response",
+                            "originalRequest": {
+                                "method": "POST",
+                                "url": "{{base_url}}/api/v1/auth/phone/send",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"phone_number\": \"invalid\"\n}"
+                                }
+                            },
+                            "status": "Unprocessable Entity",
+                            "code": 422,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": {
+                                "status": "error",
+                                "message": "Validation failed",
+                                "errors": {
+                                    "phone_number": ["Phone number must be in E.164 format (e.g., +14155552671)"]
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Verify Phone Code",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"code\": \"000000\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/phone/verify",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "phone",
+                                "verify"
+                            ]
+                        },
+                        "description": "Verifies the code sent to the user's phone. The phone number is optional and will be retrieved from session if not provided. For testing in test mode, use the code '000000'."
+                    },
+                    "response": [
+                        {
+                            "name": "Success Response",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"code\": \"000000\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/v1/auth/phone/verify",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "auth",
+                                        "phone",
+                                        "verify"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Phone number verified successfully\",\n    \"verified\": true,\n    \"user\": {\n        \"id\": 1,\n        \"name\": \"John Doe\",\n        \"email\": \"john@example.com\",\n        \"phone_number\": \"+14155552671\",\n        \"phone_verified_at\": \"2023-04-01T12:00:00.000000Z\"\n    }\n}"
+                        },
+                        {
+                            "name": "Invalid Code Response",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"code\": \"123456\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/v1/auth/phone/verify",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "auth",
+                                        "phone",
+                                        "verify"
+                                    ]
+                                }
+                            },
+                            "status": "Bad Request",
+                            "code": 400,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Invalid verification code\",\n    \"verified\": false\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Resend Phone Verification Code",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/phone/resend",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "auth", "phone", "resend"]
+                        },
+                        "description": "Resends a verification code to the authenticated user's phone number. Requires authentication."
+                    },
+                    "response": [
+                        {
+                            "name": "Success Response",
+                            "originalRequest": {
+                                "method": "POST",
+                                "url": "{{base_url}}/api/v1/auth/phone/resend"
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": {
+                                "status": "success",
+                                "message": "Verification code resent successfully",
+                                "data": {
+                                    "phone_number": "+14155552671"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Phone Already Verified Response",
+                            "originalRequest": {
+                                "method": "POST",
+                                "url": "{{base_url}}/api/v1/auth/phone/resend"
+                            },
+                            "status": "Bad Request",
+                            "code": 400,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": {
+                                "status": "error",
+                                "message": "Phone number already verified"
+                            }
+                        }
+                    ]
                 }
             ]
         },
