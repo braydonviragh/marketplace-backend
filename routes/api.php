@@ -27,6 +27,8 @@ use App\Http\Controllers\Api\V1\BalanceController;
 use App\Http\Controllers\Api\StyleController;
 use App\Http\Controllers\Api\V1\StripeController;
 use App\Http\Controllers\Api\V1\Auth\PhoneVerificationController;
+use App\Http\Controllers\Api\V1\CountryController;
+use App\Http\Controllers\Api\V1\ProvinceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +66,10 @@ Route::prefix('v1')->group(function () {
             ->middleware('throttle:6,1')
             ->name('password.update');
     });
+
+    // Countries and Provinces - Public Routes
+    Route::get('/countries', [CountryController::class, 'index']);
+    Route::get('/provinces', [ProvinceController::class, 'index']);
 
     // Protected routes with specific middleware
     // Route::middleware(['auth:sanctum', 'verified'])->group(function () {
