@@ -94,6 +94,7 @@ class RentalController extends Controller
 
     public function confirm(Rental $rental): JsonResponse
     {
+        dd($rental);
         $this->rentalService->confirmRental($rental);
         
         return response()->json([

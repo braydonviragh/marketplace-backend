@@ -22,6 +22,9 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping()
             ->runInBackground()
             ->appendOutputTo(storage_path('logs/verification-cleanup.log'));
+
+        // Schedule rental status updates to run daily at midnight
+        $schedule->command('rentals:update-statuses')->dailyAt('00:00');
     }
 
     /**

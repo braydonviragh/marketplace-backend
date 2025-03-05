@@ -121,14 +121,24 @@ class RentalService
 
     public function confirmRental(Rental $rental): void
     {
-        $userId = 2; //auth()->id();
+        $userId = 1; //auth()->id();
+        
+        // Load the offer relationship if not already loaded
+        if (!$rental->relationLoaded('offer')) {
+            $rental->load('offer.product');
+        }
+
+        // Get user IDs from the offer relationship
+        $renterId = $rental->offer->user_id;
+        $ownerId = $rental->offer->product->user_id;
+
         // Determine if user is renter or owner
-        if ($rental->user_id === $userId) {
+        if ($renterId === $userId) {
             $userType = 'renter';
-        } elseif ($rental->product->user_id === $userId) {
+        } elseif ($ownerId === $userId) {
             $userType = 'owner';
         } else {
-            throw new RentalException('You are not authorized to confirm this rental.');
+            throw new \Exception('You are not authorized to confirm this rental.');
         }
 
         // Check if rental is in pending status
@@ -153,12 +163,13 @@ class RentalService
             'type' => $userType
         ]);
 
-        // Check if both parties have confirmed
-        $confirmations = RentalConfirmation::where('rental_id', $rental->id)->count();
+        $this->activateRental($rental);
+
+        // // Check if both parties have confirmed
+        // $confirmations = RentalConfirmation::where('rental_id', $rental->id)->count();
         
-        if ($confirmations === 2) {
-            // Activate the rental
-            $this->activateRental($rental);
-        }
+        // if ($confirmations === 2) {
+        //     // Activate the rental
+        // }
     }
 } 

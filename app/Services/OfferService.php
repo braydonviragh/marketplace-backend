@@ -11,12 +11,14 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use App\Events\OfferCreated;
 use App\Events\OfferStatusChanged;
 use Illuminate\Support\Facades\DB;
+use App\Models\Payment;
 
 class OfferService
 {
     public function __construct(
         private OfferRepository $offerRepository,
-        private RentalRepository $rentalRepository
+        private RentalRepository $rentalRepository,
+        private StripeService $stripeService
     ) {}
 
     public function getOffers(array $filters = [], int $perPage = 15): LengthAwarePaginator
@@ -74,9 +76,26 @@ class OfferService
             // Update offer status
             $this->offerRepository->updateStatus($offer, $status);
             
-            // If offer is accepted, create a rental
+            // If offer is accepted, create a rental and initiate payment
             if ($status === 'accepted') {
-                $this->offerRepository->createRentalFromOffer($offer);
+                // Create rental
+                $rental = $this->offerRepository->createRentalFromOffer($offer);
+                
+                // Create payment intent
+                $paymentIntent = $this->stripeService->createPaymentIntent($rental);
+                
+                if (!$paymentIntent['success']) {
+                    throw new \Exception('Failed to create payment intent: ' . ($paymentIntent['error'] ?? 'Unknown error'));
+                }
+                
+                // Create a pending payment record
+                Payment::create([
+                    'rental_id' => $rental->id,
+                    'amount' => $rental->offer->product->price,
+                    'status' => 'pending',
+                    'payment_method' => 'stripe',
+                    'stripe_payment_intent_id' => $paymentIntent['payment_intent_id']
+                ]);
             }
         });
 

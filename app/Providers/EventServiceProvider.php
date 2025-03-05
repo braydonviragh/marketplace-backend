@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Events\OfferCreated;
+use App\Events\OfferStatusChanged;
 use App\Listeners\HandleOfferCreated;
+use App\Listeners\HandleOfferStatusChanged;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -23,6 +25,9 @@ class EventServiceProvider extends ServiceProvider
         OfferCreated::class => [
             HandleOfferCreated::class,
         ],
+        OfferStatusChanged::class => [
+            HandleOfferStatusChanged::class,
+        ],
     ];
 
     /**
@@ -32,7 +37,9 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // ... existing code ...
+
+        \App\Models\UserTransaction::observe(\App\Observers\UserTransactionObserver::class);
     }
 
     /**

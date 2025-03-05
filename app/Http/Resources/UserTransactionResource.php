@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class TransactionResource extends JsonResource
+class UserTransactionResource extends JsonResource
 {
     public function toArray($request): array
     {
@@ -13,36 +13,41 @@ class TransactionResource extends JsonResource
             'amount' => $this->amount,
             'type' => $this->type,
             'created_at' => $this->created_at,
-            'description' => $this->getTransactionDescription()
         ];
 
-        // Add rental details only for rental-related transactions
-        if ($this->type === 'add' && $this->rental) {
+        // Add rental and related data only for rental-related transactions
+        if ($this->rental) {
+            $product = $this->rental->offer->product;
+            $media = $product->media->first();
+            
             $baseData['rental'] = [
                 'id' => $this->rental->id,
-                'start_date' => $this->rental->start_date,
-                'end_date' => $this->rental->end_date,
-                'product' => [
-                    'id' => $this->rental->product->id,
-                    'title' => $this->rental->product->title,
-                    'price' => $this->rental->product->price,
-                ]
+                'offer' => [
+                    'id' => $this->rental->offer->id,
+                    'start_date' => $this->rental->offer->start_date,
+                    'end_date' => $this->rental->offer->end_date,
+                    'product' => [
+                        'id' => $product->id,
+                        'title' => $product->title,
+                        'price' => $product->price,
+                        'description' => $product->description,
+                        'thumbnail' => $media ? url($media->original_url) : null,
+                    ],
+                ],
+                'status' => $this->rental->rentalStatus->name,
             ];
+
+            // Add transaction description based on type and related data
+            $baseData['description'] = $this->type === 'add' 
+                ? "Rental payment received for {$product->title}"
+                : "Rental payment refund for {$product->title}";
+        } else {
+            // For non-rental transactions (like withdrawals)
+            $baseData['description'] = $this->type === 'remove' 
+                ? "Withdrawal to bank account"
+                : "Other transaction";
         }
 
         return $baseData;
-    }
-
-    private function getTransactionDescription(): string
-    {
-        if ($this->type === 'add' && $this->rental) {
-            return "Rental payment received for " . $this->rental->product->title;
-        }
-
-        if ($this->type === 'remove') {
-            return "Withdrawal to bank account";
-        }
-
-        return "Transaction";
     }
 } 

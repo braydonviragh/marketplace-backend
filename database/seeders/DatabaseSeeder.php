@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ProductSeeder::class,
             OfferStatusSeeder::class,
-            OfferSeeder::class,
+            PaymentStatusSeeder::class,
         ]);
     }
 } 

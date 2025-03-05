@@ -90,4 +90,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserBalance::class);
     }
+
+    public function stripeAccount(): HasOne
+    {
+        return $this->hasOne(StripeAccount::class);
+    }
 } 

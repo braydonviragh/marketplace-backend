@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\V1\Auth\SuperAdminController;
 use App\Http\Controllers\Api\V1\Auth\OnboardingController;
 use App\Http\Controllers\Api\V1\BalanceController;
 use App\Http\Controllers\Api\StyleController;
+use App\Http\Controllers\Api\V1\StripeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +65,7 @@ Route::prefix('v1')->group(function () {
         // Users
         Route::prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index']);
+            Route::get('/current-user', [UserController::class, 'currentUser']);
             Route::get('/{id}', [UserController::class, 'show']);
             Route::get('/{id}/products', [ProductController::class, 'userProducts']);
             Route::post('/{id}', [UserController::class, 'update']);
@@ -84,6 +86,7 @@ Route::prefix('v1')->group(function () {
                 ->middleware('verify.payment.amount');
             Route::post('/{id}/refund', [PaymentController::class, 'refund'])
                 ->middleware('permission:process-refunds');
+            Route::post('/confirm', [PaymentController::class, 'confirm']);
         });
 
         // Categories
@@ -177,6 +180,21 @@ Route::prefix('v1')->group(function () {
         Route::get('/balance', [BalanceController::class, 'getBalance']);
         Route::post('/balance/withdraw', [BalanceController::class, 'withdraw']);
         Route::get('/transactions', [BalanceController::class, 'getTransactions']);
+
+        // Stripe Account Routes
+        Route::prefix('stripe')->group(function () {
+            Route::get('/account', [StripeController::class, 'getAccount']);
+            Route::post('/account', [StripeController::class, 'createAccount']);
+            Route::get('/account/link', [StripeController::class, 'getAccountLink']);
+            Route::get('/dashboard', [StripeController::class, 'getDashboardLink']);
+        });
+
+        // Admin routes for viewing any user's balance and transactions
+        Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+            Route::get('/admin/users/{userId}/balance', [BalanceController::class, 'getUserBalance']);
+            Route::get('/admin/users/{userId}/transactions', [BalanceController::class, 'getUserTransactions']);
+        });
+
         Route::get('/offer-statuses', [OfferStatusController::class, 'index']);
         Route::get('/styles', [StyleController::class, 'index']);
     // });

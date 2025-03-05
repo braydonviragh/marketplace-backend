@@ -198,6 +198,216 @@
                             "Authorization": "Bearer {{token}}"
                         }
                     }
+                },
+                {
+                    "name": "Get User Balance",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/users/{{user_id}}/balance",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "users", "{{user_id}}", "balance"]
+                        },
+                        "description": "Get balance for a specific user"
+                    },
+                    "response": [
+                        {
+                            "name": "Success Response",
+                            "originalRequest": {
+                                "method": "GET",
+                                "url": "{{base_url}}/api/v1/users/1/balance"
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": {
+                                "data": {
+                                    "user_id": 1,
+                                    "balance": "150.00"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Get User Transactions",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/users/{{user_id}}/transactions?per_page=15",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "users", "{{user_id}}", "transactions"],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "Number of items per page (default: 15)"
+                                }
+                            ]
+                        },
+                        "description": "Get transaction history for a specific user"
+                    },
+                    "response": [
+                        {
+                            "name": "Success Response",
+                            "originalRequest": {
+                                "method": "GET",
+                                "url": "{{base_url}}/api/v1/users/1/transactions"
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": {
+                                "data": [
+                                    {
+                                        "id": 1,
+                                        "amount": "120.00",
+                                        "type": "add",
+                                        "created_at": "2024-03-21T12:00:00.000000Z",
+                                        "description": "Rental payment received for Designer Dress",
+                                        "rental": {
+                                            "id": 1,
+                                            "start_date": "2024-04-01 00:00:00",
+                                            "end_date": "2024-04-07 00:00:00",
+                                            "product": {
+                                                "id": 1,
+                                                "title": "Designer Dress",
+                                                "price": "150.00"
+                                            }
+                                        }
+                                    }
+                                ],
+                                "meta": {
+                                    "total": 1,
+                                    "per_page": 15,
+                                    "current_page": 1,
+                                    "last_page": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Current User",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/users/current-user",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "current-user"]
+                        },
+                        "description": "Get the currently authenticated user's complete profile data"
+                    },
+                    "response": [
+                        {
+                            "name": "Success Response",
+                            "originalRequest": {
+                                "method": "GET",
+                                "url": "{{base_url}}/api/v1/current-user"
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": {
+                                "data": {
+                                    "id": 1,
+                                    "email": "user@example.com",
+                                    "phone_number": "+14155552671",
+                                    "role": "user",
+                                    "is_active": true,
+                                    "onboarding_completed": true,
+                                    "email_verified_at": "2024-03-21T12:00:00.000000Z",
+                                    "phone_verified_at": "2024-03-21T12:00:00.000000Z",
+                                    "created_at": "2024-03-21T12:00:00.000000Z",
+                                    "updated_at": "2024-03-21T12:00:00.000000Z",
+                                    "profile": {
+                                        "id": 1,
+                                        "username": "johndoe",
+                                        "name": "John Doe",
+                                        "style": {
+                                            "id": 1,
+                                            "name": "Unisex",
+                                            "slug": "unisex"
+                                        }
+                                    },
+                                    "detailed_sizes": {
+                                        "letter_size": {
+                                            "id": 2,
+                                            "name": "M",
+                                            "slug": "m"
+                                        },
+                                        "waist_size": null,
+                                        "number_size": null
+                                    },
+                                    "brands": [
+                                        {
+                                            "id": 1,
+                                            "name": "Nike",
+                                            "slug": "nike"
+                                        }
+                                    ],
+                                    "stripe_account": {
+                                        "customer_id": "cus_xxx",
+                                        "account_id": "acct_xxx",
+                                        "account_enabled": true,
+                                        "default_payment_method": "pm_xxx"
+                                    }
+                                },
+                                "message": "Current user retrieved successfully"
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -1267,12 +1477,217 @@
                     }
                 }
             ]
+        },
+        {
+            "name": "Balance & Transactions",
+            "item": [
+                {
+                    "name": "Get My Balance",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/balance",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "balance"]
+                        },
+                        "description": "Get balance for the authenticated user"
+                    },
+                    "response": [
+                        {
+                            "name": "Success Response",
+                            "originalRequest": {
+                                "method": "GET",
+                                "url": "{{base_url}}/api/v1/balance"
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": {
+                                "data": {
+                                    "balance": "150.00"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Get My Transactions",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/transactions?per_page=15",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "transactions"],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "Number of items per page (default: 15)"
+                                }
+                            ]
+                        },
+                        "description": "Get transaction history for the authenticated user"
+                    },
+                    "response": [
+                        {
+                            "name": "Success Response",
+                            "originalRequest": {
+                                "method": "GET",
+                                "url": "{{base_url}}/api/v1/transactions"
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": {
+                                "data": [
+                                    {
+                                        "id": 1,
+                                        "amount": "120.00",
+                                        "type": "add",
+                                        "created_at": "2024-03-21T12:00:00.000000Z",
+                                        "description": "Rental payment received for Designer Dress",
+                                        "rental": {
+                                            "id": 1,
+                                            "start_date": "2024-04-01 00:00:00",
+                                            "end_date": "2024-04-07 00:00:00",
+                                            "product": {
+                                                "id": 1,
+                                                "title": "Designer Dress",
+                                                "price": "150.00"
+                                            }
+                                        }
+                                    }
+                                ],
+                                "meta": {
+                                    "total": 1,
+                                    "per_page": 15,
+                                    "current_page": 1,
+                                    "last_page": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Withdraw Balance",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/balance/withdraw",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "balance", "withdraw"]
+                        },
+                        "description": "Withdraw the authenticated user's entire balance"
+                    }
+                },
+                {
+                    "name": "Admin - Get User Balance",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/admin/users/{{user_id}}/balance",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "admin", "users", "{{user_id}}", "balance"]
+                        },
+                        "description": "Admin endpoint to get balance for any user"
+                    }
+                },
+                {
+                    "name": "Admin - Get User Transactions",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/admin/users/{{user_id}}/transactions?per_page=15",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "admin", "users", "{{user_id}}", "transactions"],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "Number of items per page (default: 15)"
+                                }
+                            ]
+                        },
+                        "description": "Admin endpoint to get transaction history for any user"
+                    }
+                }
+            ]
         }
     ],
     "variable": [
         {
             "key": "base_url",
-            "value": "http://127.0.0.1/laravel/mp-backend/public"
+            "value": "http://127.0.0.1:8000"
         }
     ]
 } 

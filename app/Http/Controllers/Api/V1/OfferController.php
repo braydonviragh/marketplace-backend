@@ -9,9 +9,12 @@ use App\Models\Offer;
 use App\Services\OfferService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Traits\ApiResponse;
 
 class OfferController extends Controller
 {
+    use ApiResponse;
+
     public function __construct(
         private OfferService $offerService
     ) {}
@@ -37,9 +40,7 @@ class OfferController extends Controller
 
         $offers = $this->offerService->getOffers($filters);
         
-        return response()->json([
-            'data' => OfferResource::collection($offers)
-        ]);
+        return $this->collectionResponse(OfferResource::collection($offers));
     }
 
     public function store(CreateOfferRequest $request): JsonResponse
@@ -49,17 +50,18 @@ class OfferController extends Controller
         $data['user_id'] = 1; //auth()->id();
         $offer = $this->offerService->createOffer($data);
         
-        return response()->json([
-            'message' => 'Offer created successfully',
-            'data' => new OfferResource($offer)
-        ], 201);
+        return $this->resourceResponse(
+            new OfferResource($offer),
+            'Offer created successfully',
+            201
+        );
     }
 
     public function show(Offer $offer): JsonResponse
     {
-        return response()->json([
-            'data' => new OfferResource($offer->load(['product.media', 'user', 'offerStatus']))
-        ]);
+        return $this->resourceResponse(
+            new OfferResource($offer->load(['user', 'product', 'product.media']))
+        );
     }
 
     public function updateStatus(Request $request, Offer $offer): JsonResponse
@@ -71,8 +73,8 @@ class OfferController extends Controller
         $this->offerService->updateOfferStatus($offer, $data['status']);
         
         return response()->json([
-            'message' => 'Offer status updated successfully',
-            'data' => new OfferResource($offer->fresh(['product', 'user', 'offerStatus']))
+            'status' => 'success',
+            'message' => 'Offer status updated successfully'
         ]);
     }
 
@@ -93,15 +95,7 @@ class OfferController extends Controller
         
         $offers = $this->offerService->getOffers($filters, $perPage);
         
-        return response()->json([
-            'data' => OfferResource::collection($offers),
-            'meta' => [
-                'current_page' => $offers->currentPage(),
-                'last_page' => $offers->lastPage(),
-                'per_page' => $offers->perPage(),
-                'total' => $offers->total()
-            ]
-        ]);
+        return $this->collectionResponse(OfferResource::collection($offers));
     }
 
     /**
@@ -116,19 +110,11 @@ class OfferController extends Controller
             'per_page' => 'sometimes|integer|min:1|max:100'
         ]);
 
-        $filters['owner_id'] = auth()->id() ?? 1; // Using 1 for testing, remove in production
+        $filters['owner_id'] = auth()->id() ?? 16; // Using 1 for testing, remove in production
         $perPage = $filters['per_page'] ?? 20;
         
         $offers = $this->offerService->getOffers($filters, $perPage);
         
-        return response()->json([
-            'data' => OfferResource::collection($offers),
-            'meta' => [
-                'current_page' => $offers->currentPage(),
-                'last_page' => $offers->lastPage(),
-                'per_page' => $offers->perPage(),
-                'total' => $offers->total()
-            ]
-        ]);
+        return $this->collectionResponse(OfferResource::collection($offers));
     }
 } 

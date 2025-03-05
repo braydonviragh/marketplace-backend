@@ -74,6 +74,16 @@ class UserResource extends JsonResource
             ]);
         }
 
+        if ($this->relationLoaded('stripeAccount')) {
+            $data['stripe_account'] = $this->stripeAccount ? [
+                'customer_id' => $this->stripeAccount->customer_id,
+                'account_id' => $this->stripeAccount->account_id,
+                'account_enabled' => $this->stripeAccount->account_enabled,
+                'default_payment_method' => $this->stripeAccount->default_payment_method,
+                'account_verified_at' => $this->stripeAccount->account_verified_at,
+            ] : null;
+        }
+
         return $data;
     }
 } 

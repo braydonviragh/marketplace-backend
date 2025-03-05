@@ -23,6 +23,32 @@ class UserController extends Controller
         $this->userService = $userService;
     }
 
+    /**
+     * Get the authenticated user's data
+     */
+    public function currentUser(): JsonResponse
+    {
+        $userId = 1; //auth()->id();
+
+        $user = $this->userService->findUser($userId);
+        
+        // Load all relevant relations for a complete user profile
+        $user->load([
+            'profile',
+            'profile.style',
+            'detailedSizes.letterSize',
+            'detailedSizes.waistSize',
+            'detailedSizes.numberSize',
+            'brands',
+            'stripeAccount'
+        ]);
+        
+        return $this->resourceResponse(
+            new UserResource($user),
+            'Current user retrieved successfully'
+        );
+    }
+
     public function index(UserRequest $request): JsonResponse
     {
         $users = $this->userService->getUsers(
@@ -40,7 +66,6 @@ class UserController extends Controller
     {
         return new SimpleUserResource($user);
     }
-
 
     public function show(int $id): JsonResponse
     {

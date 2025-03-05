@@ -206,23 +206,17 @@ class ProductRepository extends BaseRepository
         // Apply other sorting options
         if (isset($filters['sort_by'])) {
             switch ($filters['sort_by']) {
+                case 'newest':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+                case 'oldest':
+                    $query->orderBy('created_at', 'asc');
+                    break;
                 case 'price_asc':
                     $query->orderBy('price', 'asc');
                     break;
                 case 'price_desc':
                     $query->orderBy('price', 'desc');
-                    break;
-                case 'date_asc':
-                    $query->orderBy('created_at', 'asc');
-                    break;
-                case 'date_desc':
-                    $query->orderBy('created_at', 'desc');
-                    break;
-                case 'title_asc':
-                    $query->orderBy('title', 'asc');
-                    break;
-                case 'title_desc':
-                    $query->orderBy('title', 'desc');
                     break;
                 // Distance sorting is handled in the location filtering section
             }
