@@ -43,6 +43,9 @@ Route::prefix('v1')->group(function () {
         Route::post('login', [LoginController::class, 'login']);
         Route::post('register', [RegisterController::class, 'register']);
         
+        // Check email/phone availability
+        Route::post('check-availability', [RegisterController::class, 'checkAvailability']);
+        
         // Phone Verification
         Route::post('phone/send', [PhoneVerificationController::class, 'sendCode']);
         Route::post('phone/verify', [PhoneVerificationController::class, 'verifyCode']);

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\SimpleUserResource;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\VerifyPhoneRequest;
+use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
@@ -104,4 +105,36 @@ class RegisterController extends Controller
     //         'token_type' => 'Bearer',
     //     ], 'Registration successful');
     // }
+
+    public function checkAvailability(Request $request)
+    {
+        $request->validate([
+            'email' => 'sometimes|required|email',
+            'phone_number' => 'sometimes|required|string|regex:/^\+1[0-9]{10}$/',
+        ]);
+
+        $errors = [];
+        
+        // Check email if provided
+        if ($request->has('email')) {
+            $emailExists = User::where('email', $request->email)->exists();
+            if ($emailExists) {
+                $errors['email'] = 'This email address is already in use.';
+            }
+        }
+        
+        // Check phone number if provided
+        if ($request->has('phone_number')) {
+            $phoneExists = User::where('phone_number', $request->phone_number)->exists();
+            if ($phoneExists) {
+                $errors['phone_number'] = 'This phone number is already in use.';
+            }
+        }
+        
+        if (!empty($errors)) {
+            return $this->errorResponse('Validation failed', 422, $errors);
+        }
+        
+        return $this->successResponse(null, 'Available for registration');
+    }
 } 
