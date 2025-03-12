@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 class UserProfileController extends Controller
 {
@@ -32,8 +33,8 @@ class UserProfileController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        // Use auth() helper correctly to get the authenticated user
-        $user = auth()->user();
+        // Use Auth facade to get the authenticated user
+        $user = Auth::user();
         
         if (!$user) {
             return response()->json([

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\Auth\CreateSuperAdminRequest;
 use App\Http\Requests\Auth\UpdateSuperAdminRequest;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Auth;
 
 class SuperAdminController extends Controller
 {
@@ -73,7 +74,7 @@ class SuperAdminController extends Controller
         }
 
         // Prevent self-deactivation
-        if ($superAdmin->id === auth()->id()) {
+        if ($superAdmin->id === Auth::id()) {
             return $this->errorResponse('Cannot deactivate yourself', 'SELF_DEACTIVATION', 422);
         }
 

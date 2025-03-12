@@ -131,9 +131,6 @@ Route::prefix('v1')->group(function () {
                 ->middleware('verify.user.access');
         });
 
-        // Current user endpoint (for convenience)
-        Route::get('/current-user', [UserController::class, 'currentUser']);
-
         // Onboarding
         Route::post('onboarding/complete', [OnboardingController::class, 'complete']);
 

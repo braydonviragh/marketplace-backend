@@ -15,6 +15,7 @@ use App\Models\AppTransaction;
 use App\Models\AppBalance;
 use App\Models\RentalStatus;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class RentalService
 {
@@ -121,7 +122,7 @@ class RentalService
 
     public function confirmRental(Rental $rental): void
     {
-        $userId = auth()->id();
+        $userId = Auth::id();
         
         // Load the offer relationship if not already loaded
         if (!$rental->relationLoaded('offer')) {

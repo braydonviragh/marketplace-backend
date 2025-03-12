@@ -12,6 +12,7 @@ use App\Services\StripeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class BalanceController extends Controller
 {
@@ -24,7 +25,7 @@ class BalanceController extends Controller
      */
     public function getBalance(): JsonResponse
     {
-        $userId = auth()->id();
+        $userId = Auth::id();
 
         $balance = UserBalance::where('user_id', $userId)
             ->firstOrCreate(
@@ -64,7 +65,7 @@ class BalanceController extends Controller
     public function withdraw(): JsonResponse
     {
         return DB::transaction(function () {
-            $userId = auth()->id();
+            $userId = Auth::id();
             $user = User::findOrFail($userId);
             
             $userBalance = UserBalance::where('user_id', $userId)
@@ -118,7 +119,7 @@ class BalanceController extends Controller
      */
     public function getTransactions(Request $request): JsonResponse
     {
-        $userId = auth()->id();
+        $userId = Auth::id();
         $transactions = UserTransaction::where('user_id', $userId)
             ->with([
                 'rental.offer',

@@ -10,6 +10,7 @@ use App\Services\RentalService;
 use Illuminate\Http\JsonResponse;
 use App\Models\RentalStatus;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RentalController extends Controller
 {
@@ -38,7 +39,7 @@ class RentalController extends Controller
 
         // Add authenticated user's ID to filters unless they're a super admin
         if (!auth()->user()->hasRole('super_admin')) {
-            $filters['user_id'] = auth()->id();
+            $filters['user_id'] = Auth::id();
         }
 
         $rentals = $this->rentalService->getRentals($filters);
@@ -51,7 +52,7 @@ class RentalController extends Controller
     public function store(CreateRentalRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $data['user_id'] = auth()->id();
+        $data['user_id'] = Auth::id();
 
         $data['rental_status_id'] = RentalStatus::where('slug', 'pending')->first()->id;
 

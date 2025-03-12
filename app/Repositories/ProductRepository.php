@@ -6,6 +6,7 @@ use App\Models\Product;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class ProductRepository extends BaseRepository
 {
@@ -27,12 +28,12 @@ class ProductRepository extends BaseRepository
 
         // If userProducts filter is present, get only authenticated user's products
         if (isset($filters['filter']) && $filters['filter'] === 'userProducts') {
-            $query->where('user_id', auth()->id());
+            $query->where('user_id', Auth::id());
         }
 
         // If favorite filter is present, get user's favorite products
         if (isset($filters['filter']) && $filters['filter'] === 'favorite') {
-            $userId = auth()->id();
+            $userId = Auth::id();
             if ($userId) {
                 $query->whereHas('favorites', function($q) use ($userId) {
                     $q->where('user_id', $userId);

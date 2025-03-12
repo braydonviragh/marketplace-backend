@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use App\Traits\WithDynamicRelations;
 use App\Http\Resources\SimpleUserResource;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -28,8 +29,8 @@ class UserController extends Controller
      */
     public function currentUser(): JsonResponse
     {
-        // Use request() to get the authenticated user - more reliable method
-        $user = request()->user();
+        // Use Auth facade for consistent user retrieval
+        $user = Auth::user();
 
         if (!$user) {
             return response()->json([

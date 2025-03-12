@@ -10,6 +10,7 @@ use App\Services\OfferService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponse;
+use Illuminate\Support\Facades\Auth;
 
 class OfferController extends Controller
 {
@@ -36,7 +37,7 @@ class OfferController extends Controller
         //         $filters['user_id'] = auth()->id();
         //     }
         // }
-        $filters['user_id'] = auth()->id();
+        $filters['user_id'] = Auth::id();
 
         $offers = $this->offerService->getOffers($filters);
         
@@ -47,7 +48,7 @@ class OfferController extends Controller
     {
         $data = $request->validated();
         //TODO: Remove this after testing
-        $data['user_id'] = auth()->id();
+        $data['user_id'] = Auth::id();
         $offer = $this->offerService->createOffer($data);
         
         return $this->resourceResponse(
@@ -90,7 +91,7 @@ class OfferController extends Controller
             'per_page' => 'sometimes|integer|min:1|max:100'
         ]);
 
-        $filters['user_id'] = auth()->id();
+        $filters['user_id'] = Auth::id();
         $perPage = $filters['per_page'] ?? 20;
         
         $offers = $this->offerService->getOffers($filters, $perPage);
@@ -110,7 +111,7 @@ class OfferController extends Controller
             'per_page' => 'sometimes|integer|min:1|max:100'
         ]);
 
-        $filters['owner_id'] = auth()->id();
+        $filters['owner_id'] = Auth::id();
         $perPage = $filters['per_page'] ?? 20;
         
         $offers = $this->offerService->getOffers($filters, $perPage);
