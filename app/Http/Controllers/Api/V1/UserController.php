@@ -28,8 +28,8 @@ class UserController extends Controller
      */
     public function currentUser(): JsonResponse
     {
-        // Use Auth facade instead of helper to avoid any potential issues
-        $user = auth()->user();
+        // Use request() to get the authenticated user - more reliable method
+        $user = request()->user();
 
         if (!$user) {
             return response()->json([
@@ -42,6 +42,7 @@ class UserController extends Controller
         $user->load([
             'profile',
             'profile.style',
+            'profile.media', // Ensure we load media for profile picture
             'detailedSizes.letterSize',
             'detailedSizes.waistSize',
             'detailedSizes.numberSize',

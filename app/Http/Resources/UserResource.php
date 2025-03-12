@@ -41,6 +41,24 @@ class UserResource extends JsonResource
                     'slug' => $this->profile?->style?->slug,
                 ]),
             ];
+
+            // Add media information if available
+            if ($this->profile?->relationLoaded('media')) {
+                $data['profile']['media'] = $this->profile?->media->map(function($media) {
+                    return [
+                        'id' => $media->id,
+                        'url' => $media->url,
+                        'path' => $media->path,
+                        'is_primary' => $media->is_primary,
+                    ];
+                });
+
+                // Set the profile_picture attribute from media if available
+                $primaryImage = $this->profile?->media->firstWhere('is_primary', true) ?? $this->profile?->media->first();
+                if ($primaryImage) {
+                    $data['profile_picture'] = $primaryImage->url;
+                }
+            }
         }
 
         if ($this->relationLoaded('detailedSizes')) {
