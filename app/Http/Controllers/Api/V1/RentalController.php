@@ -38,7 +38,7 @@ class RentalController extends Controller
         ]);
 
         // Add authenticated user's ID to filters unless they're a super admin
-        if (!auth()->user()->hasRole('super_admin')) {
+        if (!Auth::user()->hasRole('super_admin')) {
             $filters['user_id'] = Auth::id();
         }
 

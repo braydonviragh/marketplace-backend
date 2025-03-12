@@ -44,7 +44,7 @@ class ProductRepository extends BaseRepository
         // If tailored filter is present, apply user preferences
         if (isset($filters['filter']) && $filters['filter'] === 'tailored') {
             
-            $user = auth()->user();
+            $user = Auth::user();
 
             if ($user && $user->profile) {
                 $preferences = $user->profile->getQueryablePreferences();

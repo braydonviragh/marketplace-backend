@@ -100,4 +100,32 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Product::class, 'user_product_favorites', 'user_id', 'product_id');
     }
+
+    /**
+     * Check if the user has a specific role
+     *
+     * @param string $role
+     * @return bool
+     */
+    public function hasRole(string $role): bool
+    {
+        return $this->role === $role;
+    }
+
+    /**
+     * Check if user can access another user's data
+     *
+     * @param int $userId
+     * @return bool
+     */
+    public function canAccessUser(int $userId): bool
+    {
+        // Super admins can access any user
+        if ($this->hasRole('super_admin')) {
+            return true;
+        }
+        
+        // Regular users can only access their own data
+        return $this->id === (int) $userId;
+    }
 } 
