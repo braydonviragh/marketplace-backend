@@ -10,13 +10,23 @@ return new class extends Migration
     {
         Schema::create('product_images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('product_id');
             $table->string('path');
             $table->integer('order')->default(0);
             $table->boolean('is_primary')->default(false);
             $table->json('metadata')->nullable();
             $table->timestamps();
         });
+
+        // Add foreign key constraint if products table exists
+        if (Schema::hasTable('products')) {
+            Schema::table('product_images', function (Blueprint $table) {
+                $table->foreign('product_id')
+                      ->references('id')
+                      ->on('products')
+                      ->onDelete('cascade');
+            });
+        }
     }
 
     public function down(): void
