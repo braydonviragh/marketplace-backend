@@ -12,7 +12,26 @@ class Rental extends Model
 
     protected $fillable = [
         'offer_id',
-        'rental_status_id'
+        'rental_status_id',
+        'owner_id',
+        'renter_id',
+        'product_id',
+        'start_date',
+        'end_date',
+        'total_price',
+        'total_amount',
+        'status',
+        'is_balance_released',
+        'balance_released_at'
+    ];
+
+    protected $casts = [
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+        'total_price' => 'float',
+        'total_amount' => 'float',
+        'is_balance_released' => 'boolean',
+        'balance_released_at' => 'datetime',
     ];
 
     // Relationships
@@ -28,7 +47,7 @@ class Rental extends Model
 
     public function payment()
     {
-        return $this->belongsTo(Payment::class);
+        return $this->hasOne(Payment::class);
     }
 
     // Delegate relationships through offer

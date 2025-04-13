@@ -56,40 +56,40 @@ class StripeService
     public function createPayout(User $user, float $amount): array
     {
         try {
-            // TODO: Delete after testing - this is test code
-            if (app()->environment('local')) {
+            // For test/local environment, return mock data
+            if (!app()->environment('production')) {
                 Log::info('TEST MODE: Would have sent payout', [
                     'user_id' => $user->id,
                     'amount' => $amount,
-                    'stripe_account_id' => 'TEST_ACCOUNT_ID'
+                    'stripe_account_id' => $user->stripeAccount->account_id ?? 'TEST_ACCOUNT_ID'
                 ]);
                 
                 return [
                     'success' => true,
-                    'transaction_id' => 'test_' . uniqid(),
+                    'transaction_id' => 'test_payout_' . uniqid(),
                     'amount' => $amount
                 ];
             }
 
-            // TODO: Uncomment in production
+            // For production environment, process real payouts
             // Verify user has a Stripe account connected
-            // if (!$user->stripe_account_id) {
-            //     throw new \Exception('User does not have a connected Stripe account');
-            // }
+            if (!$user->stripeAccount || !$user->stripeAccount->account_id) {
+                throw new \Exception('User does not have a connected Stripe account');
+            }
 
             // Create a Transfer to the connected account
-            // $transfer = Transfer::create([
-            //     'amount' => (int)($amount * 100), // Convert to cents
-            //     'currency' => 'usd',
-            //     'destination' => $user->stripe_account_id,
-            //     'transfer_group' => 'PAYOUT_' . $user->id,
-            // ]);
+            $transfer = Transfer::create([
+                'amount' => (int)($amount * 100), // Convert to cents
+                'currency' => 'usd',
+                'destination' => $user->stripeAccount->account_id,
+                'transfer_group' => 'PAYOUT_' . $user->id,
+            ]);
 
-            // return [
-            //     'success' => true,
-            //     'transaction_id' => $transfer->id,
-            //     'amount' => $amount
-            // ];
+            return [
+                'success' => true,
+                'transaction_id' => $transfer->id,
+                'amount' => $amount
+            ];
 
         } catch (\Exception $e) {
             Log::error('Stripe payout failed', [
@@ -213,6 +213,88 @@ class StripeService
     }
 
     /**
+     * Process a rental payment with platform fee (80/20 split)
+     * 
+     * @param Rental $rental
+     * @param string $paymentMethodId
+     * @return array
+     */
+    public function processRentalPayment(Rental $rental, string $paymentMethodId): array
+    {
+        try {
+            // Calculate amounts
+            $totalAmount = (int)($rental->total_amount * 100); // Convert to cents
+            $platformFee = (int)($totalAmount * 0.20); // 20% platform fee
+            $ownerAmount = $totalAmount - $platformFee; // 80% to owner
+            
+            // Get product owner's Stripe account
+            $ownerStripeAccount = $rental->offer->product->user->stripeAccount;
+            
+            if (!$ownerStripeAccount || !$ownerStripeAccount->account_id) {
+                throw new \Exception('Product owner does not have a connected Stripe account');
+            }
+            
+            // For local environment, simulate the payment
+            if (!app()->environment('production')) {
+                Log::info('TEST MODE: Would process rental payment', [
+                    'rental_id' => $rental->id,
+                    'total_amount' => $totalAmount / 100,
+                    'platform_fee' => $platformFee / 100,
+                    'owner_amount' => $ownerAmount / 100,
+                    'payment_method' => $paymentMethodId,
+                    'owner_stripe_account' => $ownerStripeAccount->account_id
+                ]);
+                
+                return [
+                    'success' => true,
+                    'payment_intent_id' => 'pi_test_' . uniqid(),
+                    'platform_fee' => $platformFee / 100,
+                    'owner_amount' => $ownerAmount / 100
+                ];
+            }
+            
+            // Create payment intent with application fee
+            $paymentIntent = \Stripe\PaymentIntent::create([
+                'amount' => $totalAmount,
+                'currency' => 'usd',
+                'payment_method' => $paymentMethodId,
+                'confirmation_method' => 'manual',
+                'confirm' => true,
+                'application_fee_amount' => $platformFee,
+                'transfer_data' => [
+                    'destination' => $ownerStripeAccount->account_id,
+                ],
+                'metadata' => [
+                    'rental_id' => $rental->id,
+                    'product_id' => $rental->offer->product_id,
+                    'platform_fee' => $platformFee / 100,
+                    'owner_amount' => $ownerAmount / 100
+                ],
+            ]);
+            
+            return [
+                'success' => true,
+                'payment_intent_id' => $paymentIntent->id,
+                'client_secret' => $paymentIntent->client_secret,
+                'status' => $paymentIntent->status,
+                'platform_fee' => $platformFee / 100,
+                'owner_amount' => $ownerAmount / 100
+            ];
+        } catch (\Exception $e) {
+            Log::error('Rental payment processing failed', [
+                'rental_id' => $rental->id ?? null,
+                'payment_method' => $paymentMethodId,
+                'error' => $e->getMessage()
+            ]);
+            
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
      * Create a payment intent for a rental
      */
     public function createPaymentIntent(Rental $rental): array
@@ -247,6 +329,60 @@ class StripeService
                 'error' => $e->getMessage()
             ]);
 
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Refund a payment either partially or fully
+     */
+    public function refundPayment(string $paymentIntentId, float $amount = null, string $reason = null): array
+    {
+        try {
+            $refundParams = [
+                'payment_intent' => $paymentIntentId,
+                'reason' => $reason ?: 'requested_by_customer',
+            ];
+            
+            // If amount is provided, it's a partial refund
+            if ($amount !== null) {
+                $refundParams['amount'] = (int)($amount * 100); // Convert to cents
+            }
+            
+            // In test mode, just simulate the refund
+            if ($this->isTestMode && app()->environment('local')) {
+                Log::info('TEST MODE: Would have processed refund', [
+                    'payment_intent_id' => $paymentIntentId,
+                    'amount' => $amount,
+                    'reason' => $reason
+                ]);
+                
+                return [
+                    'success' => true,
+                    'refund_id' => 're_test_' . uniqid(),
+                    'amount' => $amount
+                ];
+            }
+            
+            // Process the refund with Stripe
+            $refund = \Stripe\Refund::create($refundParams);
+            
+            return [
+                'success' => true,
+                'refund_id' => $refund->id,
+                'amount' => $refund->amount / 100, // Convert from cents back to dollars
+                'status' => $refund->status
+            ];
+        } catch (\Exception $e) {
+            Log::error('Stripe refund failed', [
+                'payment_intent_id' => $paymentIntentId,
+                'amount' => $amount,
+                'error' => $e->getMessage()
+            ]);
+            
             return [
                 'success' => false,
                 'error' => $e->getMessage()

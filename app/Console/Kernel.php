@@ -25,6 +25,9 @@ class Kernel extends ConsoleKernel
 
         // Schedule rental status updates to run daily at midnight
         $schedule->command('rentals:update-statuses')->dailyAt('00:00');
+
+        // Process pending balances daily at midnight
+        $schedule->command('app:process-pending-balances')->dailyAt('00:00');
     }
 
     /**

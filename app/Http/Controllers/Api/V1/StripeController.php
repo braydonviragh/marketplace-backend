@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\StripeAccountResource;
 use App\Repositories\StripeRepository;
 use App\Services\StripeService;
+use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+
 class StripeController extends Controller
 {
+    use ApiResponse;
+    
     public function __construct(
         protected StripeRepository $stripeRepository,
         protected StripeService $stripeService
@@ -18,95 +21,67 @@ class StripeController extends Controller
 
     public function getAccount(): JsonResponse
     {
-     //$user = Auth::user();
-     $user = User::find(1);
-     $account = $this->stripeRepository->getAccount($user);
+        $user = Auth::user();
+        $account = $this->stripeRepository->getAccount($user);
 
-        return response()->json([
-            'success' => true,
-            'data' => $account ? new StripeAccountResource($account) : null
-        ]);
+        return $this->successResponse(
+            $account ? new StripeAccountResource($account) : null,
+            'Stripe account retrieved successfully'
+        );
     }
 
     public function createAccount(): JsonResponse
     {
-        //$user = Auth::user();
-        $user = User::find(1);
+        $user = Auth::user();
 
         if ($user->stripeAccount) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User already has a Stripe account'
-            ], 400);
+            return $this->errorResponse('User already has a Stripe account', 400);
         }
 
         try {
             $accountData = $this->stripeService->createStripeAccount($user);
             $account = $this->stripeRepository->createAccount($user, $accountData);
 
-            return response()->json([
-                'success' => true,
-                'data' => new StripeAccountResource($account)
-            ]);
+            return $this->successResponse(
+                new StripeAccountResource($account),
+                'Stripe account created successfully'
+            );
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create Stripe account: ' . $e->getMessage()
-            ], 500);
+            return $this->errorResponse('Failed to create Stripe account: ' . $e->getMessage(), 500);
         }
     }
 
     public function getAccountLink(): JsonResponse
     {
-     //$user = Auth::user();
-     $user = User::find(1);
-     $account = $this->stripeRepository->getAccount($user);
+        $user = Auth::user();
+        $account = $this->stripeRepository->getAccount($user);
 
         if (!$account) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No Stripe account found'
-            ], 404);
+            return $this->errorResponse('No Stripe account found', 404);
         }
 
         try {
             $link = $this->stripeService->createAccountLink($account->account_id);
-            return response()->json([
-                'success' => true,
-                'data' => $link
-            ]);
+            return $this->successResponse($link, 'Account link created successfully');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create account link: ' . $e->getMessage()
-            ], 500);
+            return $this->errorResponse('Failed to create account link: ' . $e->getMessage(), 500);
         }
     }
 
     public function getDashboardLink(): JsonResponse
     {
-        //$user = Auth::user();
-        $user = User::find(1);
+        $user = Auth::user();
         $account = $this->stripeRepository->getAccount($user);
 
         if (!$account) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No Stripe account found'
-            ], 404);
+            return $this->errorResponse('No Stripe account found', 404);
         }
 
         try {
             $link = $this->stripeService->createDashboardLink($account->account_id);
-            return response()->json([
-                'success' => true,
-                'data' => $link
-            ]);
+            return $this->successResponse($link, 'Dashboard link created successfully');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create dashboard link: ' . $e->getMessage()
-            ], 500);
+            return $this->errorResponse('Failed to create dashboard link: ' . $e->getMessage(), 500);
         }
     }
 } 

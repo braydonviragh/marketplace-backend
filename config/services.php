@@ -37,5 +37,6 @@ return [
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
         'test_mode' => env('STRIPE_TEST_MODE', true),
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 ]; 

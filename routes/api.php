@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\V1\Auth\PhoneVerificationController;
 use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\ProvinceController;
 use App\Http\Controllers\Api\V1\UserProfileController;
+use App\Http\Controllers\Api\V1\StripeWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -115,21 +116,22 @@ Route::prefix('v1')->group(function () {
     });
     // User Profile Route
     Route::post('/user/profile', [UserProfileController::class, 'store']);
+
+    // Users
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UserController::class, 'index']);
+        Route::get('/current-user', [UserController::class, 'currentUser']);
+        Route::get('/{id}', [UserController::class, 'show']);
+        Route::post('/', [UserController::class, 'store']);
+        Route::get('/{id}/products', [ProductController::class, 'userProducts']);
+        Route::post('/{id}', [UserController::class, 'update']);
+        Route::delete('/{id}', [UserController::class, 'destroy']);
+        Route::get('/{id}/rentals', [RentalController::class, 'userRentals']);
+        Route::get('/{id}/payments', [PaymentController::class, 'userPayments'])
+            ->middleware('verify.user.access');
+    });
     // Protected routes that require authentication
     Route::middleware(['auth:sanctum'])->group(function () {
-        // Users
-        Route::prefix('users')->group(function () {
-            Route::get('/', [UserController::class, 'index']);
-            Route::get('/current-user', [UserController::class, 'currentUser']);
-            Route::get('/{id}', [UserController::class, 'show']);
-            Route::post('/', [UserController::class, 'store']);
-            Route::get('/{id}/products', [ProductController::class, 'userProducts']);
-            Route::post('/{id}', [UserController::class, 'update']);
-            Route::delete('/{id}', [UserController::class, 'destroy']);
-            Route::get('/{id}/rentals', [RentalController::class, 'userRentals']);
-            Route::get('/{id}/payments', [PaymentController::class, 'userPayments'])
-                ->middleware('verify.user.access');
-        });
 
         // Onboarding
         Route::post('onboarding/complete', [OnboardingController::class, 'complete']);
@@ -237,6 +239,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/offer-statuses', [OfferStatusController::class, 'index']);
         Route::get('/styles', [StyleController::class, 'index']);
 
-    // });
+    // Stripe Webhook Route - no CSRF or auth middleware
+    Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])->name('stripe.webhook');
 
 }); 

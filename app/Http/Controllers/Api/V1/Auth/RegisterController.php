@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Models\User;
 use App\Models\VerificationCode;
-use App\Services\SmsService;
+use App\Services\PhoneVerificationService;
 use App\Traits\ApiResponse;
 use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
@@ -14,49 +14,45 @@ use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\VerifyPhoneRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Session;
 
 class RegisterController extends Controller
 {
     use ApiResponse;
 
-    // TODO: Uncomment once SMS is setup
-    // protected SmsService $smsService;
-    // 
-    // public function __construct(SmsService $smsService)
-    // {
-    //     $this->smsService = $smsService;
-    // }
+    protected $verificationService;
+    
+    public function __construct(PhoneVerificationService $verificationService)
+    {
+        $this->verificationService = $verificationService;
+    }
 
     public function register(RegisterRequest $request)
     {
-        // TODO: Uncomment once SMS is setup
-        // Generate verification code
-        // $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-        // 
-        // Store verification code
-        // VerificationCode::create([
-        //     'phone_number' => $request->phone_number,
-        //     'code' => $code,
-        //     'expires_at' => now()->addMinutes(10),
-        // ]);
-        //
-        // Send SMS
-        // $this->smsService->sendVerificationCode($request->phone_number, $code);
-        //
-        // return $this->successResponse([
-        //     'phone_number' => $request->phone_number,
-        //     'message' => 'Verification code sent to your phone'
-        // ], 'Please verify your phone number', 200);
+        // Get the phone number from the request
+        $phoneNumber = $request->phone_number;
+        
+        // Check if the phone number is verified in the session
+        $verifiedPhones = session('verified_phones', []);
+        $isVerified = in_array($phoneNumber, $verifiedPhones);
+        
+        // If not verified, return an error
+        if (!$isVerified) {
+            return $this->errorResponse(
+                'Phone number must be verified before registration.',
+                422
+            );
+        }
 
-        // Create user with basic information
+        // Create user with verified phone
         $user = User::create([
             'email' => $request->email,
-            'phone_number' => $request->phone_number,
+            'phone_number' => $phoneNumber,
             'password' => Hash::make($request->password),
             'terms_accepted' => true,
             'terms_accepted_at' => now(),
-            'phone_verified_at' => now(), // Auto-verify for testing
             'remember_token' => Str::random(10),
+            'phone_verified_at' => now(), // Set phone_verified_at since it's already verified
         ]);
         
         // Create user profile if profile data is provided
@@ -81,9 +77,12 @@ class RegisterController extends Controller
             $user->load('profile');
         }
 
-        // Create a long-lived token for iOS app usage (60 days)
-        // Token will be used for authenticating all requests
+        // Create token
         $token = $user->createToken('auth_token')->plainTextToken;
+        
+        // Remove the phone number from the verified phones session
+        $verifiedPhones = array_diff($verifiedPhones, [$phoneNumber]);
+        session(['verified_phones' => $verifiedPhones]);
 
         return $this->successResponse([
             'user' => new SimpleUserResource($user),
