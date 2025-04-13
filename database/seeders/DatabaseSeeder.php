@@ -12,12 +12,12 @@ class DatabaseSeeder extends Seeder
             CountryAndProvinceSeeder::class,
             CategorySeeder::class,
             ColorSeeder::class,
+            PaymentStatusSeeder::class,
             SizesAndBrandsSeeder::class,
             RentalStatusSeeder::class,  
             UserSeeder::class,
             ProductSeeder::class,
             OfferStatusSeeder::class,
-            PaymentStatusSeeder::class,
         ]);
     }
 } 
