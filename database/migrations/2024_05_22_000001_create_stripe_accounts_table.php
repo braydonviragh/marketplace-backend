@@ -11,17 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stripe_accounts', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('account_id')->unique()->nullable();
-            $table->boolean('account_enabled')->default(false);
-            $table->timestamp('account_verified_at')->nullable();
-            $table->json('account_details')->nullable();
-            $table->string('business_type')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
-        });
+        // Check if the table already exists and skip if it does
+        if (!Schema::hasTable('stripe_accounts')) {
+            Schema::create('stripe_accounts', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->string('account_id')->nullable();
+                $table->boolean('account_enabled')->default(false);
+                $table->timestamp('account_verified_at')->nullable();
+                $table->json('account_details')->nullable();
+                $table->string('business_type')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
     }
 
     /**

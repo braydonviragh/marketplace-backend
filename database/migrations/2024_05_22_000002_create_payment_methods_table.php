@@ -11,20 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payment_methods', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('payment_method_id')->unique();
-            $table->string('type')->default('card');
-            $table->string('brand')->nullable();
-            $table->string('last4')->nullable();
-            $table->string('exp_month')->nullable();
-            $table->string('exp_year')->nullable();
-            $table->boolean('is_default')->default(false);
-            $table->json('metadata')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
-        });
+        // Check if the table already exists and skip if it does
+        if (!Schema::hasTable('payment_methods')) {
+            Schema::create('payment_methods', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->string('payment_method_id');
+                $table->string('type'); // card, bank_account, etc.
+                $table->string('brand')->nullable(); // Visa, Mastercard, etc.
+                $table->string('last4')->nullable();
+                $table->integer('exp_month')->nullable();
+                $table->integer('exp_year')->nullable();
+                $table->boolean('is_default')->default(false);
+                $table->json('metadata')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
     }
 
     /**

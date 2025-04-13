@@ -11,15 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_balances', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->decimal('available_balance', 10, 2)->default(0.00);
-            $table->decimal('pending_balance', 10, 2)->default(0.00);
-            $table->decimal('total_earned', 10, 2)->default(0.00);
-            $table->decimal('total_withdrawn', 10, 2)->default(0.00);
-            $table->timestamps();
-        });
+        // Check if the table already exists and skip if it does
+        if (!Schema::hasTable('user_balances')) {
+            Schema::create('user_balances', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->decimal('available_balance', 10, 2)->default(0.00);
+                $table->decimal('pending_balance', 10, 2)->default(0.00);
+                $table->decimal('total_earned', 10, 2)->default(0.00);
+                $table->decimal('total_withdrawn', 10, 2)->default(0.00);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

@@ -11,23 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transactions', function (Blueprint $table) {
-            $table->id();
-            $table->uuid('uuid')->unique();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('type')->comment('credit or debit'); // credit for incoming, debit for outgoing
-            $table->string('status')->default('pending');
-            $table->decimal('amount', 10, 2);
-            $table->decimal('fee', 10, 2)->default(0.00);
-            $table->string('description')->nullable();
-            $table->string('transaction_type')->comment('rental, withdrawal, refund, etc.');
-            $table->foreignId('source_id')->nullable()->comment('related offer/payment/etc. ID');
-            $table->string('source_type')->nullable()->comment('related model type');
-            $table->string('stripe_transaction_id')->nullable();
-            $table->json('metadata')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
-        });
+        // Check if the table already exists and skip if it does
+        if (!Schema::hasTable('transactions')) {
+            Schema::create('transactions', function (Blueprint $table) {
+                $table->id();
+                $table->uuid('uuid')->unique();
+                $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+                $table->string('type')->comment('credit or debit'); // credit for incoming, debit for outgoing
+                $table->string('status')->default('pending');
+                $table->decimal('amount', 10, 2);
+                $table->decimal('fee', 10, 2)->default(0.00);
+                $table->string('description')->nullable();
+                $table->string('transaction_type')->comment('rental, withdrawal, refund, etc.');
+                $table->foreignId('source_id')->nullable()->comment('related offer/payment/etc. ID');
+                $table->string('source_type')->nullable()->comment('related model type');
+                $table->string('stripe_transaction_id')->nullable();
+                $table->json('metadata')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
     }
 
     /**

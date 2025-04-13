@@ -12,9 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('rentals', function (Blueprint $table) {
-            $table->boolean('is_balance_released')->default(false)->after('status');
-            $table->timestamp('balance_released_at')->nullable()->after('is_balance_released');
-            $table->decimal('total_amount', 10, 2)->nullable()->after('total_price');
+            // Check if columns don't exist before adding them
+            if (!Schema::hasColumn('rentals', 'is_balance_released')) {
+                $table->boolean('is_balance_released')->default(false);
+            }
+            
+            if (!Schema::hasColumn('rentals', 'balance_released_at')) {
+                $table->timestamp('balance_released_at')->nullable();
+            }
+            
+            if (!Schema::hasColumn('rentals', 'total_amount')) {
+                $table->decimal('total_amount', 10, 2)->nullable();
+            }
         });
     }
 
@@ -24,9 +33,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('rentals', function (Blueprint $table) {
-            $table->dropColumn('is_balance_released');
-            $table->dropColumn('balance_released_at');
-            $table->dropColumn('total_amount');
+            $table->dropColumn(['is_balance_released', 'balance_released_at', 'total_amount']);
         });
     }
 }; 
