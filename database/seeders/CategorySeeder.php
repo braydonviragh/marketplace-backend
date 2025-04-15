@@ -77,12 +77,12 @@ class CategorySeeder extends Seeder
                 'description' => 'One-piece outfits and rompers',
                 'icon' => 'jumpsuit'
             ],
-            [
-                'name' => 'Shoes',
-                'slug' => 'shoes',
-                'description' => 'All types of footwear',
-                'icon' => 'shoes'
-            ],
+            // [
+            //     'name' => 'Shoes',
+            //     'slug' => 'shoes',
+            //     'description' => 'All types of footwear',
+            //     'icon' => 'shoes'
+            // ],
             [
                 'name' => 'Shorts',
                 'slug' => 'shorts',
@@ -96,14 +96,14 @@ class CategorySeeder extends Seeder
                 'icon' => 'skirt'
             ],
             [
-                'name' => 'Sweats & Hoodies',
-                'slug' => 'sweats-hoodies',
+                'name' => 'Sweats',
+                'slug' => 'sweats',
                 'description' => 'Comfortable loungewear and casual outerwear',
-                'icon' => 'sweats'
+                'icon' => 'sweat'
             ],
             [
-                'name' => 'Knits',
-                'slug' => 'knits',
+                'name' => 'Knitwear',
+                'slug' => 'knitwear',
                 'description' => 'Knitted tops and sweaters',
                 'icon' => 'knit'
             ],
