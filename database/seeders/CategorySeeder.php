@@ -102,10 +102,10 @@ class CategorySeeder extends Seeder
                 'icon' => 'sweats'
             ],
             [
-                'name' => 'Sweaters & Knits',
-                'slug' => 'sweaters-knits',
+                'name' => 'Knits',
+                'slug' => 'knits',
                 'description' => 'Knitted tops and sweaters',
-                'icon' => 'sweater'
+                'icon' => 'knit'
             ],
             [
                 'name' => 'Suits',
