@@ -8,14 +8,20 @@ use Illuminate\Support\Facades\Cache;
 class PhoneVerificationService
 {
     protected $testMode;
+    protected $isLocalEnv;
 
     public function __construct()
     {
         // Default to test mode unless explicitly set to false in environment
         $this->testMode = env('TWILIO_TEST_MODE', true);
         
+        // Check if we're in local environment
+        $this->isLocalEnv = env('APP_ENV') === 'local';
+        
         // Log the current mode
-        Log::info("Phone verification service initialized in " . ($this->testMode ? "TEST" : "PRODUCTION") . " mode");
+        Log::info("Phone verification service initialized in " . 
+                 ($this->testMode ? "TEST" : "PRODUCTION") . " mode, " .
+                 ($this->isLocalEnv ? "LOCAL" : "NON-LOCAL") . " environment");
         
         // Production would use Twilio client initialization here
         if (!$this->testMode) {
@@ -37,6 +43,12 @@ class PhoneVerificationService
         $phoneNumber = $this->sanitizePhoneNumber($phoneNumber);
         
         try {
+            // Local environment - always succeeds
+            if ($this->isLocalEnv) {
+                Log::info("Local environment: Verification code for {$phoneNumber} automatically sent (local environment)");
+                return true;
+            }
+            
             // Test mode - always works and uses predictable codes
             if ($this->testMode) {
                 // Generate a test code (for development)
@@ -75,17 +87,28 @@ class PhoneVerificationService
         $phoneNumber = $this->sanitizePhoneNumber($phoneNumber);
         
         try {
+            // Local environment - always succeeds for easier testing
+            if ($this->isLocalEnv) {
+                Log::info("Local environment: Verification for {$phoneNumber} with code {$code} is automatically approved (local environment)");
+                
+                // Add the phone number to verified phones in session for registration
+                $verifiedPhones = session('verified_phones', []);
+                if (!in_array($phoneNumber, $verifiedPhones)) {
+                    $verifiedPhones[] = $phoneNumber;
+                    session(['verified_phones' => $verifiedPhones]);
+                }
+                
+                return true;
+            }
+            
             // Test mode - bypass verification in development/testing
             if ($this->testMode) {
-                // TODO: Uncomment this once in production
                 // Check for a specific test code or cached code
-                // $testCode = Cache::get("verification_code_{$phoneNumber}", '123456');
-                // $isValid = $code === '123456' || $code === $testCode;
+                $testCode = Cache::get("verification_code_{$phoneNumber}", '123456');
+                $isValid = $code === '123456' || $code === $testCode;
                 
-                // For testing purposes, always return true
-                $isValid = true;
-                
-                Log::info("Test mode: Verification for {$phoneNumber} with code {$code} is automatically approved (test mode)");
+                Log::info("Test mode: Verification for {$phoneNumber} with code {$code} is " . 
+                    ($isValid ? "valid" : "invalid"));
                 
                 return $isValid;
             }

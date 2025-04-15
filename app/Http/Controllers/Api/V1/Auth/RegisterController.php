@@ -32,9 +32,18 @@ class RegisterController extends Controller
         // Get the phone number from the request
         $phoneNumber = $request->phone_number;
         
+        // Check if we're in local environment - automatically verify phone
+        $isLocalEnv = env('APP_ENV') === 'local';
+        
         // Check if the phone number is verified in the session
         $verifiedPhones = session('verified_phones', []);
         $isVerified = in_array($phoneNumber, $verifiedPhones);
+        
+        // In local environment, always consider the phone verified for testing
+        if ($isLocalEnv && !$isVerified) {
+            $isVerified = true;
+            \Illuminate\Support\Facades\Log::info("Local environment: Auto-verifying phone number {$phoneNumber} for registration");
+        }
         
         // If not verified, return an error
         if (!$isVerified) {

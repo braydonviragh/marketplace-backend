@@ -18,6 +18,7 @@ class UserSeeder extends Seeder
             'phone_number' => '+1234567890',
             'role' => 'super_admin',
             'onboarding_completed' => true,
+            'password' => 'password',
         ]);
 
         // Create admin profile

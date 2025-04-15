@@ -66,6 +66,12 @@ class PhoneVerificationController extends Controller
      */
     public function verifyCode(Request $request): JsonResponse
     {
+        // Check if we're in local environment
+        $isLocalEnv = env('APP_ENV') === 'local';
+        if ($isLocalEnv) {
+            Log::info("Local environment: Auto-verification activated for phone verification endpoint");
+        }
+        
         // Validate the request
         $request->validate([
             'code' => 'required|string|size:6',
