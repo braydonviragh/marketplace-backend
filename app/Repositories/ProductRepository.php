@@ -93,7 +93,12 @@ class ProductRepository extends BaseRepository
         }
 
         if (isset($filters['category_id'])) {
-            $query->where('category_id', $filters['category_id']);
+            // Handle category_id as either single value or array
+            if (is_array($filters['category_id'])) {
+                $query->whereIn('category_id', $filters['category_id']);
+            } else {
+                $query->where('category_id', $filters['category_id']);
+            }
         }
 
         if (isset($filters['brand_id'])) {

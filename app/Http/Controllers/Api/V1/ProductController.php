@@ -26,7 +26,7 @@ class ProductController extends Controller
     {
         $filters = $request->validate([
             'user_id' => 'sometimes|exists:users,id',
-            'category_id' => 'sometimes|exists:categories,id',
+            'category_id' => 'sometimes',
             'brand_id' => 'sometimes|exists:brands,id',
             'color_id' => 'sometimes|exists:colors,id',
             'letter_size_id' => 'sometimes|exists:letter_sizes,id',
