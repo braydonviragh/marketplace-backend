@@ -48,40 +48,12 @@ use App\Http\Controllers\Api\V1\StripeWebhookController;
 */
 
 // SIMPLE HEALTH CHECK FOR RAILWAY - Plain text with no dependencies
-Route::get('/api/health', function () {
+Route::get('/health', function () {
     return response('check complete', 200)
         ->header('Content-Type', 'text/plain')
         ->header('Access-Control-Allow-Origin', '*') // Allow all origins
         ->header('Access-Control-Allow-Methods', 'GET, OPTIONS') // Only GET and OPTIONS
         ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allow these headers
-})->withoutMiddleware(['web', 'api']);
-
-// Root health check endpoint
-Route::get('/health', function () {
-    return response()->json([
-        'status' => 'ok',
-        'timestamp' => now()->toIso8601String(),
-        'php_version' => phpversion(),
-        'app_version' => config('app.version', '1.0.0'),
-        'environment' => config('app.env'),
-    ])
-    ->header('Access-Control-Allow-Origin', '*')
-    ->header('Access-Control-Allow-Methods', 'GET, OPTIONS')
-    ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-})->withoutMiddleware(['web', 'api']);
-
-// The v1 prefixed version
-Route::get('/v1/health', function () {
-    return response()->json([
-        'status' => 'ok',
-        'timestamp' => now()->toIso8601String(),
-        'php_version' => phpversion(),
-        'app_version' => config('app.version', '1.0.0'),
-        'environment' => config('app.env'),
-    ])
-    ->header('Access-Control-Allow-Origin', '*')
-    ->header('Access-Control-Allow-Methods', 'GET, OPTIONS')
-    ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 })->withoutMiddleware(['web', 'api']);
 
 Route::prefix('v1')->group(function () {

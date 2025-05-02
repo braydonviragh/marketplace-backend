@@ -7,6 +7,21 @@ define('LARAVEL_START', microtime(true));
 
 /*
 |--------------------------------------------------------------------------
+| Process Railway Environment Variables
+|--------------------------------------------------------------------------
+|
+| Load Railway specific environment variables before the application starts
+| This ensures that Railway's variables are properly mapped to Laravel's
+| environment configuration.
+|
+*/
+
+if (file_exists(__DIR__.'/update-railway-vars.php')) {
+    require __DIR__.'/update-railway-vars.php';
+}
+
+/*
+|--------------------------------------------------------------------------
 | Check If The Application Is Under Maintenance
 |--------------------------------------------------------------------------
 |
