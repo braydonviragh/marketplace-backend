@@ -14,7 +14,11 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     nginx \
-    supervisor
+    supervisor \
+    nano \
+    procps \
+    iputils-ping \
+    net-tools
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -30,8 +34,10 @@ RUN mkdir -p /var/log/nginx \
     && mkdir -p /var/cache/nginx \
     && mkdir -p /var/log/supervisor \
     && mkdir -p /etc/supervisor/conf.d \
+    && mkdir -p /var/run/supervisor \
     && chown -R www-data:www-data /var/log/nginx \
-    && chown -R www-data:www-data /var/cache/nginx
+    && chown -R www-data:www-data /var/cache/nginx \
+    && chown -R www-data:www-data /var/log/supervisor
 
 # Copy nginx and supervisor configurations
 COPY docker/nginx.conf /etc/nginx/nginx.conf
@@ -44,19 +50,21 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 # Copy existing application directory contents
 COPY . /var/www
 
-# Create Laravel storage directory structure if it doesn't exist
+# Generate initial Laravel storage structure
 RUN mkdir -p /var/www/storage/app/public \
-    && mkdir -p /var/www/storage/framework/cache \
+    && mkdir -p /var/www/storage/framework/cache/data \
     && mkdir -p /var/www/storage/framework/sessions \
     && mkdir -p /var/www/storage/framework/testing \
     && mkdir -p /var/www/storage/framework/views \
-    && mkdir -p /var/www/storage/logs
+    && mkdir -p /var/www/storage/logs \
+    && touch /var/www/storage/logs/laravel.log
 
 # Set correct permissions
 RUN chown -R www-data:www-data /var/www/storage \
     && chown -R www-data:www-data /var/www/bootstrap/cache \
-    && chmod -R 775 /var/www/storage \
-    && chmod -R 775 /var/www/bootstrap/cache
+    && chmod -R 777 /var/www/storage \
+    && chmod -R 777 /var/www/bootstrap/cache \
+    && chmod 666 /var/www/storage/logs/laravel.log
 
 # Install composer dependencies
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-interaction --no-dev --optimize-autoloader
