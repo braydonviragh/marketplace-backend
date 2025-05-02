@@ -118,8 +118,12 @@ chmod 644 /var/www/public/api/health\n\
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf\n\
 ' > /var/www/health-railway.sh && chmod +x /var/www/health-railway.sh
 
+# Copy our health check script
+COPY health-railway.sh /var/www/health-railway.sh
+RUN chmod +x /var/www/health-railway.sh
+
 # Default port - Railway uses PORT env var
 EXPOSE 8080
 
-# Use the simpler health check script for Railway
+# Use the health check script for Railway
 CMD ["/var/www/health-railway.sh"] 

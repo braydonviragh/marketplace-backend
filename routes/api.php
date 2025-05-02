@@ -1,6 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+// First, the raw health check route - NO MIDDLEWARE!
+Route::get('/health', function () {
+    return response('check complete', 200)
+        ->header('Content-Type', 'text/plain')
+        ->header('Access-Control-Allow-Origin', '*') // Allow all origins
+        ->header('Access-Control-Allow-Methods', 'GET, OPTIONS') // Only GET and OPTIONS
+        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allow these headers
+});
+
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\RentalController;
 use App\Http\Controllers\Api\V1\PaymentController;
@@ -41,7 +50,10 @@ use App\Http\Controllers\Api\V1\StripeWebhookController;
 // SIMPLE HEALTH CHECK FOR RAILWAY - Plain text with no dependencies
 Route::get('/api/health', function () {
     return response('check complete', 200)
-        ->header('Content-Type', 'text/plain');
+        ->header('Content-Type', 'text/plain')
+        ->header('Access-Control-Allow-Origin', '*') // Allow all origins
+        ->header('Access-Control-Allow-Methods', 'GET, OPTIONS') // Only GET and OPTIONS
+        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allow these headers
 });
 
 // Root health check endpoint
