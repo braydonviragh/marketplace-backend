@@ -18,13 +18,29 @@ RUN apt-get update && apt-get install -y \
     nano \
     procps \
     iputils-ping \
-    net-tools
+    net-tools \
+    ca-certificates \
+    lsb-release \
+    acl \
+    htop \
+    vim \
+    strace \
+    tcpdump
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath zip
+
+# Install additional PHP extensions
+RUN apt-get update && apt-get install -y \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -35,17 +51,35 @@ RUN mkdir -p /var/log/nginx \
     && mkdir -p /var/log/supervisor \
     && mkdir -p /etc/supervisor/conf.d \
     && mkdir -p /var/run/supervisor \
+    && mkdir -p /run \
+    && touch /run/.containerenv \
+    && touch /.dockerenv \
     && chown -R www-data:www-data /var/log/nginx \
     && chown -R www-data:www-data /var/cache/nginx \
     && chown -R www-data:www-data /var/log/supervisor
+
+# Configure PHP-FPM
+RUN { \
+    echo '[global]'; \
+    echo 'error_log = /proc/self/fd/2'; \
+    echo 'log_level = notice'; \
+    echo 'daemonize = no'; \
+    echo '[www]'; \
+    echo 'access.log = /proc/self/fd/2'; \
+    echo 'clear_env = no'; \
+    echo 'catch_workers_output = yes'; \
+    echo 'decorate_workers_output = no'; \
+} > /usr/local/etc/php-fpm.d/zz-docker.conf
 
 # Copy nginx and supervisor configurations
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY start-railway.sh /var/www/start-railway.sh
 
-# Make entrypoint executable
-RUN chmod +x /usr/local/bin/entrypoint.sh
+# Make scripts executable
+RUN chmod +x /usr/local/bin/entrypoint.sh \
+    && chmod +x /var/www/start-railway.sh
 
 # Copy existing application directory contents
 COPY . /var/www
@@ -69,9 +103,9 @@ RUN chown -R www-data:www-data /var/www/storage \
 # Install composer dependencies
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-interaction --no-dev --optimize-autoloader
 
-# Expose port 8080
+# Default port - Railway uses PORT env var
 EXPOSE 8080
 
 # Set entrypoint
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"] 
+CMD ["/var/www/start-railway.sh"] 

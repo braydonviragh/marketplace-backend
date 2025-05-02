@@ -6,8 +6,8 @@
     "buildCommand": null
   },
   "deploy": {
-    "startCommand": "supervisord -c /etc/supervisor/conf.d/supervisord.conf",
-    "healthcheckPath": "/api/v1/health",
+    "startCommand": "./start-railway.sh",
+    "healthcheckPath": "/",
     "healthcheckTimeout": 600,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10,

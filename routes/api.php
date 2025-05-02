@@ -38,7 +38,18 @@ use App\Http\Controllers\Api\V1\StripeWebhookController;
 |--------------------------------------------------------------------------
 */
 
-// Simple health check endpoint for Railway
+// Health check endpoints for Railway at both root and API path
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'timestamp' => now()->toIso8601String(),
+        'php_version' => phpversion(),
+        'app_version' => config('app.version', '1.0.0'),
+        'environment' => config('app.env'),
+    ]);
+});
+
+// The v1 prefixed version
 Route::get('/v1/health', function () {
     return response()->json([
         'status' => 'ok',

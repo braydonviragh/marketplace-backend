@@ -3,6 +3,9 @@ set -e
 
 echo "[$(date)] CONTAINER STARTUP: Beginning initialization..."
 
+# Create a container environment marker for detection
+touch /.dockerenv
+
 # Special handling for Railway deployment
 if [ -n "$RAILWAY_ENVIRONMENT" ]; then
     echo "[$(date)] Detected Railway environment: $RAILWAY_ENVIRONMENT"
@@ -20,8 +23,8 @@ echo "[$(date)] Storage directories created successfully."
 
 # Set permissions
 echo "[$(date)] STEP 2: Setting directory permissions..."
-chmod -R 775 /var/www/storage
-chmod -R 775 /var/www/bootstrap/cache
+chmod -R 777 /var/www/storage
+chmod -R 777 /var/www/bootstrap/cache
 chown -R www-data:www-data /var/www/storage
 chown -R www-data:www-data /var/www/bootstrap/cache
 echo "[$(date)] Permissions set successfully."
@@ -44,6 +47,7 @@ if [ ! -f /var/www/.env ]; then
         # Add debug to .env
         echo "APP_DEBUG=true" >> /var/www/.env
         echo "LOG_LEVEL=debug" >> /var/www/.env
+        echo "LOG_CHANNEL=stderr" >> /var/www/.env
         echo "[$(date)] .env file created from example with debug enabled."
     else
         echo "[$(date)] ERROR: .env.example file not found! Creating minimal .env..."
@@ -86,45 +90,12 @@ fi
 
 # Cache configuration
 echo "[$(date)] STEP 6: Caching configuration..."
-php /var/www/artisan config:clear
+cd /var/www
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+php artisan cache:clear
 echo "[$(date)] Configuration cache cleared."
-
-# Verify storage directory permissions again
-echo "[$(date)] STEP 7: Verifying storage permissions..."
-ls -la /var/www/storage
-echo "[$(date)] Storage permissions verified."
-
-# Test Nginx configuration
-echo "[$(date)] STEP 8: Testing Nginx configuration..."
-nginx -t || echo "[$(date)] Warning: Nginx configuration test failed"
-echo "[$(date)] Nginx configuration verified."
-
-# Check if supervisord is properly installed
-echo "[$(date)] STEP 9: Testing Supervisor installation..."
-if command -v supervisord >/dev/null 2>&1; then
-    echo "[$(date)] Supervisor is installed."
-else
-    echo "[$(date)] ERROR: Supervisor is not installed or not in PATH."
-    apt-get update && apt-get install -y supervisor
-    echo "[$(date)] Installed supervisor."
-fi
-
-# Check supervisor config
-if [ -f /etc/supervisor/conf.d/supervisord.conf ]; then
-    echo "[$(date)] STEP 10: Supervisor configuration found."
-    cat /etc/supervisor/conf.d/supervisord.conf
-else
-    echo "[$(date)] ERROR: Supervisor configuration not found at /etc/supervisor/conf.d/supervisord.conf."
-    mkdir -p /etc/supervisor/conf.d/
-    cp /var/www/docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-    echo "[$(date)] Copied supervisor config from docker directory."
-fi
-
-# Make sure storage directory exists and is writable
-echo "[$(date)] STEP 11: Final directory check..."
-mkdir -p /var/www/storage/logs
-chmod -R 777 /var/www/storage/logs
-echo "[$(date)] Final directory permissions set."
 
 # Create a test log file
 echo "[$(date)] Container startup successful" > /var/www/storage/logs/laravel.log
@@ -133,11 +104,5 @@ chmod 666 /var/www/storage/logs/laravel.log
 echo "[$(date)] All initialization steps completed successfully."
 echo "[$(date)] Starting command: $@"
 
-# Special handling for Railway's direct invocation of the Procfile
-if [ -n "$RAILWAY_ENVIRONMENT" ] && [ "$1" = "supervisord" ]; then
-    echo "[$(date)] Running in Railway environment with supervisor command..."
-    exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
-else
-    # Execute the command (supervisord)
-    exec "$@"
-fi 
+# Execute the command passed to entrypoint
+exec "$@" 
