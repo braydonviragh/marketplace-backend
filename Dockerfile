@@ -129,10 +129,6 @@ RUN chmod +x /var/www/docker/health-check.sh
 # Copy application code
 COPY --chown=www-data:www-data . /var/www/
 
-# Copy environment file for Railway
-COPY .env.railway /var/www/.env
-RUN chmod 644 /var/www/.env
-
 # Default port - Railway uses PORT env var
 EXPOSE 8080
 
