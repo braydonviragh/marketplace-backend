@@ -51,6 +51,7 @@ if $IN_DOCKER; then
   touch /var/log/nginx/health_check.log
   touch /var/log/nginx/root_check.log
   touch /var/log/nginx/api_access.log
+  touch /var/log/nginx/api_health_check.log
   chmod 777 /var/log/nginx/*.log
   
   # Ensure .env exists

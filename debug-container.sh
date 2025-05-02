@@ -101,6 +101,13 @@ else
   log "ERROR: Nginx error log not found"
 fi
 
+log "API health check log (last 10 lines):"
+if [ -f /var/log/nginx/api_health_check.log ]; then
+  tail -10 /var/log/nginx/api_health_check.log
+else
+  log "ERROR: API health check log not found"
+fi
+
 log "Laravel log (last 10 lines):"
 if [ -f /var/www/storage/logs/laravel.log ]; then
   tail -10 /var/www/storage/logs/laravel.log
@@ -122,6 +129,9 @@ curl -v -s localhost:${PORT:-8080}/ 2>&1 || log "ERROR: Curl failed or not insta
 
 log "Curl test of /health endpoint:"
 curl -v -s localhost:${PORT:-8080}/health 2>&1 || log "ERROR: Curl failed or not installed"
+
+log "Curl test of API health endpoint (Railway health check):"
+curl -v -s localhost:${PORT:-8080}/api/health 2>&1 || log "ERROR: Curl failed or not installed"
 
 log "Curl test of /api/v1/health endpoint:"
 curl -v -s localhost:${PORT:-8080}/api/v1/health 2>&1 || log "ERROR: Curl failed or not installed"
