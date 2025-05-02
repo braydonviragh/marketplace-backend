@@ -74,11 +74,11 @@ RUN { \
 # Copy nginx and supervisor configurations
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY docker/entrypoint.sh /var/www/docker/entrypoint.sh
 COPY start-railway.sh /var/www/start-railway.sh
 
 # Make scripts executable
-RUN chmod +x /usr/local/bin/entrypoint.sh \
+RUN chmod +x /var/www/docker/entrypoint.sh \
     && chmod +x /var/www/start-railway.sh
 
 # Copy existing application directory contents
@@ -121,6 +121,17 @@ exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf\n\
 # Copy our health check script and make it executable
 COPY health-railway.sh /var/www/health-railway.sh
 RUN chmod +x /var/www/health-railway.sh
+
+# Copy health check script
+COPY docker/health-check.sh /var/www/docker/health-check.sh
+RUN chmod +x /var/www/docker/health-check.sh
+
+# Copy application code
+COPY --chown=www-data:www-data . /var/www/
+
+# Copy environment file for Railway
+COPY .env.railway /var/www/.env
+RUN chmod 644 /var/www/.env
 
 # Default port - Railway uses PORT env var
 EXPOSE 8080
