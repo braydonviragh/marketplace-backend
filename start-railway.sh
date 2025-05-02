@@ -1,153 +1,114 @@
 #!/bin/bash
 set -e
 
-timestamp() {
-  date +"%Y-%m-%d %H:%M:%S"
-}
-
 log() {
-  echo "$(timestamp) - $1"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
 }
 
-log "Application startup beginning"
+# CRITICAL: Create health check endpoint immediately as the first thing
+log "Creating health check endpoint for Railway..."
+mkdir -p /var/www/public/api
+echo "check complete" > /var/www/public/api/health
+chmod 644 /var/www/public/api/health
+log "Health check created at /var/www/public/api/health"
 
-# Determine if we're running in Docker or not
-IN_DOCKER=false
-if [ -f "/.dockerenv" ] || grep -q docker /proc/1/cgroup 2>/dev/null; then
-  IN_DOCKER=true
-  log "Running in Docker container"
-else
-  log "Running in non-Docker environment"
-fi
+# Create a static health check JSON file as well
+echo '{"status":"ok","message":"Health check file found"}' > /var/www/public/api/health.json
+chmod 644 /var/www/public/api/health.json
 
-# Set base directory based on environment
-if $IN_DOCKER; then
-  BASE_DIR="/var/www"
-else
-  BASE_DIR="."
-fi
-
-cd "$BASE_DIR"
-log "Working directory: $(pwd)"
-
-# Create Laravel storage directories
-mkdir -p storage/framework/cache
-mkdir -p storage/framework/sessions
-mkdir -p storage/framework/views
-mkdir -p storage/logs
-mkdir -p bootstrap/cache
-
-# Set proper permissions for Laravel
-if $IN_DOCKER; then
-  log "Setting Docker container permissions"
-  chmod -R 777 storage
-  chmod -R 777 bootstrap/cache
-  
-  # Create Nginx log files and directories if they don't exist
-  log "Setting up Nginx logs"
-  mkdir -p /var/log/nginx
-  touch /var/log/nginx/access.log
-  touch /var/log/nginx/error.log
-  touch /var/log/nginx/health_check.log
-  touch /var/log/nginx/root_check.log
-  touch /var/log/nginx/api_access.log
-  touch /var/log/nginx/api_health_check.log
-  chmod 777 /var/log/nginx/*.log
-  
-  # Ensure .env exists
-  if [ ! -f .env ]; then
-    log "Creating .env file from example"
-    cp -n .env.example .env 2>/dev/null || echo "APP_KEY=" > .env
-    php artisan key:generate --force
-  fi
-  
-  # Ensure PORT is set for Nginx
-  if [ -z "$PORT" ]; then
-    log "PORT environment variable not set, defaulting to 8080"
-    export PORT=8080
-  else
-    log "PORT environment variable set to $PORT"
-  fi
-  
-  # Test Nginx configuration
-  log "Testing Nginx configuration"
-  nginx -t || log "WARNING: Nginx configuration test failed"
-  
-  # Test if PHP-FPM is working
-  log "Testing PHP-FPM"
-  if [ -e /usr/local/sbin/php-fpm ]; then
-    log "PHP-FPM binary exists at /usr/local/sbin/php-fpm"
-  else
-    log "WARNING: PHP-FPM binary not found at expected location"
-  fi
-  
-  # Optimize Laravel for production
-  log "Optimizing Laravel application"
-  php artisan config:clear
-  php artisan route:clear
-  php artisan view:clear
-  php artisan cache:clear
-  
-  # Check for supervisor config
-  if [ -f "/etc/supervisor/conf.d/supervisord.conf" ]; then
-    log "Starting supervisord with config at /etc/supervisor/conf.d/supervisord.conf"
-    # Show the config for debugging
-    log "Supervisor configuration:"
-    cat /etc/supervisor/conf.d/supervisord.conf
+# Check if we're in a Docker container
+if [ -f /.dockerenv ] || [ -f /etc/supervisor/conf.d/supervisord.conf ]; then
+    log "Running in Docker container"
     
-    # Create a marker file to test if health check endpoint is working
-    echo '{"status":"ok","message":"Health check test file found"}' > public/health-test.json
-    chmod 644 public/health-test.json
+    # Create storage structure
+    log "Setting up Laravel storage directories..."
+    mkdir -p /var/www/storage/framework/cache
+    mkdir -p /var/www/storage/framework/sessions
+    mkdir -p /var/www/storage/framework/views
+    mkdir -p /var/www/storage/logs
+    mkdir -p /var/www/bootstrap/cache
     
-    # Start supervisor
-    exec supervisord -c /etc/supervisor/conf.d/supervisord.conf -n
-  else
-    log "ERROR: Supervisor config not found at /etc/supervisor/conf.d/supervisord.conf"
-    log "Available files in /etc/supervisor/conf.d/:"
-    ls -la /etc/supervisor/conf.d/ || log "Directory not accessible"
+    # Set permissions
+    log "Setting directory permissions..."
+    chmod -R 777 /var/www/storage
+    chmod -R 777 /var/www/bootstrap/cache
     
-    # Fallback to direct service start if supervisor isn't available
-    log "Falling back to direct service startup"
+    # Create log files with proper permissions
+    log "Creating log files..."
+    touch /var/log/nginx/access.log
+    touch /var/log/nginx/error.log
+    touch /var/log/nginx/api_health_access.log
+    touch /var/log/nginx/api_health_error.log
     
-    # Start PHP-FPM first
-    log "Starting PHP-FPM..."
-    php-fpm
+    # Check for Nginx
+    if command -v nginx &> /dev/null; then
+        log "Nginx is available"
+    else
+        log "WARNING: Nginx not found!"
+    fi
     
-    # Wait for PHP-FPM to fully initialize
-    log "Waiting 2 seconds for PHP-FPM to initialize..."
-    sleep 2
+    # Check for PHP-FPM
+    if command -v php-fpm &> /dev/null; then
+        log "PHP-FPM is available"
+    else
+        log "WARNING: PHP-FPM not found!"
+    fi
     
-    # Start Nginx
-    log "Starting Nginx..."
-    nginx -g "daemon off;" &
+    # Clear Laravel configuration cache
+    log "Clearing Laravel configuration cache..."
+    cd /var/www
+    php artisan config:clear
+    php artisan route:clear
+    php artisan cache:clear
     
-    # Wait 3 seconds to let services initialize
-    log "Waiting 3 seconds for services to initialize..."
+    # Start supervisor (which will start nginx and php-fpm)
+    log "Starting supervisord with configuration: /etc/supervisor/conf.d/supervisord.conf"
+    if [ -f /etc/supervisor/conf.d/supervisord.conf ]; then
+        cat /etc/supervisor/conf.d/supervisord.conf
+    else
+        log "WARNING: Supervisor config not found at /etc/supervisor/conf.d/supervisord.conf"
+    fi
+    
+    # CRITICAL: Output proof that the static file exists
+    log "Verifying health check file exists..."
+    ls -la /var/www/public/api/health
+    cat /var/www/public/api/health
+    
+    # Start supervisor in background
+    /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf &
+    
+    # Sleep briefly to give services time to start
+    log "Waiting for services to start..."
     sleep 3
     
-    # Test the health endpoint directly
-    log "Testing API health endpoint..."
+    # Test health endpoint with curl
+    log "Testing health endpoint..."
     curl -v http://localhost:${PORT:-8080}/api/health || log "WARNING: Health check test failed"
     
-    wait
-  fi
+    # Keep container running
+    log "Container started, health check should now be working"
+    tail -f /var/log/nginx/access.log
 else
-  # Non-Docker environment (like Railway without Docker)
-  log "Setting up for non-Docker environment"
-  chmod -R 775 storage
-  chmod -R 775 bootstrap/cache
-  
-  # Ensure we have an app key
-  if [ ! -f .env ]; then
-    log "Creating .env file from example"
-    cp -n .env.example .env 2>/dev/null || echo "APP_KEY=" > .env
-  fi
-  
-  php artisan key:generate --force
-  php artisan config:cache
-  php artisan route:cache
-  
-  # Start the Laravel development server
-  log "Starting Laravel development server"
-  exec php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
+    # Running locally, not in a container
+    log "Running outside Docker container - using fallback mode"
+    
+    # Create storage structure
+    log "Setting up Laravel storage directories..."
+    mkdir -p storage/framework/cache
+    mkdir -p storage/framework/sessions
+    mkdir -p storage/framework/views
+    mkdir -p storage/logs
+    mkdir -p bootstrap/cache
+    
+    # Set permissions
+    log "Setting directory permissions..."
+    chmod -R 775 storage
+    chmod -R 775 bootstrap/cache
+    
+    # Generate key if needed
+    php artisan key:generate --no-interaction
+    
+    # Start the web server
+    log "Starting PHP development server..."
+    php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
 fi 

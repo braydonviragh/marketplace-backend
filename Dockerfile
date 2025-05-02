@@ -103,9 +103,23 @@ RUN chown -R www-data:www-data /var/www/storage \
 # Install composer dependencies
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-interaction --no-dev --optimize-autoloader
 
+# Create health check endpoint
+RUN mkdir -p /var/www/public/api && \
+    echo "check complete" > /var/www/public/api/health && \
+    chmod 644 /var/www/public/api/health
+
+# Create health check shell script
+RUN echo '#!/bin/bash\n\
+mkdir -p /var/www/public/api\n\
+echo "check complete" > /var/www/public/api/health\n\
+chmod 644 /var/www/public/api/health\n\
+\n\
+# Start supervisor which will start nginx and php-fpm\n\
+exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf\n\
+' > /var/www/health-railway.sh && chmod +x /var/www/health-railway.sh
+
 # Default port - Railway uses PORT env var
 EXPOSE 8080
 
-# Set entrypoint
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["/var/www/start-railway.sh"] 
+# Use the simpler health check script for Railway
+CMD ["/var/www/health-railway.sh"] 

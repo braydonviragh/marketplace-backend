@@ -13,10 +13,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Ultra simple health check for Railway
+Route::get('/api/health', function () {
+    return response('check complete', 200)
+        ->header('Content-Type', 'text/plain');
+});
+
 Route::get('/', function () {
-    return response()->json([
-        'status' => 'ok',
-        'message' => 'Laravel application is running',
-        'timestamp' => now()->toIso8601String(),
-    ]);
+    return view('welcome');
 });
