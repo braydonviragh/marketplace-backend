@@ -1,0 +1,15 @@
+.git
+.github
+.vscode
+.idea
+node_modules
+tests
+.env.bak
+*.log
+*.sqlite
+dump-autoload.sh
+
+# Don't ignore these files - Railway needs them
+!.env.example
+!bin/setup-env.sh
+!bin/build.sh 
