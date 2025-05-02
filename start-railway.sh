@@ -1,114 +1,125 @@
 #!/bin/bash
+
+# Exit on error
 set -e
 
+# Log function for clarity
 log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
+    echo "[$(date)] $1"
 }
 
-# CRITICAL: Create health check endpoint immediately as the first thing
-log "Creating health check endpoint for Railway..."
+log "STARTUP: Railway deployment starting..."
+
+# Create health check files FIRST (before anything else)
+log "SETUP: Setting up health check endpoints..."
+
+# Create the public directory if it doesn't exist
+mkdir -p /var/www/public
 mkdir -p /var/www/public/api
+
+# Simple text health check (static file)
 echo "check complete" > /var/www/public/api/health
 chmod 644 /var/www/public/api/health
-log "Health check created at /var/www/public/api/health"
+log "SETUP: Created static health check at /api/health"
 
-# Create a static health check JSON file as well
-echo '{"status":"ok","message":"Health check file found"}' > /var/www/public/api/health.json
+# JSON health check (static file)
+echo '{"status":"ok","timestamp":"'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'",' > /var/www/public/api/health.json
+echo '"message":"Railway health check endpoint"}' >> /var/www/public/api/health.json
 chmod 644 /var/www/public/api/health.json
+log "SETUP: Created JSON health check at /api/health.json"
 
-# Check if we're in a Docker container
-if [ -f /.dockerenv ] || [ -f /etc/supervisor/conf.d/supervisord.conf ]; then
-    log "Running in Docker container"
-    
-    # Create storage structure
-    log "Setting up Laravel storage directories..."
-    mkdir -p /var/www/storage/framework/cache
+# Simple PHP health check (no Laravel dependency)
+cat > /var/www/public/healthz.php << 'EOF'
+<?php
+// Health check - no Laravel dependency
+header('Content-Type: text/plain');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    // Handle preflight requests
+    http_response_code(200);
+    exit();
+}
+
+// Return success
+echo "OK";
+exit(0);
+EOF
+chmod 644 /var/www/public/healthz.php
+log "SETUP: Created PHP health check at /healthz.php"
+
+# Log directories for nginx
+mkdir -p /var/log/nginx
+touch /var/log/nginx/access.log
+touch /var/log/nginx/error.log
+touch /var/log/nginx/api_health_access.log
+touch /var/log/nginx/api_health_error.log
+touch /var/log/nginx/healthz_access.log
+touch /var/log/nginx/healthz_error.log
+log "SETUP: Created log directories and files"
+
+# Determine if we're running in Docker
+if [ -f /.dockerenv ] || [ -f /run/.containerenv ]; then
+    # We're in a container
+    IN_DOCKER=true
+    log "INFO: Running in Docker container"
+else
+    # We're not in a container
+    IN_DOCKER=false
+    log "INFO: Running outside of Docker container"
+fi
+
+# Display environment info for debugging
+log "ENV: PHP Version: $(php -v | head -n 1)"
+log "ENV: OS: $(uname -a)"
+log "ENV: APP_URL: $APP_URL"
+log "ENV: APP_ENV: $APP_ENV"
+
+# Create storage structure if missing
+if [ ! -d /var/www/storage/logs ]; then
+    log "SETUP: Creating missing storage directories"
+    mkdir -p /var/www/storage/app/public
+    mkdir -p /var/www/storage/framework/cache/data
     mkdir -p /var/www/storage/framework/sessions
+    mkdir -p /var/www/storage/framework/testing
     mkdir -p /var/www/storage/framework/views
     mkdir -p /var/www/storage/logs
-    mkdir -p /var/www/bootstrap/cache
-    
-    # Set permissions
-    log "Setting directory permissions..."
-    chmod -R 777 /var/www/storage
-    chmod -R 777 /var/www/bootstrap/cache
-    
-    # Create log files with proper permissions
-    log "Creating log files..."
-    touch /var/log/nginx/access.log
-    touch /var/log/nginx/error.log
-    touch /var/log/nginx/api_health_access.log
-    touch /var/log/nginx/api_health_error.log
-    
-    # Check for Nginx
-    if command -v nginx &> /dev/null; then
-        log "Nginx is available"
-    else
-        log "WARNING: Nginx not found!"
-    fi
-    
-    # Check for PHP-FPM
-    if command -v php-fpm &> /dev/null; then
-        log "PHP-FPM is available"
-    else
-        log "WARNING: PHP-FPM not found!"
-    fi
-    
-    # Clear Laravel configuration cache
-    log "Clearing Laravel configuration cache..."
-    cd /var/www
-    php artisan config:clear
-    php artisan route:clear
-    php artisan cache:clear
-    
-    # Start supervisor (which will start nginx and php-fpm)
-    log "Starting supervisord with configuration: /etc/supervisor/conf.d/supervisord.conf"
-    if [ -f /etc/supervisor/conf.d/supervisord.conf ]; then
-        cat /etc/supervisor/conf.d/supervisord.conf
-    else
-        log "WARNING: Supervisor config not found at /etc/supervisor/conf.d/supervisord.conf"
-    fi
-    
-    # CRITICAL: Output proof that the static file exists
-    log "Verifying health check file exists..."
-    ls -la /var/www/public/api/health
-    cat /var/www/public/api/health
-    
-    # Start supervisor in background
-    /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf &
-    
-    # Sleep briefly to give services time to start
-    log "Waiting for services to start..."
-    sleep 3
-    
-    # Test health endpoint with curl
-    log "Testing health endpoint..."
-    curl -v http://localhost:${PORT:-8080}/api/health || log "WARNING: Health check test failed"
-    
-    # Keep container running
-    log "Container started, health check should now be working"
-    tail -f /var/log/nginx/access.log
+    touch /var/www/storage/logs/laravel.log
+fi
+
+# Set correct permissions
+log "SETUP: Setting permissions"
+chown -R www-data:www-data /var/www/storage
+chmod -R 775 /var/www/storage
+chown -R www-data:www-data /var/www/bootstrap/cache
+chmod -R 775 /var/www/bootstrap/cache
+
+# Handle startup based on environment
+if [ "$IN_DOCKER" = true ]; then
+    log "STARTUP: Using supervisord to manage services"
+    # In Docker, use supervisord (from entrypoint.sh)
+    exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
 else
-    # Running locally, not in a container
-    log "Running outside Docker container - using fallback mode"
+    # Not in Docker, direct service start
+    log "STARTUP: Starting PHP-FPM"
+    php-fpm &
     
-    # Create storage structure
-    log "Setting up Laravel storage directories..."
-    mkdir -p storage/framework/cache
-    mkdir -p storage/framework/sessions
-    mkdir -p storage/framework/views
-    mkdir -p storage/logs
-    mkdir -p bootstrap/cache
+    # Wait for PHP-FPM to be ready
+    sleep 2
     
-    # Set permissions
-    log "Setting directory permissions..."
-    chmod -R 775 storage
-    chmod -R 775 bootstrap/cache
+    log "STARTUP: Starting Nginx"
+    nginx &
     
-    # Generate key if needed
-    php artisan key:generate --no-interaction
+    # Wait for Nginx to be ready
+    sleep 2
     
-    # Start the web server
-    log "Starting PHP development server..."
-    php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
+    # Test the health endpoint
+    log "TEST: Testing health endpoint"
+    curl -v http://localhost:${PORT:-8080}/healthz.php || log "WARNING: Health check test failed"
+    
+    # Keep the script running
+    log "READY: Application is running"
+    tail -f /var/log/nginx/error.log
 fi 

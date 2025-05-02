@@ -8,7 +8,7 @@ Route::get('/health', function () {
         ->header('Access-Control-Allow-Origin', '*') // Allow all origins
         ->header('Access-Control-Allow-Methods', 'GET, OPTIONS') // Only GET and OPTIONS
         ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allow these headers
-});
+})->withoutMiddleware(\Illuminate\Http\Middleware\HandleCors::class);
 
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\RentalController;
@@ -54,7 +54,7 @@ Route::get('/api/health', function () {
         ->header('Access-Control-Allow-Origin', '*') // Allow all origins
         ->header('Access-Control-Allow-Methods', 'GET, OPTIONS') // Only GET and OPTIONS
         ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allow these headers
-});
+})->withoutMiddleware(['web', 'api']);
 
 // Root health check endpoint
 Route::get('/health', function () {
@@ -64,8 +64,11 @@ Route::get('/health', function () {
         'php_version' => phpversion(),
         'app_version' => config('app.version', '1.0.0'),
         'environment' => config('app.env'),
-    ]);
-});
+    ])
+    ->header('Access-Control-Allow-Origin', '*')
+    ->header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+    ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+})->withoutMiddleware(['web', 'api']);
 
 // The v1 prefixed version
 Route::get('/v1/health', function () {
@@ -75,8 +78,11 @@ Route::get('/v1/health', function () {
         'php_version' => phpversion(),
         'app_version' => config('app.version', '1.0.0'),
         'environment' => config('app.env'),
-    ]);
-});
+    ])
+    ->header('Access-Control-Allow-Origin', '*')
+    ->header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+    ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+})->withoutMiddleware(['web', 'api']);
 
 Route::prefix('v1')->group(function () {
     // Public Authentication Routes

@@ -118,12 +118,16 @@ chmod 644 /var/www/public/api/health\n\
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf\n\
 ' > /var/www/health-railway.sh && chmod +x /var/www/health-railway.sh
 
-# Copy our health check script
+# Copy our health check script and make it executable
 COPY health-railway.sh /var/www/health-railway.sh
 RUN chmod +x /var/www/health-railway.sh
 
 # Default port - Railway uses PORT env var
 EXPOSE 8080
+
+# Create a healthcheck for Docker
+HEALTHCHECK --interval=5s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-8080}/healthz.php || exit 1
 
 # Use the health check script for Railway
 CMD ["/var/www/health-railway.sh"] 

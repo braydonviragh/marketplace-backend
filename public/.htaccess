@@ -28,12 +28,23 @@ php_value max_input_time 300
 
 # Handle CORS
 <IfModule mod_headers.c>
-    SetEnvIf Origin "http://localhost:9000" ALLOWED_ORIGIN=$0
-    Header set Access-Control-Allow-Origin "%{ALLOWED_ORIGIN}e" env=ALLOWED_ORIGIN
-    Header set Access-Control-Allow-Credentials "true"
-    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-    Header set Access-Control-Allow-Headers "X-Requested-With, Content-Type, X-Token-Auth, Authorization, Accept, Origin"
-    Header set Access-Control-Max-Age "86400"
+    # Allow all origins for health check endpoints
+    <FilesMatch "^(healthz\.php|api/health|health)$">
+        Header set Access-Control-Allow-Origin "*"
+        Header set Access-Control-Allow-Methods "GET, OPTIONS"
+        Header set Access-Control-Allow-Headers "X-Requested-With, Content-Type, X-Token-Auth, Authorization, Accept, Origin"
+        Header set Access-Control-Max-Age "86400"
+    </FilesMatch>
+    
+    # Allow specific origins for other endpoints
+    <FilesMatch "^(?!(healthz\.php|api/health|health))">
+        SetEnvIf Origin "http(s)?://(.+\.)?(localhost:9000|localhost:3000|localhost:5173)$" ALLOWED_ORIGIN=$0
+        Header set Access-Control-Allow-Origin "%{ALLOWED_ORIGIN}e" env=ALLOWED_ORIGIN
+        Header set Access-Control-Allow-Credentials "true"
+        Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Header set Access-Control-Allow-Headers "X-Requested-With, Content-Type, X-Token-Auth, Authorization, Accept, Origin"
+        Header set Access-Control-Max-Age "86400"
+    </FilesMatch>
 
     # Handle preflight OPTIONS requests
     RewriteEngine On
