@@ -122,13 +122,6 @@ exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf\n\
 COPY health-railway.sh /var/www/health-railway.sh
 RUN chmod +x /var/www/health-railway.sh
 
-# Copy health check script
-COPY docker/health-check.sh /var/www/docker/health-check.sh
-RUN chmod +x /var/www/docker/health-check.sh
-
-# Copy application code
-COPY --chown=www-data:www-data . /var/www/
-
 # Default port - Railway uses PORT env var
 EXPOSE 8080
 
