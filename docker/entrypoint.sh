@@ -33,13 +33,21 @@ echo "[$(date)] Permissions set successfully."
 ls -la /var/www/storage
 ls -la /var/www/bootstrap
 
+# Create static health check files
+echo "[$(date)] STEP 3: Creating health check files..."
+mkdir -p /var/www/public/api
+echo '{"status":"ok","timestamp":"'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'",' > /var/www/public/api/health.json
+echo '"php_version":"'$(php -r 'echo phpversion();')'","message":"Static health check file"}' >> /var/www/public/api/health.json
+chmod 644 /var/www/public/api/health.json
+echo "[$(date)] Health check files created."
+
 # Display PHP version
-echo "[$(date)] STEP 3: Checking PHP installation..."
+echo "[$(date)] STEP 4: Checking PHP installation..."
 php -v
 echo "[$(date)] PHP installation verified."
 
 # Check for .env file
-echo "[$(date)] STEP 4: Checking environment file..."
+echo "[$(date)] STEP 5: Checking environment file..."
 if [ ! -f /var/www/.env ]; then
     echo "[$(date)] .env file not found, creating from example..."
     if [ -f /var/www/.env.example ]; then
@@ -79,7 +87,7 @@ EOL
 fi
 
 # Generate application key if not set
-echo "[$(date)] STEP 5: Checking application key..."
+echo "[$(date)] STEP 6: Checking application key..."
 if grep -q "APP_KEY=" /var/www/.env && ! grep -q "APP_KEY=$" /var/www/.env; then
     echo "[$(date)] Application key already exists."
 else
@@ -89,7 +97,7 @@ else
 fi
 
 # Cache configuration
-echo "[$(date)] STEP 6: Caching configuration..."
+echo "[$(date)] STEP 7: Caching configuration..."
 cd /var/www
 php artisan config:clear
 php artisan route:clear

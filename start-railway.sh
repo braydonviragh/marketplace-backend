@@ -95,6 +95,10 @@ if $IN_DOCKER; then
     log "Supervisor configuration:"
     cat /etc/supervisor/conf.d/supervisord.conf
     
+    # Create a marker file to test if health check endpoint is working
+    echo '{"status":"ok","message":"Health check test file found"}' > public/health-test.json
+    chmod 644 public/health-test.json
+    
     # Start supervisor
     exec supervisord -c /etc/supervisor/conf.d/supervisord.conf -n
   else
@@ -104,8 +108,27 @@ if $IN_DOCKER; then
     
     # Fallback to direct service start if supervisor isn't available
     log "Falling back to direct service startup"
-    php-fpm &
+    
+    # Start PHP-FPM first
+    log "Starting PHP-FPM..."
+    php-fpm
+    
+    # Wait for PHP-FPM to fully initialize
+    log "Waiting 2 seconds for PHP-FPM to initialize..."
+    sleep 2
+    
+    # Start Nginx
+    log "Starting Nginx..."
     nginx -g "daemon off;" &
+    
+    # Wait 3 seconds to let services initialize
+    log "Waiting 3 seconds for services to initialize..."
+    sleep 3
+    
+    # Test the health endpoint directly
+    log "Testing API health endpoint..."
+    curl -v http://localhost:${PORT:-8080}/api/health || log "WARNING: Health check test failed"
+    
     wait
   fi
 else
