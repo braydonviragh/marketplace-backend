@@ -10,6 +10,10 @@ log() {
 
 log "Starting Railway deployment script..."
 
+# Export PORT for various services to use
+export PORT=${PORT:-8080}
+log "Using PORT: $PORT"
+
 # Include the test script to verify environment variables
 if [ -f /var/www/test-env.sh ]; then
     log "Running environment test script"
@@ -39,7 +43,8 @@ echo json_encode([
     'status' => 'ok',
     'timestamp' => date('c'),
     'php_version' => phpversion(),
-    'message' => 'Health check from healthz.php'
+    'message' => 'Health check from healthz.php',
+    'port' => getenv('PORT') ?: '8080'
 ]);
 EOL
 chmod 644 /var/www/public/healthz.php
@@ -66,7 +71,7 @@ chmod 644 /var/log/nginx/error.log
 
 # Log environment info
 log "Environment information:"
-log "PORT: ${PORT:-8080}"
+log "PORT: ${PORT}"
 log "PWD: $(pwd)"
 log "USER: $(whoami)"
 log "PHP Version: $(php -v | head -n 1)"
