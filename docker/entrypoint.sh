@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e
 
+# Create static health check file immediately
+echo "Creating health check files..."
+mkdir -p /var/www/public/api
+echo "check complete" > /var/www/public/api/health
+chmod 644 /var/www/public/api/health
+echo "Static health check file created"
+
 echo "[$(date)] CONTAINER STARTUP: Beginning initialization..."
 
 # Create a container environment marker for detection

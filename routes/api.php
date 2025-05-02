@@ -38,7 +38,13 @@ use App\Http\Controllers\Api\V1\StripeWebhookController;
 |--------------------------------------------------------------------------
 */
 
-// Health check endpoints for Railway at both root and API path
+// SIMPLE HEALTH CHECK FOR RAILWAY - Plain text with no dependencies
+Route::get('/api/health', function () {
+    return response('check complete', 200)
+        ->header('Content-Type', 'text/plain');
+});
+
+// Root health check endpoint
 Route::get('/health', function () {
     return response()->json([
         'status' => 'ok',
