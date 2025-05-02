@@ -3,6 +3,12 @@ set -e
 
 echo "[$(date)] CONTAINER STARTUP: Beginning initialization..."
 
+# Special handling for Railway deployment
+if [ -n "$RAILWAY_ENVIRONMENT" ]; then
+    echo "[$(date)] Detected Railway environment: $RAILWAY_ENVIRONMENT"
+    echo "[$(date)] Setting up for Railway deployment..."
+fi
+
 # Create required directories
 echo "[$(date)] STEP 1: Creating Laravel storage directories..."
 mkdir -p /var/www/storage/framework/cache/data
@@ -48,13 +54,14 @@ APP_KEY=
 APP_DEBUG=true
 APP_URL=http://localhost:8080
 LOG_LEVEL=debug
+LOG_CHANNEL=stderr
 
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=laravel
-DB_USERNAME=root
-DB_PASSWORD=
+DB_CONNECTION=${DB_CONNECTION:-mysql}
+DB_HOST=${DB_HOST:-127.0.0.1}
+DB_PORT=${DB_PORT:-3306}
+DB_DATABASE=${DB_DATABASE:-laravel}
+DB_USERNAME=${DB_USERNAME:-root}
+DB_PASSWORD=${DB_PASSWORD:-}
 
 BROADCAST_DRIVER=log
 CACHE_DRIVER=file
@@ -126,5 +133,11 @@ chmod 666 /var/www/storage/logs/laravel.log
 echo "[$(date)] All initialization steps completed successfully."
 echo "[$(date)] Starting command: $@"
 
-# Execute the command (supervisord)
-exec "$@" 
+# Special handling for Railway's direct invocation of the Procfile
+if [ -n "$RAILWAY_ENVIRONMENT" ] && [ "$1" = "supervisord" ]; then
+    echo "[$(date)] Running in Railway environment with supervisor command..."
+    exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
+else
+    # Execute the command (supervisord)
+    exec "$@"
+fi 

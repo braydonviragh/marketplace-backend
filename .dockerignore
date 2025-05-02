@@ -29,4 +29,9 @@ docker/
 Dockerfile
 .dockerignore
 .gitignore
-.gitattributes 
+.gitattributes
+
+# Heroku specific files
+vendor/bin/heroku*
+.heroku
+*.buildpacks 
