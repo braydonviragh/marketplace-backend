@@ -1,0 +1,4 @@
+NIXPACKS_PKGS=php82
+NIXPACKS_INSTALL_CMD=bash bin/build.sh
+NIXPACKS_START_CMD=php artisan serve --port=$PORT --host=0.0.0.0
+PHP_VERSION=8.2 
