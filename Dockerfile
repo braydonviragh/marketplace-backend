@@ -105,13 +105,17 @@ RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-interaction --no-dev --opti
 
 # Create health check endpoint
 RUN mkdir -p /var/www/public/api && \
-    echo "check complete" > /var/www/public/api/health && \
+    echo "OK" > /var/www/public/api/health && \
     chmod 644 /var/www/public/api/health
+
+# Create simple PHP health check
+RUN echo '<?php header("Content-Type: text/plain"); echo "OK"; exit(0);' > /var/www/public/healthz.php && \
+    chmod 644 /var/www/public/healthz.php
 
 # Create health check shell script
 RUN echo '#!/bin/bash\n\
 mkdir -p /var/www/public/api\n\
-echo "check complete" > /var/www/public/api/health\n\
+echo "OK" > /var/www/public/api/health\n\
 chmod 644 /var/www/public/api/health\n\
 \n\
 # Start supervisor which will start nginx and php-fpm\n\

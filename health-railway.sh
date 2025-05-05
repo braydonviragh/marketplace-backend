@@ -14,7 +14,7 @@ log "STARTUP: Project ID: ${RAILWAY_PROJECT_ID:-unknown}"
 mkdir -p /var/www/public/api
 
 # Simple text health check
-echo "check complete" > /var/www/public/api/health
+echo "OK" > /var/www/public/api/health
 chmod 644 /var/www/public/api/health
 log "STARTUP: Created text health check at /api/health"
 
@@ -33,10 +33,7 @@ log "STARTUP: Created JSON health check at /api/health.json"
 cat > /var/www/public/healthz.php << 'EOF'
 <?php
 header('Content-Type: text/plain');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
-echo 'check complete';
+echo 'OK';
 exit(0);
 EOF
 chmod 644 /var/www/public/healthz.php

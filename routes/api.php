@@ -3,12 +3,9 @@
 use Illuminate\Support\Facades\Route;
 // First, the raw health check route - NO MIDDLEWARE!
 Route::get('/health', function () {
-    return response('check complete', 200)
-        ->header('Content-Type', 'text/plain')
-        ->header('Access-Control-Allow-Origin', '*') // Allow all origins
-        ->header('Access-Control-Allow-Methods', 'GET, OPTIONS') // Only GET and OPTIONS
-        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allow these headers
-})->withoutMiddleware(\Illuminate\Http\Middleware\HandleCors::class);
+    return response('OK', 200)
+        ->header('Content-Type', 'text/plain');
+})->withoutMiddleware(['web', 'api', \Illuminate\Http\Middleware\HandleCors::class]); // Remove all middleware to ensure it always responds
 
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\RentalController;
@@ -47,14 +44,7 @@ use App\Http\Controllers\Api\V1\StripeWebhookController;
 |--------------------------------------------------------------------------
 */
 
-// SIMPLE HEALTH CHECK FOR RAILWAY - Plain text with no dependencies
-Route::get('/health', function () {
-    return response('check complete', 200)
-        ->header('Content-Type', 'text/plain')
-        ->header('Access-Control-Allow-Origin', '*') // Allow all origins
-        ->header('Access-Control-Allow-Methods', 'GET, OPTIONS') // Only GET and OPTIONS
-        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allow these headers
-})->withoutMiddleware(['web', 'api']);
+// Removed duplicate health check route
 
 Route::prefix('v1')->group(function () {
     // Public Authentication Routes
