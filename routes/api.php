@@ -46,7 +46,9 @@ use App\Http\Controllers\Api\V1\StripeWebhookController;
 
 // Removed duplicate health check route
 
-Route::prefix('v1')->group(function () {
+    // Test route for product endpoint
+    Route::get('/product-test', [ProductController::class, 'test']);
+
     // Public Authentication Routes
     Route::prefix('auth')->group(function () {
         Route::post('login', [LoginController::class, 'login']);
@@ -250,4 +252,3 @@ Route::prefix('v1')->group(function () {
     // Stripe Webhook Route - no CSRF or auth middleware
     Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])->name('stripe.webhook');
 
-}); 
