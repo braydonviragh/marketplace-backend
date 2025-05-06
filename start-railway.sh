@@ -69,16 +69,6 @@ chmod 755 /var/log/nginx
 chmod 644 /var/log/nginx/access.log
 chmod 644 /var/log/nginx/error.log
 
-# Laravel database migration and seeding
-cd /var/www
-log "Running Laravel migrations with --force flag..."
-php artisan migrate --force
-log "Database migrations completed successfully."
-
-log "Running Laravel database seeders..."
-php artisan db:seed --force
-log "Database seeding completed successfully."
-
 # Log environment info
 log "Environment information:"
 log "PORT: ${PORT}"
