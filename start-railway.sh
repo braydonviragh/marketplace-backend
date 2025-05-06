@@ -77,14 +77,6 @@ log "USER: $(whoami)"
 log "PHP Version: $(php -v | head -n 1)"
 log "Nginx Version: $(nginx -v 2>&1)"
 
-# Run Laravel database migrations and seeders
-log "Running database migrations..."
-cd /var/www
-php artisan migrate:fresh --force
-log "Migration complete. Running database seeders..."
-php artisan db:seed --force
-log "Database seeding complete."
-
 # Start services with supervisord
 log "Starting services with supervisord..."
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf 
