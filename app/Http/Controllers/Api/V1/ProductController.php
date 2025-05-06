@@ -103,17 +103,4 @@ class ProductController extends Controller
             'message' => 'Product deleted successfully'
         ], Response::HTTP_OK);
     }
-    
-    /**
-     * Test endpoint that returns an empty product array without querying the database.
-     *
-     * @return JsonResponse
-     */
-    public function test(): JsonResponse
-    {
-        return response()->json([
-            'data' => [],
-            'message' => 'Test endpoint successful'
-        ]);
-    }
 } 
