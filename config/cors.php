@@ -19,7 +19,15 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:9000', 'http://127.0.0.1:3000', 'http://127.0.0.1:5173', 'http://127.0.0.1:9000'],
+    'allowed_origins' => [
+        'http://localhost:3000', 
+        'http://localhost:5173', 
+        'http://localhost:9000', 
+        'http://127.0.0.1:3000', 
+        'http://127.0.0.1:5173', 
+        'http://127.0.0.1:9000',
+        'https://frontend-production-2dab.up.railway.app'
+    ],
 
     'allowed_origins_patterns' => [],
 
