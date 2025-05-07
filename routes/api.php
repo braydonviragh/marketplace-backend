@@ -44,7 +44,13 @@ use App\Http\Controllers\Api\V1\StripeWebhookController;
 |--------------------------------------------------------------------------
 */
 
-// Removed duplicate health check route
+// Handle OPTIONS requests for CORS preflight
+Route::options('/{any}', function () {
+    return response('', 200)
+        ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
+        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-XSRF-TOKEN')
+        ->header('Access-Control-Max-Age', '86400'); // 24 hours
+})->where('any', '.*');
 
     // Test route for product endpoint
     Route::get('/product-test', [ProductController::class, 'test']);
