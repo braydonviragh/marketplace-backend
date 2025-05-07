@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: marketplace-backend
+    container_name: marketplace-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=marketplace
+      - DB_USERNAME=marketplace_user
+      - DB_PASSWORD=marketplace_password
+    depends_on:
+      - db
+    networks:
+      - marketplace-network
+
+  db:
+    image: mysql:8.0
+    container_name: marketplace-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: marketplace
+      MYSQL_USER: marketplace_user
+      MYSQL_PASSWORD: marketplace_password
+      MYSQL_ROOT_PASSWORD: root_password
+      SERVICE_NAME: mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - marketplace-network
+
+networks:
+  marketplace-network:
+    driver: bridge
+
+volumes:
+  dbdata: 

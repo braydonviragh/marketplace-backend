@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\UserTransactionRequest;
 use App\Http\Resources\UserTransactionResource;
 use App\Models\UserTransaction;
 use App\Models\UserBalance;
@@ -20,6 +19,7 @@ use App\Http\Resources\UserBalanceResource;
 use App\Http\Requests\Balance\WithdrawRequest;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Http\Requests\TransactionRequest;
 
 class BalanceController extends Controller
 {

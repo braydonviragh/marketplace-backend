@@ -44,4 +44,22 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
     ];
+    
+    /**
+     * The middleware that should be excluded from the specified URIs.
+     *
+     * @var array<int, string>
+     */
+    protected $middlewareExceptPaths = [
+        \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class => [
+            'api/health',
+            'api/*/health',
+            'health',
+            'healthz.php',
+            'v1/health'
+        ],
+        \Illuminate\Http\Middleware\HandleCors::class => [
+            'healthz.php'
+        ]
+    ];
 } 

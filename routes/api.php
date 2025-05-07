@@ -1,6 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+// First, the raw health check route - NO MIDDLEWARE!
+Route::get('/health', function () {
+    return response('OK', 200)
+        ->header('Content-Type', 'text/plain');
+})->withoutMiddleware(['web', 'api', \Illuminate\Http\Middleware\HandleCors::class]); // Remove all middleware to ensure it always responds
+
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\RentalController;
 use App\Http\Controllers\Api\V1\PaymentController;
@@ -38,7 +44,11 @@ use App\Http\Controllers\Api\V1\StripeWebhookController;
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('v1')->group(function () {
+// Removed duplicate health check route
+
+    // Test route for product endpoint
+    Route::get('/product-test', [ProductController::class, 'test']);
+
     // Public Authentication Routes
     Route::prefix('auth')->group(function () {
         Route::post('login', [LoginController::class, 'login']);
@@ -242,4 +252,3 @@ Route::prefix('v1')->group(function () {
     // Stripe Webhook Route - no CSRF or auth middleware
     Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])->name('stripe.webhook');
 
-}); 
