@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 // First, the raw health check route - NO MIDDLEWARE!
 Route::get('/health', function () {
     return response('OK', 200)
@@ -44,13 +46,16 @@ use App\Http\Controllers\Api\V1\StripeWebhookController;
 |--------------------------------------------------------------------------
 */
 
-// Handle OPTIONS requests for CORS preflight
-Route::options('/{any}', function () {
-    return response('', 200)
-        ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
-        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-XSRF-TOKEN')
-        ->header('Access-Control-Max-Age', '86400'); // 24 hours
-})->where('any', '.*');
+// Add a middleware to ensure CORS is processed for all routes
+Route::middleware([\App\Http\Middleware\RailwayCors::class])->group(function () {
+    
+    // Handle OPTIONS requests for CORS preflight
+    Route::options('/{any}', function () {
+        return response('', 200)
+            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
+            ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-XSRF-TOKEN, Accept')
+            ->header('Access-Control-Max-Age', '86400'); // 24 hours
+    })->where('any', '.*');
 
     // Test route for product endpoint
     Route::get('/product-test', [ProductController::class, 'test']);
@@ -257,4 +262,36 @@ Route::options('/{any}', function () {
 
     // Stripe Webhook Route - no CSRF or auth middleware
     Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])->name('stripe.webhook');
+});
+
+// Add a CORS test endpoint that returns all request headers
+Route::get('/cors-test', function (Request $request) {
+    // Get headers from the request
+    $headers = $request->headers->all();
+    
+    // Sanitize sensitive data for logging
+    if (isset($headers['authorization'])) {
+        $headers['authorization'] = ['[REDACTED]'];
+    }
+    
+    // Log the request for debugging
+    Log::debug('CORS test endpoint called', [
+        'origin' => $request->header('Origin'),
+        'method' => $request->method(),
+        'headers' => $headers
+    ]);
+    
+    // Return all request headers and current CORS configuration
+    return response()->json([
+        'success' => true,
+        'message' => 'CORS test endpoint',
+        'request_headers' => $headers,
+        'cors_config' => [
+            'allowed_origins' => env('CORS_ALLOWED_ORIGINS'),
+            'session_domain' => env('SESSION_DOMAIN'),
+            'railway_env' => env('RAILWAY_ENVIRONMENT'),
+        ],
+        'timestamp' => now()->toIso8601String()
+    ]);
+});
 

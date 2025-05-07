@@ -35,6 +35,8 @@ class Kernel extends HttpKernel
     ];
 
     protected $middleware = [
+        // Place Railway-specific middleware first
+        \App\Http\Middleware\RailwayCors::class,
         // \App\Http\Middleware\TrustHosts::class,
         \App\Http\Middleware\TrustProxies::class,
         \Illuminate\Http\Middleware\HandleCors::class,
