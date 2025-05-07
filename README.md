@@ -6,15 +6,15 @@ A modern, full-featured Laravel-based API backend for a clothing rental marketpl
 
 Spindle is a peer-to-peer clothing rental platform built to make fashion more sustainable and accessible. The backend provides a comprehensive API that powers the Vue/Quasar frontend application with features including:
 
-- Secure user authentication with email and phone verification
+- Secure user authentication with email and phone verification (tbd)
 - Product management with detailed categorization and filtering
 - Rental and offer negotiation system
-- Integrated Stripe payment processing
-- User reviews and ratings
+- Integrated Stripe payment processing (tbd)
+- User reviews and ratings (tbd)
 - Geolocation-based product search
-- Admin dashboard for platform management
+- Admin dashboard for platform management (tbd)
 
-## Key Features (Non-Technical)
+## Key Features
 
 - **User Accounts**: People can sign up, verify their identity, and manage their profiles
 - **Clothing Listings**: Users can photograph and list their clothing items with details like size, brand, and rental price
@@ -804,23 +804,6 @@ The main API groups include:
 
 ### Users
 - Profile management
-- Reviews and ratings
-- Favorite products
-- Notification preferences
-
-### Admin
-- User management
-- Product moderation
-- Transaction oversight
-- Platform statistics
-
-## Testing
-
-Run the test suite with:
-
-```bash
-php artisan test
-```
 
 ## Deployment
 
@@ -842,10 +825,3 @@ railway up
 
 See the [Spindle Frontend Repository](https://github.com/braydonviragh/marketplace-frontend) for instructions on setting up the Vue/Quasar frontend application.
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
