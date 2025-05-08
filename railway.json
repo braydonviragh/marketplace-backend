@@ -10,6 +10,6 @@
     "healthcheckPath": "/api/health",
     "healthcheckTimeout": 300,
     "startCommand": "/var/www/start-railway.sh",
-    "postDeploy": "cd /var/www && php artisan migrate --force && php artisan db:seed --force"
+    "postDeploy": "cd /var/www && php artisan migrate --force && php artisan db:seed --force && php artisan db:seed --class=UserSeeder --force && php artisan db:seed --class=ProductSeeder --force"
   }
 } 

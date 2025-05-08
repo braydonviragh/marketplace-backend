@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:9000', 'http://127.0.0.1:3000', 'http://127.0.0.1:5173', 'http://127.0.0.1:9000', '*'],
+    'allowed_origins' => array_filter(explode(',', env('CORS_ALLOWED_ORIGINS', '*'))),
 
     'allowed_origins_patterns' => [],
 
@@ -30,5 +30,18 @@ return [
     'max_age' => 0,
 
     'supports_credentials' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Vary Header
+    |--------------------------------------------------------------------------
+    |
+    | When a server responds to a request with a specific origin in the
+    | Access-Control-Allow-Origin header, the Vary: Origin header should be
+    | included to indicate to caches that server responses may vary based on
+    | the Origin of the request.
+    |
+    */
+    'vary' => ['Origin'],
 
 ];
