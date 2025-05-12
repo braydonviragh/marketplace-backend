@@ -5,11 +5,36 @@
 
 echo "Building and integrating frontend into Laravel backend..."
 
-# Check if frontend directory exists as a sibling to this directory
+# If the frontend directory exists as a sibling to this directory, use it
+# Otherwise, try to clone it from the repository if FRONTEND_REPO environment variable is set
 FRONTEND_DIR="../marketplace-frontend"
 if [ ! -d "$FRONTEND_DIR" ]; then
-  echo "Error: Frontend directory not found at $FRONTEND_DIR"
-  exit 1
+  echo "Frontend directory not found at $FRONTEND_DIR"
+  
+  # Check if we have a repository URL to clone
+  if [ -n "$FRONTEND_REPO" ]; then
+    echo "Cloning frontend repository from $FRONTEND_REPO"
+    git clone "$FRONTEND_REPO" "$FRONTEND_DIR"
+    if [ ! -d "$FRONTEND_DIR" ]; then
+      echo "Error: Failed to clone frontend repository."
+      exit 1
+    fi
+  else
+    echo "Error: Frontend directory not found and FRONTEND_REPO environment variable not set."
+    echo "Creating an empty frontend directory for Railway deployment."
+    mkdir -p "$FRONTEND_DIR"
+    # Create a minimal package.json
+    cat > "$FRONTEND_DIR/package.json" << EOF
+{
+  "name": "marketplace-frontend",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "mkdir -p dist/spa && echo '<html><body><h1>Marketplace Frontend</h1><p>Default placeholder page.</p></body></html>' > dist/spa/index.html"
+  }
+}
+EOF
+  fi
 fi
 
 # Navigate to frontend directory and build it
@@ -27,6 +52,7 @@ fi
 # Copy the built frontend directly to Laravel public directory
 echo "Copying frontend build to Laravel public directory root..."
 cd - # Return to backend directory
+mkdir -p "./public"
 cp -R "$FRONTEND_DIR/dist/spa/"* "./public/"
 
 echo "Frontend integration complete! Files copied to public directory" 

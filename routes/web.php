@@ -19,8 +19,9 @@ Route::get('/api/health', function () {
         ->header('Content-Type', 'text/plain');
 });
 
+// Serve the Vue SPA from the root
 Route::get('/', function () {
-    return view('welcome');
+    return file_get_contents(public_path('index.html'));
 });
 
 // Catch-all route to serve Vue SPA for any non-API routes
