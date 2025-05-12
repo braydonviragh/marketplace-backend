@@ -108,6 +108,10 @@ RUN chown -R www-data:www-data /var/www/storage \
     && chmod -R 777 /var/www/bootstrap/cache \
     && chmod 666 /var/www/storage/logs/laravel.log
 
+# Make frontend directory in public
+RUN mkdir -p /var/www/public/frontend \
+    && chown -R www-data:www-data /var/www/public/frontend
+
 # Install composer dependencies
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-interaction --no-dev --optimize-autoloader
 
