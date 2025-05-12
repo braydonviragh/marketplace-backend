@@ -22,3 +22,8 @@ Route::get('/api/health', function () {
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Catch-all route to serve Vue SPA for any non-API routes
+Route::get('/{any}', function () {
+    return file_get_contents(public_path('index.html'));
+})->where('any', '.*');
