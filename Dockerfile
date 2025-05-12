@@ -25,7 +25,15 @@ RUN apt-get update && apt-get install -y \
     htop \
     vim \
     strace \
-    tcpdump
+    tcpdump \
+    gnupg
+
+# Install Node.js 18
+RUN mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_18.x nodistro main" > /etc/apt/sources.list.d/nodesource.list && \
+    apt-get update && \
+    apt-get install -y nodejs npm
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -99,6 +107,10 @@ RUN chown -R www-data:www-data /var/www/storage \
     && chmod -R 777 /var/www/storage \
     && chmod -R 777 /var/www/bootstrap/cache \
     && chmod 666 /var/www/storage/logs/laravel.log
+
+# Make frontend directory in public
+RUN mkdir -p /var/www/public/frontend \
+    && chown -R www-data:www-data /var/www/public/frontend
 
 # Install composer dependencies
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-interaction --no-dev --optimize-autoloader
