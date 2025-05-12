@@ -19,6 +19,22 @@ Route::get('/api/health', function () {
         ->header('Content-Type', 'text/plain');
 });
 
+// Debug route to check if frontend files exist
+Route::get('/debug-frontend', function () {
+    $indexPath = public_path('index.html');
+    $exists = file_exists($indexPath);
+    $size = $exists ? filesize($indexPath) : 0;
+    
+    $files = scandir(public_path());
+    $files = array_diff($files, ['.', '..']);
+    
+    return response()->json([
+        'index_exists' => $exists,
+        'index_size' => $size,
+        'public_directory_files' => $files
+    ]);
+});
+
 // Serve the Vue SPA from the root
 Route::get('/', function () {
     return file_get_contents(public_path('index.html'));

@@ -55,4 +55,16 @@ cd - # Return to backend directory
 mkdir -p "./public"
 cp -R "$FRONTEND_DIR/dist/spa/"* "./public/"
 
-echo "Frontend integration complete! Files copied to public directory" 
+# Set proper permissions on the public directory
+echo "Setting proper permissions on public directory..."
+chmod -R 755 "./public/"
+if command -v chown &> /dev/null; then
+  chown -R www-data:www-data "./public/" 2>/dev/null || true
+fi
+
+# Create a test file to verify public directory is writable
+echo "<html><body>Test file - Verify directory is writable</body></html>" > "./public/test.html"
+
+echo "Frontend integration complete! Files copied to public directory"
+echo "Public directory files:"
+ls -la "./public/" 

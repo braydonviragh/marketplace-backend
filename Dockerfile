@@ -99,16 +99,17 @@ RUN mkdir -p /var/www/storage/app/public \
     && mkdir -p /var/www/storage/logs \
     && touch /var/www/storage/logs/laravel.log
 
-# Set correct permissions
+# Set correct permissions for Laravel directories
 RUN chown -R www-data:www-data /var/www/storage \
     && chown -R www-data:www-data /var/www/bootstrap/cache \
     && chmod -R 777 /var/www/storage \
     && chmod -R 777 /var/www/bootstrap/cache \
     && chmod 666 /var/www/storage/logs/laravel.log
 
-# Make frontend directory in public
-RUN mkdir -p /var/www/public/frontend \
-    && chown -R www-data:www-data /var/www/public/frontend
+# Ensure public directory exists and has proper permissions
+RUN mkdir -p /var/www/public \
+    && chown -R www-data:www-data /var/www/public \
+    && chmod -R 755 /var/www/public
 
 # Install composer dependencies
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-interaction --no-dev --optimize-autoloader
