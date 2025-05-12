@@ -15,7 +15,8 @@ class MediaService
 
     public function __construct()
     {
-        $this->disk = config('app.env') === 'local' ? 'public' : 's3';
+        // Use S3 when FILESYSTEM_DISK is set to 's3', otherwise use 'public'
+        $this->disk = config('filesystems.default') === 's3' ? 's3' : 'public';
         // Check if image optimization is possible
         $this->canOptimize = extension_loaded('gd') && class_exists('Intervention\Image\Facades\Image');
     }
