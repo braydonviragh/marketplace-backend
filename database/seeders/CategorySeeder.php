@@ -15,67 +15,67 @@ class CategorySeeder extends Seeder
                 'name' => 'Dresses',
                 'slug' => 'dresses',
                 'description' => 'All types of dresses including casual, formal, and special occasion',
-                'icon' => 'dress'
+                'icon' => '001-dress'
             ],
             [
                 'name' => 'Tops',
                 'slug' => 'tops',
                 'description' => 'Shirts, blouses, t-shirts, and all upper body garments',
-                'icon' => 'top'
+                'icon' => '002-tshirt'
             ],
             [
                 'name' => 'Handbags',
                 'slug' => 'handbags',
                 'description' => 'Purses, totes, clutches, and all types of bags',
-                'icon' => 'handbag'
+                'icon' => '003-handbag'
             ],
             [
                 'name' => 'Accessories',
                 'slug' => 'accessories',
                 'description' => 'Belts, scarves, hats, and other fashion accessories',
-                'icon' => 'accessories'
+                'icon' => '004-safety-glasses'
             ],
             [
                 'name' => 'Activewear',
                 'slug' => 'activewear',
                 'description' => 'Athletic and workout clothing',
-                'icon' => 'activewear'
+                'icon' => '005-sport'
             ],
             [
                 'name' => 'Blazers',
                 'slug' => 'blazers',
                 'description' => 'Professional and casual blazers and jackets',
-                'icon' => 'blazer'
+                'icon' => '006-suit'
             ],
             [
                 'name' => 'Bodysuits',
                 'slug' => 'bodysuits',
                 'description' => 'Form-fitting one-piece garments',
-                'icon' => 'bodysuit'
+                'icon' => '007-diving-suit'
             ],
             [
                 'name' => 'Jeans',
                 'slug' => 'jeans',
                 'description' => 'Denim pants in various styles and cuts',
-                'icon' => 'jeans'
+                'icon' => '008-race-suit'
             ],
             [
                 'name' => 'Jewelry',
                 'slug' => 'jewelry',
                 'description' => 'Necklaces, earrings, bracelets, and other jewelry items',
-                'icon' => 'jewelry'
+                'icon' => '010-diamonds'
             ],
             [
                 'name' => 'Pants',
                 'slug' => 'pants',
                 'description' => 'All types of pants excluding jeans',
-                'icon' => 'pants'
+                'icon' => '009-trousers'
             ],
             [
                 'name' => 'Jumpsuits',
                 'slug' => 'jumpsuits',
                 'description' => 'One-piece outfits and rompers',
-                'icon' => 'jumpsuit'
+                'icon' => '011-trousers-1'
             ],
             // [
             //     'name' => 'Shoes',
@@ -87,37 +87,37 @@ class CategorySeeder extends Seeder
                 'name' => 'Shorts',
                 'slug' => 'shorts',
                 'description' => 'Casual and formal shorts',
-                'icon' => 'shorts'
+                'icon' => '012-short'
             ],
             [
                 'name' => 'Skirts',
                 'slug' => 'skirts',
                 'description' => 'All styles and lengths of skirts',
-                'icon' => 'skirt'
+                'icon' => '013-skirt'
             ],
             [
                 'name' => 'Sweats',
                 'slug' => 'sweats',
                 'description' => 'Comfortable loungewear and casual outerwear',
-                'icon' => 'sweat'
+                'icon' => '015-hoodie'
             ],
             [
                 'name' => 'Knitwear',
                 'slug' => 'knitwear',
                 'description' => 'Knitted tops and sweaters',
-                'icon' => 'knit'
+                'icon' => '014-sweater'
             ],
             [
                 'name' => 'Suits',
                 'slug' => 'suits',
                 'description' => 'Professional and formal suit sets',
-                'icon' => 'suit'
+                'icon' => '016-suit-1'
             ],
             [
                 'name' => 'Other',
                 'slug' => 'other',
                 'description' => 'Other clothing items not listed in other categories',
-                'icon' => 'other'
+                'icon' => '017-laundry-bag'
             ],
         ];
 

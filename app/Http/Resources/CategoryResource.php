@@ -14,6 +14,7 @@ class CategoryResource extends JsonResource
             'slug' => $this->slug,
             'description' => $this->description,
             'icon' => $this->icon,
+            'image_url' => $this->icon ? asset("icons/categories/{$this->icon}.png") : null,
         ];
     }
 } 
