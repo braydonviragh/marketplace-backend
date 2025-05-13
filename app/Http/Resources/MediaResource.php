@@ -19,7 +19,7 @@ class MediaResource extends JsonResource
             'id' => $this->id,
             'order' => $this->order,
             'is_primary' => $this->is_primary,
-            'url' => url('/storage/' . $this->path),
+            'url' => env('AWS_URL') . '/' . $this->path,
         ];
     }
 } 

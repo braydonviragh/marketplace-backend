@@ -39,8 +39,7 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            /*TODO: Change this to the correct URL AFTER TESTING*/
-            'url' => env('APP_URL').'/storage',
+            'url' => env('AWS_URL') . '/',
             'visibility' => 'public',
             'throw' => false,
         ],
