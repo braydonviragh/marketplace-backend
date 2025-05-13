@@ -159,7 +159,7 @@ class ProductSeeder extends Seeder
             
             for ($i = 0; $i < $imageCount; $i++) {
                 if ($image = $this->picsumService->getRandomImage()) {
-                    $media = $this->mediaService->uploadMedia($product, $image, [
+                    $this->mediaService->uploadMedia($product, $image, [
                         'is_primary' => $i === 0,
                         'order' => $i,
                         'metadata' => [
@@ -168,13 +168,6 @@ class ProductSeeder extends Seeder
                             'source' => 'picsum',
                             'picsum_id' => rand(1, 1000),
                         ],
-                    ]);
-                    
-                    // Log where the image was uploaded
-                    Log::info("Product {$product->id} image uploaded:", [
-                        'disk' => $media->disk,
-                        'path' => $media->path,
-                        'url' => $media->url,
                     ]);
                     
                     // Clean up temp file
