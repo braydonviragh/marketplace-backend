@@ -16,6 +16,11 @@ class ProductResource extends JsonResource
      */
     public function toArray($request): array
     {
+        // Ensure media is loaded if not already loaded
+        if (!$this->relationLoaded('media')) {
+            $this->load('media');
+        }
+        
         $array = [
             'id' => $this->id,
             
@@ -52,7 +57,8 @@ class ProductResource extends JsonResource
             'color' => $this->color,
             'style' => $this->style,
             
-            'media' => MediaResource::collection($this->whenLoaded('media')),
+            // Always include media, even if empty
+            'media' => MediaResource::collection($this->media),
         ];
 
         return $array;
