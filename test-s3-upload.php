@@ -1,92 +1,62 @@
 <?php
-
-// Test script to verify S3 uploads
-
 require __DIR__.'/vendor/autoload.php';
 
 $app = require_once __DIR__.'/bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-use App\Services\MediaService;
+use Illuminate\Support\Facades\Storage;
 use App\Services\PicsumService;
+use App\Services\MediaService;
 use App\Models\Product;
 
-echo "S3 Upload Test Script\n";
-echo "====================\n\n";
+echo "S3 Upload Test\n";
+echo "=============\n\n";
 
-// 1. Check current configuration
-echo "Current Storage Configuration:\n";
-echo "- Default Disk: " . config('filesystems.default') . "\n";
-echo "- S3 Bucket: " . config('filesystems.disks.s3.bucket') . "\n";
-echo "- S3 URL: " . config('filesystems.disks.s3.url') . "\n\n";
+// Check env & configuration
+echo "Environment: " . config('app.env') . "\n";
+echo "Filesystem Disk: " . config('filesystems.default') . "\n";
+echo "Media Service Disk: ";
+$mediaService = app(MediaService::class);
+$reflectionClass = new ReflectionClass($mediaService);
+$property = $reflectionClass->getProperty('disk');
+$property->setAccessible(true);
+echo $property->getValue($mediaService) . "\n\n";
 
-// 2. Test basic S3 connection
-echo "Testing S3 Connection...\n";
+// Test direct S3 upload
 try {
-    // Try to create a test file
-    $testContent = "S3 Connection Test - " . date('Y-m-d H:i:s');
-    $testPath = 'test-uploads/test-' . time() . '.txt';
-    
-    $success = Storage::disk('s3')->put($testPath, $testContent);
-    
-    if ($success) {
-        echo "✅ Successfully created file on S3: {$testPath}\n";
-        echo "- URL: " . Storage::disk('s3')->url($testPath) . "\n\n";
-    } else {
-        echo "❌ Failed to create test file on S3.\n\n";
-    }
+    $result = Storage::disk('s3')->put('test-file.txt', 'This is a test file');
+    echo "Direct S3 upload test: " . ($result ? "SUCCESS" : "FAILED") . "\n";
 } catch (\Exception $e) {
-    echo "❌ S3 Connection Error: " . $e->getMessage() . "\n\n";
+    echo "Direct S3 upload error: " . $e->getMessage() . "\n";
 }
 
-// 3. Test image upload via MediaService
-echo "Testing Image Upload via MediaService...\n";
+// Test MediaService upload with first product
 try {
-    // Get the first product
     $product = Product::first();
-    
-    if (!$product) {
-        echo "⚠️ No products found in database. Creating a test product...\n";
-        $product = Product::create([
-            'user_id' => 1,
-            'category_id' => 1,
-            'title' => 'Test Product',
-            'description' => 'Test product for S3 upload',
-            'price' => 100,
-            'is_available' => true
-        ]);
-    }
-    
-    // Use PicsumService to get a test image
-    $picsumService = app(PicsumService::class);
-    $mediaService = app(MediaService::class);
-    
-    $image = $picsumService->getRandomImage();
-    
-    if (!$image) {
-        echo "❌ Failed to get test image from Picsum.\n";
+    if ($product) {
+        $picsumService = app(PicsumService::class);
+        $image = $picsumService->getRandomImage();
+        if ($image) {
+            $media = $mediaService->uploadMedia($product, $image, [
+                'is_primary' => true,
+                'order' => 0,
+                'metadata' => ['test' => true]
+            ]);
+            echo "Media upload succeeded. Details:\n";
+            echo "- ID: " . $media->id . "\n";
+            echo "- Disk used: " . $media->disk . "\n";
+            echo "- Path: " . $media->path . "\n";
+            echo "- URL: " . $media->url . "\n";
+            
+            // Clean up temp file
+            unlink($image->getPathname());
+        } else {
+            echo "Failed to get test image from Picsum\n";
+        }
     } else {
-        echo "✅ Got test image from Picsum.\n";
-        
-        // Upload the image
-        $media = $mediaService->uploadMedia($product, $image, [
-            'is_primary' => true,
-            'order' => 0
-        ]);
-        
-        echo "✅ Image uploaded:\n";
-        echo "- Disk: {$media->disk}\n";
-        echo "- Path: {$media->path}\n";
-        echo "- URL: {$media->url}\n\n";
-        
-        // Clean up temp file
-        unlink($image->getPathname());
+        echo "No products found in database\n";
     }
-    
 } catch (\Exception $e) {
-    echo "❌ Media Upload Error: " . $e->getMessage() . "\n\n";
+    echo "Media upload error: " . $e->getMessage() . "\n";
 }
-
-echo "\nTest completed.\n"; 

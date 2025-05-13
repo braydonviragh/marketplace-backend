@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class MediaService
 {
@@ -15,8 +16,10 @@ class MediaService
 
     public function __construct()
     {
-        // Use S3 when FILESYSTEM_DISK is set to 's3', otherwise use 'public'
-        $this->disk = config('filesystems.default') === 's3' ? 's3' : 'public';
+        // Use the configured filesystem disk from config instead of determining based on environment
+        $this->disk = config('filesystems.default', 's3');
+        Log::info("MediaService initialized with disk: {$this->disk}");
+        
         // Check if image optimization is possible
         $this->canOptimize = extension_loaded('gd') && class_exists('Intervention\Image\Facades\Image');
     }
@@ -35,23 +38,49 @@ class MediaService
             try {
                 $file = $this->optimizeImage($file);
             } catch (\Exception $e) {
-                \Log::warning('Image optimization failed: ' . $e->getMessage());
+                Log::warning('Image optimization failed: ' . $e->getMessage());
                 // Continue without optimization
             }
         }
 
-        // Generate path based on model type and ID
+        // Get model type in lowercase
         $modelType = Str::lower(class_basename($model));
+        
+        // Set the base folder based on model type - using dashes instead of spaces
+        $baseFolder = match($modelType) {
+            'product' => 'product-images',
+            'user' => 'user-images',
+            default => $modelType . '-images',
+        };
+        
+        // Generate path based on model type and ID
         $filePath = sprintf(
             '%s/%s/%s.%s',
-            $modelType,
+            $baseFolder,
             $model->id,
             Str::uuid(),
             $file->getClientOriginalExtension()
         );
 
-        // Store the file
-        Storage::disk($this->disk)->put($filePath, file_get_contents($file));
+        // Store the file with public read access
+        try {
+            Log::info("Attempting to upload file to {$this->disk} disk at path: {$filePath}");
+            
+            // If using S3, set the visibility to public
+            if ($this->disk === 's3') {
+                Storage::disk($this->disk)->put($filePath, file_get_contents($file), [
+                    'visibility' => 'public',
+                    'ContentType' => $file->getMimeType(),
+                ]);
+            } else {
+                Storage::disk($this->disk)->put($filePath, file_get_contents($file));
+            }
+            
+            Log::info("File uploaded successfully to {$this->disk} disk");
+        } catch (\Exception $e) {
+            Log::error("Failed to upload file to {$this->disk} disk: " . $e->getMessage());
+            throw $e;
+        }
 
         // Create media record
         return $model->media()->create([

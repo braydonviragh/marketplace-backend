@@ -29,11 +29,6 @@ echo '"php_version":"'$(php -r 'echo phpversion();')'","message":"Static health 
 chmod 644 /var/www/public/api/health.json
 chmod 644 /var/www/public/api/health
 
-# Ensure storage link is created
-log "Ensuring storage symlink is created..."
-cd /var/www && php artisan storage:link --force
-log "Storage symlink created or verified"
-
 # Create a Healthz.php file in public directory
 log "Creating healthz.php in public directory..."
 cat > /var/www/public/healthz.php <<EOL
