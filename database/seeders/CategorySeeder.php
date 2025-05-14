@@ -57,7 +57,7 @@ class CategorySeeder extends Seeder
                 'name' => 'Jeans',
                 'slug' => 'jeans',
                 'description' => 'Denim pants in various styles and cuts',
-                'icon' => '008-race-suit'
+                'icon' => '011-trousers-1'
             ],
             [
                 'name' => 'Jewelry',
@@ -75,7 +75,7 @@ class CategorySeeder extends Seeder
                 'name' => 'Jumpsuits',
                 'slug' => 'jumpsuits',
                 'description' => 'One-piece outfits and rompers',
-                'icon' => '011-trousers-1'
+                'icon' => '008-race-suit'
             ],
             // [
             //     'name' => 'Shoes',
